@@ -1,0 +1,1475 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_b5259db65d8249832b0b9c0015b0fa49 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+</head>
+<body>
+    
+    
+            <div class="folium-map" id="map_b5259db65d8249832b0b9c0015b0fa49" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_b5259db65d8249832b0b9c0015b0fa49 = L.map(
+                "map_b5259db65d8249832b0b9c0015b0fa49",
+                {
+                    center: [17.95384615384615, 89.1076923076923],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 6,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_726d9b43dbff8bd8e3570489613a035a = L.tileLayer(
+                "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 18,
+  "maxNativeZoom": 18,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors \u0026copy; \u003ca href=\"https://carto.com/attributions\"\u003eCARTO\u003c/a\u003e",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_726d9b43dbff8bd8e3570489613a035a.addTo(map_b5259db65d8249832b0b9c0015b0fa49);
+        
+    
+            var tile_layer_8489a21fe8b645ef5c9008d44d61d135 = L.tileLayer(
+                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 19,
+  "maxNativeZoom": 19,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_8489a21fe8b645ef5c9008d44d61d135.addTo(map_b5259db65d8249832b0b9c0015b0fa49);
+        
+    
+            var poly_line_b84f2d1ac33ffdfcd6839e8c1f80a55b = L.polyline(
+                [[15.3, 92.1], [15.2, 92.1], [15.2, 92.1], [15.2, 92.1], [15.2, 92.0], [15.1, 92.0], [15.2, 91.9], [15.2, 91.8], [15.3, 91.6], [15.3, 91.5], [15.4, 91.4], [15.5, 91.1], [15.6, 90.7], [15.8, 90.3], [16.1, 89.9], [16.4, 89.6], [16.7, 89.3], [16.9, 89.1], [17.3, 89.0], [17.6, 88.8], [18.0, 88.7], [18.3, 88.4], [18.7, 88.2], [19.0, 88.0], [19.3, 87.8], [19.5, 87.6], [19.8, 87.5], [20.1, 87.3], [20.5, 87.1], [20.7, 87.0], [20.9, 86.9], [21.1, 86.8], [21.2, 86.7], [21.3, 86.6], [21.3, 86.5], [21.3, 86.4], [21.3, 86.4], [21.2, 86.5], [21.2, 86.4]],
+                {"bubblingMouseEvents": true, "color": "#38bdf8", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#38bdf8", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.8, "smoothFactor": 1.0, "stroke": true, "weight": 4}
+            ).addTo(map_b5259db65d8249832b0b9c0015b0fa49);
+        
+    
+            poly_line_b84f2d1ac33ffdfcd6839e8c1f80a55b.bindTooltip(
+                `<div>
+                     Cyclone DANA Track Path
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_7b165505c9ec32c9625538b35b7ca100 = L.circleMarker(
+                [15.3, 92.1],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_b5259db65d8249832b0b9c0015b0fa49);
+        
+    
+        var popup_18a1886eee19a8c46b1e5d7482deccd7 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_6d97371723cf25876c126fabbb665e18 = $(`<div id="html_6d97371723cf25876c126fabbb665e18" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #3b82f6; font-size: 14px;">Cyclone DANA</b><br/>             <b>Time:</b> 2024-10-21 06:00 UTC<br/>             <b>Intensity:</b> Depression (<28 kts)<br/>             <b>Wind:</b> 20.0 kts (37.0 km/h)<br/>             <b>Central Pressure:</b> 1004.0 mb<br/>             <b>Location:</b> 15.30°N, 92.10°E                      </div>         </div>`)[0];
+                popup_18a1886eee19a8c46b1e5d7482deccd7.setContent(html_6d97371723cf25876c126fabbb665e18);
+            
+        
+
+        circle_marker_7b165505c9ec32c9625538b35b7ca100.bindPopup(popup_18a1886eee19a8c46b1e5d7482deccd7)
+        ;
+
+        
+    
+    
+            circle_marker_7b165505c9ec32c9625538b35b7ca100.bindTooltip(
+                `<div>
+                     Oct 21 06:00 | 20 kts | Depression (<28 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_d613381ba507291ff581280c63c29ae7 = L.circleMarker(
+                [15.2, 92.1],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_b5259db65d8249832b0b9c0015b0fa49);
+        
+    
+        var popup_b69c57d0a1a0d43a5a67c7c6b1aca1fb = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_719c08f9ce388d24c2d0b9af4242668b = $(`<div id="html_719c08f9ce388d24c2d0b9af4242668b" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #3b82f6; font-size: 14px;">Cyclone DANA</b><br/>             <b>Time:</b> 2024-10-21 09:00 UTC<br/>             <b>Intensity:</b> Depression (<28 kts)<br/>             <b>Wind:</b> 20.0 kts (37.0 km/h)<br/>             <b>Central Pressure:</b> 1003.0 mb<br/>             <b>Location:</b> 15.20°N, 92.10°E                      </div>         </div>`)[0];
+                popup_b69c57d0a1a0d43a5a67c7c6b1aca1fb.setContent(html_719c08f9ce388d24c2d0b9af4242668b);
+            
+        
+
+        circle_marker_d613381ba507291ff581280c63c29ae7.bindPopup(popup_b69c57d0a1a0d43a5a67c7c6b1aca1fb)
+        ;
+
+        
+    
+    
+            circle_marker_d613381ba507291ff581280c63c29ae7.bindTooltip(
+                `<div>
+                     Oct 21 09:00 | 20 kts | Depression (<28 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_12b17bdfcf244595ec279e243af0ff59 = L.circleMarker(
+                [15.2, 92.1],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_b5259db65d8249832b0b9c0015b0fa49);
+        
+    
+        var popup_e4c88db2b06b64f0c1440711ee066f63 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_5528eff0b7b34ceb28777511e6238d43 = $(`<div id="html_5528eff0b7b34ceb28777511e6238d43" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #3b82f6; font-size: 14px;">Cyclone DANA</b><br/>             <b>Time:</b> 2024-10-21 12:00 UTC<br/>             <b>Intensity:</b> Depression (<28 kts)<br/>             <b>Wind:</b> 20.0 kts (37.0 km/h)<br/>             <b>Central Pressure:</b> 1002.0 mb<br/>             <b>Location:</b> 15.20°N, 92.10°E                      </div>         </div>`)[0];
+                popup_e4c88db2b06b64f0c1440711ee066f63.setContent(html_5528eff0b7b34ceb28777511e6238d43);
+            
+        
+
+        circle_marker_12b17bdfcf244595ec279e243af0ff59.bindPopup(popup_e4c88db2b06b64f0c1440711ee066f63)
+        ;
+
+        
+    
+    
+            circle_marker_12b17bdfcf244595ec279e243af0ff59.bindTooltip(
+                `<div>
+                     Oct 21 12:00 | 20 kts | Depression (<28 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_e209b8731bfef741fc1b0c0c657604cf = L.circleMarker(
+                [15.2, 92.1],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_b5259db65d8249832b0b9c0015b0fa49);
+        
+    
+        var popup_fe107dc5de281a7039195fcd87713da0 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_8aaec50cd99fa64eee5e401fe0627764 = $(`<div id="html_8aaec50cd99fa64eee5e401fe0627764" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #3b82f6; font-size: 14px;">Cyclone DANA</b><br/>             <b>Time:</b> 2024-10-21 15:00 UTC<br/>             <b>Intensity:</b> Depression (<28 kts)<br/>             <b>Wind:</b> 20.0 kts (37.0 km/h)<br/>             <b>Central Pressure:</b> 1001.0 mb<br/>             <b>Location:</b> 15.20°N, 92.10°E                      </div>         </div>`)[0];
+                popup_fe107dc5de281a7039195fcd87713da0.setContent(html_8aaec50cd99fa64eee5e401fe0627764);
+            
+        
+
+        circle_marker_e209b8731bfef741fc1b0c0c657604cf.bindPopup(popup_fe107dc5de281a7039195fcd87713da0)
+        ;
+
+        
+    
+    
+            circle_marker_e209b8731bfef741fc1b0c0c657604cf.bindTooltip(
+                `<div>
+                     Oct 21 15:00 | 20 kts | Depression (<28 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_d01638819a83ecbd93faae5f010a8ed6 = L.circleMarker(
+                [15.2, 92.0],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_b5259db65d8249832b0b9c0015b0fa49);
+        
+    
+        var popup_685a1abc85f9dc053ed70c85e5083c98 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_a04deba9115482dae25532d5bc568ada = $(`<div id="html_a04deba9115482dae25532d5bc568ada" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #3b82f6; font-size: 14px;">Cyclone DANA</b><br/>             <b>Time:</b> 2024-10-21 18:00 UTC<br/>             <b>Intensity:</b> Depression (<28 kts)<br/>             <b>Wind:</b> 20.0 kts (37.0 km/h)<br/>             <b>Central Pressure:</b> 999.0 mb<br/>             <b>Location:</b> 15.20°N, 92.00°E                      </div>         </div>`)[0];
+                popup_685a1abc85f9dc053ed70c85e5083c98.setContent(html_a04deba9115482dae25532d5bc568ada);
+            
+        
+
+        circle_marker_d01638819a83ecbd93faae5f010a8ed6.bindPopup(popup_685a1abc85f9dc053ed70c85e5083c98)
+        ;
+
+        
+    
+    
+            circle_marker_d01638819a83ecbd93faae5f010a8ed6.bindTooltip(
+                `<div>
+                     Oct 21 18:00 | 20 kts | Depression (<28 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_019b0238ebd2040d127a3cee232f9c51 = L.circleMarker(
+                [15.1, 92.0],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_b5259db65d8249832b0b9c0015b0fa49);
+        
+    
+        var popup_ba07423e84b5a57b973269308ab86e8c = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_4f147270ec383650191f8c3b2942a586 = $(`<div id="html_4f147270ec383650191f8c3b2942a586" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #3b82f6; font-size: 14px;">Cyclone DANA</b><br/>             <b>Time:</b> 2024-10-21 21:00 UTC<br/>             <b>Intensity:</b> Depression (<28 kts)<br/>             <b>Wind:</b> 20.0 kts (37.0 km/h)<br/>             <b>Central Pressure:</b> 999.0 mb<br/>             <b>Location:</b> 15.10°N, 92.00°E                      </div>         </div>`)[0];
+                popup_ba07423e84b5a57b973269308ab86e8c.setContent(html_4f147270ec383650191f8c3b2942a586);
+            
+        
+
+        circle_marker_019b0238ebd2040d127a3cee232f9c51.bindPopup(popup_ba07423e84b5a57b973269308ab86e8c)
+        ;
+
+        
+    
+    
+            circle_marker_019b0238ebd2040d127a3cee232f9c51.bindTooltip(
+                `<div>
+                     Oct 21 21:00 | 20 kts | Depression (<28 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_8378fe5408ec64773ba89b69211a7a5f = L.circleMarker(
+                [15.2, 91.9],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_b5259db65d8249832b0b9c0015b0fa49);
+        
+    
+        var popup_825b0339f4b7f7711862a5136abe1961 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_8b2fca8fe2f1acddb9feb59413222943 = $(`<div id="html_8b2fca8fe2f1acddb9feb59413222943" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #3b82f6; font-size: 14px;">Cyclone DANA</b><br/>             <b>Time:</b> 2024-10-22 00:00 UTC<br/>             <b>Intensity:</b> Depression (<28 kts)<br/>             <b>Wind:</b> 20.0 kts (37.0 km/h)<br/>             <b>Central Pressure:</b> 998.0 mb<br/>             <b>Location:</b> 15.20°N, 91.90°E                      </div>         </div>`)[0];
+                popup_825b0339f4b7f7711862a5136abe1961.setContent(html_8b2fca8fe2f1acddb9feb59413222943);
+            
+        
+
+        circle_marker_8378fe5408ec64773ba89b69211a7a5f.bindPopup(popup_825b0339f4b7f7711862a5136abe1961)
+        ;
+
+        
+    
+    
+            circle_marker_8378fe5408ec64773ba89b69211a7a5f.bindTooltip(
+                `<div>
+                     Oct 22 00:00 | 20 kts | Depression (<28 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_4461e6cd7ab7407e6fd15ae5fe3fccf3 = L.circleMarker(
+                [15.2, 91.8],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_b5259db65d8249832b0b9c0015b0fa49);
+        
+    
+        var popup_dbb87f69bb93d1e0145120bac7c5539e = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_090ba05231cda31fefb573eee88453bb = $(`<div id="html_090ba05231cda31fefb573eee88453bb" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #3b82f6; font-size: 14px;">Cyclone DANA</b><br/>             <b>Time:</b> 2024-10-22 03:00 UTC<br/>             <b>Intensity:</b> Depression (<28 kts)<br/>             <b>Wind:</b> 23.0 kts (42.6 km/h)<br/>             <b>Central Pressure:</b> 998.0 mb<br/>             <b>Location:</b> 15.20°N, 91.80°E                      </div>         </div>`)[0];
+                popup_dbb87f69bb93d1e0145120bac7c5539e.setContent(html_090ba05231cda31fefb573eee88453bb);
+            
+        
+
+        circle_marker_4461e6cd7ab7407e6fd15ae5fe3fccf3.bindPopup(popup_dbb87f69bb93d1e0145120bac7c5539e)
+        ;
+
+        
+    
+    
+            circle_marker_4461e6cd7ab7407e6fd15ae5fe3fccf3.bindTooltip(
+                `<div>
+                     Oct 22 03:00 | 23 kts | Depression (<28 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_66a13ceaa3d2014b27caa156cccc5937 = L.circleMarker(
+                [15.3, 91.6],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_b5259db65d8249832b0b9c0015b0fa49);
+        
+    
+        var popup_029763e27072f6be2812929c468dece7 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_02874a62b5affd4e9908945e887ee2eb = $(`<div id="html_02874a62b5affd4e9908945e887ee2eb" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #3b82f6; font-size: 14px;">Cyclone DANA</b><br/>             <b>Time:</b> 2024-10-22 06:00 UTC<br/>             <b>Intensity:</b> Depression (<28 kts)<br/>             <b>Wind:</b> 25.0 kts (46.3 km/h)<br/>             <b>Central Pressure:</b> 997.0 mb<br/>             <b>Location:</b> 15.30°N, 91.60°E                      </div>         </div>`)[0];
+                popup_029763e27072f6be2812929c468dece7.setContent(html_02874a62b5affd4e9908945e887ee2eb);
+            
+        
+
+        circle_marker_66a13ceaa3d2014b27caa156cccc5937.bindPopup(popup_029763e27072f6be2812929c468dece7)
+        ;
+
+        
+    
+    
+            circle_marker_66a13ceaa3d2014b27caa156cccc5937.bindTooltip(
+                `<div>
+                     Oct 22 06:00 | 25 kts | Depression (<28 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_f0761a35dcbd9c30124b71573fc2f404 = L.circleMarker(
+                [15.3, 91.5],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_b5259db65d8249832b0b9c0015b0fa49);
+        
+    
+        var popup_9feb0cb71c912d54ecad32d94472cd76 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_30bedeb6cf2313f5f3c76a92093c4deb = $(`<div id="html_30bedeb6cf2313f5f3c76a92093c4deb" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #3b82f6; font-size: 14px;">Cyclone DANA</b><br/>             <b>Time:</b> 2024-10-22 09:00 UTC<br/>             <b>Intensity:</b> Depression (<28 kts)<br/>             <b>Wind:</b> 25.0 kts (46.3 km/h)<br/>             <b>Central Pressure:</b> 997.0 mb<br/>             <b>Location:</b> 15.30°N, 91.50°E                      </div>         </div>`)[0];
+                popup_9feb0cb71c912d54ecad32d94472cd76.setContent(html_30bedeb6cf2313f5f3c76a92093c4deb);
+            
+        
+
+        circle_marker_f0761a35dcbd9c30124b71573fc2f404.bindPopup(popup_9feb0cb71c912d54ecad32d94472cd76)
+        ;
+
+        
+    
+    
+            circle_marker_f0761a35dcbd9c30124b71573fc2f404.bindTooltip(
+                `<div>
+                     Oct 22 09:00 | 25 kts | Depression (<28 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_2e7fa282e68e68354b25c7f29f94d890 = L.circleMarker(
+                [15.4, 91.4],
+                {"bubblingMouseEvents": true, "color": "#06b6d4", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#06b6d4", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_b5259db65d8249832b0b9c0015b0fa49);
+        
+    
+        var popup_74ff76c3377e89a325c0918eff5fe464 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_471852bfbd4fca2fccdeb3605f2c0aa9 = $(`<div id="html_471852bfbd4fca2fccdeb3605f2c0aa9" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #06b6d4; font-size: 14px;">Cyclone DANA</b><br/>             <b>Time:</b> 2024-10-22 12:00 UTC<br/>             <b>Intensity:</b> Deep Depression (28-33 kts)<br/>             <b>Wind:</b> 30.0 kts (55.6 km/h)<br/>             <b>Central Pressure:</b> 996.0 mb<br/>             <b>Location:</b> 15.40°N, 91.40°E                      </div>         </div>`)[0];
+                popup_74ff76c3377e89a325c0918eff5fe464.setContent(html_471852bfbd4fca2fccdeb3605f2c0aa9);
+            
+        
+
+        circle_marker_2e7fa282e68e68354b25c7f29f94d890.bindPopup(popup_74ff76c3377e89a325c0918eff5fe464)
+        ;
+
+        
+    
+    
+            circle_marker_2e7fa282e68e68354b25c7f29f94d890.bindTooltip(
+                `<div>
+                     Oct 22 12:00 | 30 kts | Deep Depression (28-33 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_bf044ae4a76d907cdc272520e264a291 = L.circleMarker(
+                [15.5, 91.1],
+                {"bubblingMouseEvents": true, "color": "#06b6d4", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#06b6d4", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_b5259db65d8249832b0b9c0015b0fa49);
+        
+    
+        var popup_247eab8354f80db720147573625eef5b = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_aea5768ccaed9614981a4fa04613ef28 = $(`<div id="html_aea5768ccaed9614981a4fa04613ef28" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #06b6d4; font-size: 14px;">Cyclone DANA</b><br/>             <b>Time:</b> 2024-10-22 15:00 UTC<br/>             <b>Intensity:</b> Deep Depression (28-33 kts)<br/>             <b>Wind:</b> 28.0 kts (51.9 km/h)<br/>             <b>Central Pressure:</b> 996.0 mb<br/>             <b>Location:</b> 15.50°N, 91.10°E                      </div>         </div>`)[0];
+                popup_247eab8354f80db720147573625eef5b.setContent(html_aea5768ccaed9614981a4fa04613ef28);
+            
+        
+
+        circle_marker_bf044ae4a76d907cdc272520e264a291.bindPopup(popup_247eab8354f80db720147573625eef5b)
+        ;
+
+        
+    
+    
+            circle_marker_bf044ae4a76d907cdc272520e264a291.bindTooltip(
+                `<div>
+                     Oct 22 15:00 | 28 kts | Deep Depression (28-33 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_5e435e00a1f042449008a2b9ce21aa34 = L.circleMarker(
+                [15.6, 90.7],
+                {"bubblingMouseEvents": true, "color": "#06b6d4", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#06b6d4", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_b5259db65d8249832b0b9c0015b0fa49);
+        
+    
+        var popup_548db37e9ebb2d57084b42baa52438a8 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_09c899e0a5a127cffeddd89b6ddbd2da = $(`<div id="html_09c899e0a5a127cffeddd89b6ddbd2da" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #06b6d4; font-size: 14px;">Cyclone DANA</b><br/>             <b>Time:</b> 2024-10-22 18:00 UTC<br/>             <b>Intensity:</b> Deep Depression (28-33 kts)<br/>             <b>Wind:</b> 30.0 kts (55.6 km/h)<br/>             <b>Central Pressure:</b> 995.0 mb<br/>             <b>Location:</b> 15.60°N, 90.70°E                      </div>         </div>`)[0];
+                popup_548db37e9ebb2d57084b42baa52438a8.setContent(html_09c899e0a5a127cffeddd89b6ddbd2da);
+            
+        
+
+        circle_marker_5e435e00a1f042449008a2b9ce21aa34.bindPopup(popup_548db37e9ebb2d57084b42baa52438a8)
+        ;
+
+        
+    
+    
+            circle_marker_5e435e00a1f042449008a2b9ce21aa34.bindTooltip(
+                `<div>
+                     Oct 22 18:00 | 30 kts | Deep Depression (28-33 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_f05472ef71a25047ed5069ffb2ce01a5 = L.circleMarker(
+                [15.8, 90.3],
+                {"bubblingMouseEvents": true, "color": "#06b6d4", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#06b6d4", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_b5259db65d8249832b0b9c0015b0fa49);
+        
+    
+        var popup_ae4e102f6f68c2d44b6e6b7256bb2812 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_9e5a2dec1fd5207451843ebe592ae537 = $(`<div id="html_9e5a2dec1fd5207451843ebe592ae537" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #06b6d4; font-size: 14px;">Cyclone DANA</b><br/>             <b>Time:</b> 2024-10-22 21:00 UTC<br/>             <b>Intensity:</b> Deep Depression (28-33 kts)<br/>             <b>Wind:</b> 33.0 kts (61.1 km/h)<br/>             <b>Central Pressure:</b> 995.0 mb<br/>             <b>Location:</b> 15.80°N, 90.30°E                      </div>         </div>`)[0];
+                popup_ae4e102f6f68c2d44b6e6b7256bb2812.setContent(html_9e5a2dec1fd5207451843ebe592ae537);
+            
+        
+
+        circle_marker_f05472ef71a25047ed5069ffb2ce01a5.bindPopup(popup_ae4e102f6f68c2d44b6e6b7256bb2812)
+        ;
+
+        
+    
+    
+            circle_marker_f05472ef71a25047ed5069ffb2ce01a5.bindTooltip(
+                `<div>
+                     Oct 22 21:00 | 33 kts | Deep Depression (28-33 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_f35b4bde6ebba509a9beaa722e871c3e = L.circleMarker(
+                [16.1, 89.9],
+                {"bubblingMouseEvents": true, "color": "#10b981", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#10b981", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_b5259db65d8249832b0b9c0015b0fa49);
+        
+    
+        var popup_cbfc478e4d05922b9c513bcc1e1d0d90 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_fc777b4fb87eabdc496af37b3b9d5fb6 = $(`<div id="html_fc777b4fb87eabdc496af37b3b9d5fb6" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #10b981; font-size: 14px;">Cyclone DANA</b><br/>             <b>Time:</b> 2024-10-23 00:00 UTC<br/>             <b>Intensity:</b> Cyclonic Storm (34-47 kts)<br/>             <b>Wind:</b> 35.0 kts (64.8 km/h)<br/>             <b>Central Pressure:</b> 994.0 mb<br/>             <b>Location:</b> 16.10°N, 89.90°E                      </div>         </div>`)[0];
+                popup_cbfc478e4d05922b9c513bcc1e1d0d90.setContent(html_fc777b4fb87eabdc496af37b3b9d5fb6);
+            
+        
+
+        circle_marker_f35b4bde6ebba509a9beaa722e871c3e.bindPopup(popup_cbfc478e4d05922b9c513bcc1e1d0d90)
+        ;
+
+        
+    
+    
+            circle_marker_f35b4bde6ebba509a9beaa722e871c3e.bindTooltip(
+                `<div>
+                     Oct 23 00:00 | 35 kts | Cyclonic Storm (34-47 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_96c712bf8ced8344999ceeebf225114c = L.circleMarker(
+                [16.4, 89.6],
+                {"bubblingMouseEvents": true, "color": "#10b981", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#10b981", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_b5259db65d8249832b0b9c0015b0fa49);
+        
+    
+        var popup_9a6de8299c8b78acb7cc008f43a54599 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_6258266d73e2d7ecd876b7770936c3a5 = $(`<div id="html_6258266d73e2d7ecd876b7770936c3a5" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #10b981; font-size: 14px;">Cyclone DANA</b><br/>             <b>Time:</b> 2024-10-23 03:00 UTC<br/>             <b>Intensity:</b> Cyclonic Storm (34-47 kts)<br/>             <b>Wind:</b> 38.0 kts (70.4 km/h)<br/>             <b>Central Pressure:</b> 994.0 mb<br/>             <b>Location:</b> 16.40°N, 89.60°E                      </div>         </div>`)[0];
+                popup_9a6de8299c8b78acb7cc008f43a54599.setContent(html_6258266d73e2d7ecd876b7770936c3a5);
+            
+        
+
+        circle_marker_96c712bf8ced8344999ceeebf225114c.bindPopup(popup_9a6de8299c8b78acb7cc008f43a54599)
+        ;
+
+        
+    
+    
+            circle_marker_96c712bf8ced8344999ceeebf225114c.bindTooltip(
+                `<div>
+                     Oct 23 03:00 | 38 kts | Cyclonic Storm (34-47 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_d020ea2ff9073c53c89f1a5c7f59ad79 = L.circleMarker(
+                [16.7, 89.3],
+                {"bubblingMouseEvents": true, "color": "#10b981", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#10b981", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_b5259db65d8249832b0b9c0015b0fa49);
+        
+    
+        var popup_a4581df00f329ae4ab24b3753b5ea773 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_296acb9b7b247ebbadcbc815ffb31014 = $(`<div id="html_296acb9b7b247ebbadcbc815ffb31014" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #10b981; font-size: 14px;">Cyclone DANA</b><br/>             <b>Time:</b> 2024-10-23 06:00 UTC<br/>             <b>Intensity:</b> Cyclonic Storm (34-47 kts)<br/>             <b>Wind:</b> 40.0 kts (74.1 km/h)<br/>             <b>Central Pressure:</b> 993.0 mb<br/>             <b>Location:</b> 16.70°N, 89.30°E                      </div>         </div>`)[0];
+                popup_a4581df00f329ae4ab24b3753b5ea773.setContent(html_296acb9b7b247ebbadcbc815ffb31014);
+            
+        
+
+        circle_marker_d020ea2ff9073c53c89f1a5c7f59ad79.bindPopup(popup_a4581df00f329ae4ab24b3753b5ea773)
+        ;
+
+        
+    
+    
+            circle_marker_d020ea2ff9073c53c89f1a5c7f59ad79.bindTooltip(
+                `<div>
+                     Oct 23 06:00 | 40 kts | Cyclonic Storm (34-47 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_c8fd0a4f4481862e338dae22a49d22c2 = L.circleMarker(
+                [16.9, 89.1],
+                {"bubblingMouseEvents": true, "color": "#10b981", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#10b981", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_b5259db65d8249832b0b9c0015b0fa49);
+        
+    
+        var popup_27bd229cd7c622ddf1e87920f7baa6a7 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_b7b6f1a0a7dd194a3652e7adb59587fb = $(`<div id="html_b7b6f1a0a7dd194a3652e7adb59587fb" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #10b981; font-size: 14px;">Cyclone DANA</b><br/>             <b>Time:</b> 2024-10-23 09:00 UTC<br/>             <b>Intensity:</b> Cyclonic Storm (34-47 kts)<br/>             <b>Wind:</b> 45.0 kts (83.3 km/h)<br/>             <b>Central Pressure:</b> 992.0 mb<br/>             <b>Location:</b> 16.90°N, 89.10°E                      </div>         </div>`)[0];
+                popup_27bd229cd7c622ddf1e87920f7baa6a7.setContent(html_b7b6f1a0a7dd194a3652e7adb59587fb);
+            
+        
+
+        circle_marker_c8fd0a4f4481862e338dae22a49d22c2.bindPopup(popup_27bd229cd7c622ddf1e87920f7baa6a7)
+        ;
+
+        
+    
+    
+            circle_marker_c8fd0a4f4481862e338dae22a49d22c2.bindTooltip(
+                `<div>
+                     Oct 23 09:00 | 45 kts | Cyclonic Storm (34-47 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_631ee94f2491bd3fdfb558ac5805e341 = L.circleMarker(
+                [17.3, 89.0],
+                {"bubblingMouseEvents": true, "color": "#f59e0b", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#f59e0b", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_b5259db65d8249832b0b9c0015b0fa49);
+        
+    
+        var popup_3fd4b7db2cbb642dc55dce5dbe79274b = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_e918e7330a1da797fb9a68eeb26b8e86 = $(`<div id="html_e918e7330a1da797fb9a68eeb26b8e86" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #f59e0b; font-size: 14px;">Cyclone DANA</b><br/>             <b>Time:</b> 2024-10-23 12:00 UTC<br/>             <b>Intensity:</b> Severe Cyclonic Storm (48-63 kts)<br/>             <b>Wind:</b> 50.0 kts (92.6 km/h)<br/>             <b>Central Pressure:</b> 991.0 mb<br/>             <b>Location:</b> 17.30°N, 89.00°E                      </div>         </div>`)[0];
+                popup_3fd4b7db2cbb642dc55dce5dbe79274b.setContent(html_e918e7330a1da797fb9a68eeb26b8e86);
+            
+        
+
+        circle_marker_631ee94f2491bd3fdfb558ac5805e341.bindPopup(popup_3fd4b7db2cbb642dc55dce5dbe79274b)
+        ;
+
+        
+    
+    
+            circle_marker_631ee94f2491bd3fdfb558ac5805e341.bindTooltip(
+                `<div>
+                     Oct 23 12:00 | 50 kts | Severe Cyclonic Storm (48-63 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_6b539cb4f0976b035018a835f408af4b = L.circleMarker(
+                [17.6, 88.8],
+                {"bubblingMouseEvents": true, "color": "#f59e0b", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#f59e0b", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_b5259db65d8249832b0b9c0015b0fa49);
+        
+    
+        var popup_9b3711162c90ee10ff186f88927f528a = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_62f87452ece592eb55ab3446f4f45505 = $(`<div id="html_62f87452ece592eb55ab3446f4f45505" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #f59e0b; font-size: 14px;">Cyclone DANA</b><br/>             <b>Time:</b> 2024-10-23 15:00 UTC<br/>             <b>Intensity:</b> Severe Cyclonic Storm (48-63 kts)<br/>             <b>Wind:</b> 53.0 kts (98.2 km/h)<br/>             <b>Central Pressure:</b> 991.0 mb<br/>             <b>Location:</b> 17.60°N, 88.80°E                      </div>         </div>`)[0];
+                popup_9b3711162c90ee10ff186f88927f528a.setContent(html_62f87452ece592eb55ab3446f4f45505);
+            
+        
+
+        circle_marker_6b539cb4f0976b035018a835f408af4b.bindPopup(popup_9b3711162c90ee10ff186f88927f528a)
+        ;
+
+        
+    
+    
+            circle_marker_6b539cb4f0976b035018a835f408af4b.bindTooltip(
+                `<div>
+                     Oct 23 15:00 | 53 kts | Severe Cyclonic Storm (48-63 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_312d816d5ed169f5d8c4e74734e65cd1 = L.circleMarker(
+                [18.0, 88.7],
+                {"bubblingMouseEvents": true, "color": "#f59e0b", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#f59e0b", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_b5259db65d8249832b0b9c0015b0fa49);
+        
+    
+        var popup_cf8d82086003cb60473abc1f8b5b4bc0 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_421d389b49e7a87b3153226aba8cb45a = $(`<div id="html_421d389b49e7a87b3153226aba8cb45a" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #f59e0b; font-size: 14px;">Cyclone DANA</b><br/>             <b>Time:</b> 2024-10-23 18:00 UTC<br/>             <b>Intensity:</b> Severe Cyclonic Storm (48-63 kts)<br/>             <b>Wind:</b> 55.0 kts (101.9 km/h)<br/>             <b>Central Pressure:</b> 990.0 mb<br/>             <b>Location:</b> 18.00°N, 88.70°E                      </div>         </div>`)[0];
+                popup_cf8d82086003cb60473abc1f8b5b4bc0.setContent(html_421d389b49e7a87b3153226aba8cb45a);
+            
+        
+
+        circle_marker_312d816d5ed169f5d8c4e74734e65cd1.bindPopup(popup_cf8d82086003cb60473abc1f8b5b4bc0)
+        ;
+
+        
+    
+    
+            circle_marker_312d816d5ed169f5d8c4e74734e65cd1.bindTooltip(
+                `<div>
+                     Oct 23 18:00 | 55 kts | Severe Cyclonic Storm (48-63 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_325d757b4aef3b67b5b2dbe28ca18934 = L.circleMarker(
+                [18.3, 88.4],
+                {"bubblingMouseEvents": true, "color": "#f59e0b", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#f59e0b", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_b5259db65d8249832b0b9c0015b0fa49);
+        
+    
+        var popup_62a17dc3f9b6ecc26f18a562c13eecf1 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_88b2a3829a80a78e35e7dff41cce90d0 = $(`<div id="html_88b2a3829a80a78e35e7dff41cce90d0" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #f59e0b; font-size: 14px;">Cyclone DANA</b><br/>             <b>Time:</b> 2024-10-23 21:00 UTC<br/>             <b>Intensity:</b> Severe Cyclonic Storm (48-63 kts)<br/>             <b>Wind:</b> 58.0 kts (107.4 km/h)<br/>             <b>Central Pressure:</b> 989.0 mb<br/>             <b>Location:</b> 18.30°N, 88.40°E                      </div>         </div>`)[0];
+                popup_62a17dc3f9b6ecc26f18a562c13eecf1.setContent(html_88b2a3829a80a78e35e7dff41cce90d0);
+            
+        
+
+        circle_marker_325d757b4aef3b67b5b2dbe28ca18934.bindPopup(popup_62a17dc3f9b6ecc26f18a562c13eecf1)
+        ;
+
+        
+    
+    
+            circle_marker_325d757b4aef3b67b5b2dbe28ca18934.bindTooltip(
+                `<div>
+                     Oct 23 21:00 | 58 kts | Severe Cyclonic Storm (48-63 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_08b402a111c43d3b70fdfdb3cb6414b1 = L.circleMarker(
+                [18.7, 88.2],
+                {"bubblingMouseEvents": true, "color": "#f59e0b", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#f59e0b", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_b5259db65d8249832b0b9c0015b0fa49);
+        
+    
+        var popup_2fd13eaf6e5aaaef1be92d4128e358b8 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_260ff5f15c83390a478f7385eb75ca8e = $(`<div id="html_260ff5f15c83390a478f7385eb75ca8e" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #f59e0b; font-size: 14px;">Cyclone DANA</b><br/>             <b>Time:</b> 2024-10-24 00:00 UTC<br/>             <b>Intensity:</b> Severe Cyclonic Storm (48-63 kts)<br/>             <b>Wind:</b> 60.0 kts (111.1 km/h)<br/>             <b>Central Pressure:</b> 988.0 mb<br/>             <b>Location:</b> 18.70°N, 88.20°E                      </div>         </div>`)[0];
+                popup_2fd13eaf6e5aaaef1be92d4128e358b8.setContent(html_260ff5f15c83390a478f7385eb75ca8e);
+            
+        
+
+        circle_marker_08b402a111c43d3b70fdfdb3cb6414b1.bindPopup(popup_2fd13eaf6e5aaaef1be92d4128e358b8)
+        ;
+
+        
+    
+    
+            circle_marker_08b402a111c43d3b70fdfdb3cb6414b1.bindTooltip(
+                `<div>
+                     Oct 24 00:00 | 60 kts | Severe Cyclonic Storm (48-63 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_bbdcacc579061fc8c15ab648195ee24e = L.circleMarker(
+                [19.0, 88.0],
+                {"bubblingMouseEvents": true, "color": "#f59e0b", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#f59e0b", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_b5259db65d8249832b0b9c0015b0fa49);
+        
+    
+        var popup_0789fbeab66d47af863916a8776d3d88 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_70d025146663e6b5c788233e4df53dfb = $(`<div id="html_70d025146663e6b5c788233e4df53dfb" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #f59e0b; font-size: 14px;">Cyclone DANA</b><br/>             <b>Time:</b> 2024-10-24 03:00 UTC<br/>             <b>Intensity:</b> Severe Cyclonic Storm (48-63 kts)<br/>             <b>Wind:</b> 63.0 kts (116.7 km/h)<br/>             <b>Central Pressure:</b> 987.0 mb<br/>             <b>Location:</b> 19.00°N, 88.00°E                      </div>         </div>`)[0];
+                popup_0789fbeab66d47af863916a8776d3d88.setContent(html_70d025146663e6b5c788233e4df53dfb);
+            
+        
+
+        circle_marker_bbdcacc579061fc8c15ab648195ee24e.bindPopup(popup_0789fbeab66d47af863916a8776d3d88)
+        ;
+
+        
+    
+    
+            circle_marker_bbdcacc579061fc8c15ab648195ee24e.bindTooltip(
+                `<div>
+                     Oct 24 03:00 | 63 kts | Severe Cyclonic Storm (48-63 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_eed8f44e2160a3555b4f248d51de58d5 = L.circleMarker(
+                [19.3, 87.8],
+                {"bubblingMouseEvents": true, "color": "#ffffff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#f97316", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(map_b5259db65d8249832b0b9c0015b0fa49);
+        
+    
+        var popup_a38aee5127ae658ed1eb0a0591cf24b6 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_cbb1244fedb6ea6fc7a012c820ae55b4 = $(`<div id="html_cbb1244fedb6ea6fc7a012c820ae55b4" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #f97316; font-size: 14px;">Cyclone DANA</b><br/>             <b>Time:</b> 2024-10-24 06:00 UTC<br/>             <b>Intensity:</b> Very Severe Cyclonic Storm (64-89 kts)<br/>             <b>Wind:</b> 65.0 kts (120.4 km/h)<br/>             <b>Central Pressure:</b> 986.0 mb<br/>             <b>Location:</b> 19.30°N, 87.80°E             <br/><b style="color: #ef4444;">★ PEAK INTENSITY</b>         </div>         </div>`)[0];
+                popup_a38aee5127ae658ed1eb0a0591cf24b6.setContent(html_cbb1244fedb6ea6fc7a012c820ae55b4);
+            
+        
+
+        circle_marker_eed8f44e2160a3555b4f248d51de58d5.bindPopup(popup_a38aee5127ae658ed1eb0a0591cf24b6)
+        ;
+
+        
+    
+    
+            circle_marker_eed8f44e2160a3555b4f248d51de58d5.bindTooltip(
+                `<div>
+                     Oct 24 06:00 | 65 kts | Very Severe Cyclonic Storm (64-89 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_b08e06d2cad7c2c23c091d3cfd197a83 = L.circleMarker(
+                [19.5, 87.6],
+                {"bubblingMouseEvents": true, "color": "#f97316", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#f97316", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_b5259db65d8249832b0b9c0015b0fa49);
+        
+    
+        var popup_68ecd19f6e3c886ab90402b3bac014cc = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_2c65ecc77a113f3e249a44363a00040b = $(`<div id="html_2c65ecc77a113f3e249a44363a00040b" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #f97316; font-size: 14px;">Cyclone DANA</b><br/>             <b>Time:</b> 2024-10-24 09:00 UTC<br/>             <b>Intensity:</b> Very Severe Cyclonic Storm (64-89 kts)<br/>             <b>Wind:</b> 65.0 kts (120.4 km/h)<br/>             <b>Central Pressure:</b> 986.0 mb<br/>             <b>Location:</b> 19.50°N, 87.60°E                      </div>         </div>`)[0];
+                popup_68ecd19f6e3c886ab90402b3bac014cc.setContent(html_2c65ecc77a113f3e249a44363a00040b);
+            
+        
+
+        circle_marker_b08e06d2cad7c2c23c091d3cfd197a83.bindPopup(popup_68ecd19f6e3c886ab90402b3bac014cc)
+        ;
+
+        
+    
+    
+            circle_marker_b08e06d2cad7c2c23c091d3cfd197a83.bindTooltip(
+                `<div>
+                     Oct 24 09:00 | 65 kts | Very Severe Cyclonic Storm (64-89 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_04675b83bea5475d79579a202ad89b45 = L.circleMarker(
+                [19.8, 87.5],
+                {"bubblingMouseEvents": true, "color": "#f97316", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#f97316", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_b5259db65d8249832b0b9c0015b0fa49);
+        
+    
+        var popup_2ad1b026541273e499c398d56f845da6 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_343fa61ffdc8c40ff7adf66c4ba26e8d = $(`<div id="html_343fa61ffdc8c40ff7adf66c4ba26e8d" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #f97316; font-size: 14px;">Cyclone DANA</b><br/>             <b>Time:</b> 2024-10-24 12:00 UTC<br/>             <b>Intensity:</b> Very Severe Cyclonic Storm (64-89 kts)<br/>             <b>Wind:</b> 65.0 kts (120.4 km/h)<br/>             <b>Central Pressure:</b> 985.0 mb<br/>             <b>Location:</b> 19.80°N, 87.50°E                      </div>         </div>`)[0];
+                popup_2ad1b026541273e499c398d56f845da6.setContent(html_343fa61ffdc8c40ff7adf66c4ba26e8d);
+            
+        
+
+        circle_marker_04675b83bea5475d79579a202ad89b45.bindPopup(popup_2ad1b026541273e499c398d56f845da6)
+        ;
+
+        
+    
+    
+            circle_marker_04675b83bea5475d79579a202ad89b45.bindTooltip(
+                `<div>
+                     Oct 24 12:00 | 65 kts | Very Severe Cyclonic Storm (64-89 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_94f7d1eb0ab38b3c2ba201731cc38cb9 = L.circleMarker(
+                [20.1, 87.3],
+                {"bubblingMouseEvents": true, "color": "#f59e0b", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#f59e0b", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_b5259db65d8249832b0b9c0015b0fa49);
+        
+    
+        var popup_31f91b4e6080a6419fb297e27f706bd3 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_21c76a77a962fb37a922e56cd4303834 = $(`<div id="html_21c76a77a962fb37a922e56cd4303834" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #f59e0b; font-size: 14px;">Cyclone DANA</b><br/>             <b>Time:</b> 2024-10-24 15:00 UTC<br/>             <b>Intensity:</b> Severe Cyclonic Storm (48-63 kts)<br/>             <b>Wind:</b> 63.0 kts (116.7 km/h)<br/>             <b>Central Pressure:</b> 986.0 mb<br/>             <b>Location:</b> 20.10°N, 87.30°E                      </div>         </div>`)[0];
+                popup_31f91b4e6080a6419fb297e27f706bd3.setContent(html_21c76a77a962fb37a922e56cd4303834);
+            
+        
+
+        circle_marker_94f7d1eb0ab38b3c2ba201731cc38cb9.bindPopup(popup_31f91b4e6080a6419fb297e27f706bd3)
+        ;
+
+        
+    
+    
+            circle_marker_94f7d1eb0ab38b3c2ba201731cc38cb9.bindTooltip(
+                `<div>
+                     Oct 24 15:00 | 63 kts | Severe Cyclonic Storm (48-63 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_0c3cc2b656d1bc1c964d5328592fc0ff = L.circleMarker(
+                [20.5, 87.1],
+                {"bubblingMouseEvents": true, "color": "#f59e0b", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#f59e0b", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_b5259db65d8249832b0b9c0015b0fa49);
+        
+    
+        var popup_4e3c85f77c77fc65151e3ff5898e299d = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_7994035b9aa6db426ca72899611f3a5a = $(`<div id="html_7994035b9aa6db426ca72899611f3a5a" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #f59e0b; font-size: 14px;">Cyclone DANA</b><br/>             <b>Time:</b> 2024-10-24 18:00 UTC<br/>             <b>Intensity:</b> Severe Cyclonic Storm (48-63 kts)<br/>             <b>Wind:</b> 60.0 kts (111.1 km/h)<br/>             <b>Central Pressure:</b> 988.0 mb<br/>             <b>Location:</b> 20.50°N, 87.10°E                      </div>         </div>`)[0];
+                popup_4e3c85f77c77fc65151e3ff5898e299d.setContent(html_7994035b9aa6db426ca72899611f3a5a);
+            
+        
+
+        circle_marker_0c3cc2b656d1bc1c964d5328592fc0ff.bindPopup(popup_4e3c85f77c77fc65151e3ff5898e299d)
+        ;
+
+        
+    
+    
+            circle_marker_0c3cc2b656d1bc1c964d5328592fc0ff.bindTooltip(
+                `<div>
+                     Oct 24 18:00 | 60 kts | Severe Cyclonic Storm (48-63 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_e79b3fd0df670e2b145fbc85b6672f28 = L.circleMarker(
+                [20.7, 87.0],
+                {"bubblingMouseEvents": true, "color": "#f59e0b", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#f59e0b", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_b5259db65d8249832b0b9c0015b0fa49);
+        
+    
+        var popup_95cb7b4e25effa06971239ebc4205a38 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_c58a82f6b491b691e3036412d9384509 = $(`<div id="html_c58a82f6b491b691e3036412d9384509" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #f59e0b; font-size: 14px;">Cyclone DANA</b><br/>             <b>Time:</b> 2024-10-24 21:00 UTC<br/>             <b>Intensity:</b> Severe Cyclonic Storm (48-63 kts)<br/>             <b>Wind:</b> 58.0 kts (107.4 km/h)<br/>             <b>Central Pressure:</b> 988.0 mb<br/>             <b>Location:</b> 20.70°N, 87.00°E                      </div>         </div>`)[0];
+                popup_95cb7b4e25effa06971239ebc4205a38.setContent(html_c58a82f6b491b691e3036412d9384509);
+            
+        
+
+        circle_marker_e79b3fd0df670e2b145fbc85b6672f28.bindPopup(popup_95cb7b4e25effa06971239ebc4205a38)
+        ;
+
+        
+    
+    
+            circle_marker_e79b3fd0df670e2b145fbc85b6672f28.bindTooltip(
+                `<div>
+                     Oct 24 21:00 | 58 kts | Severe Cyclonic Storm (48-63 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_1a0de139fa2737c88bc4d71835332f0f = L.circleMarker(
+                [20.9, 86.9],
+                {"bubblingMouseEvents": true, "color": "#f59e0b", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#f59e0b", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_b5259db65d8249832b0b9c0015b0fa49);
+        
+    
+        var popup_754050551682d98c65b5626c27b3b792 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_0dfe475e2b33541460104d33fdfcc42b = $(`<div id="html_0dfe475e2b33541460104d33fdfcc42b" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #f59e0b; font-size: 14px;">Cyclone DANA</b><br/>             <b>Time:</b> 2024-10-25 00:00 UTC<br/>             <b>Intensity:</b> Severe Cyclonic Storm (48-63 kts)<br/>             <b>Wind:</b> 55.0 kts (101.9 km/h)<br/>             <b>Central Pressure:</b> 990.0 mb<br/>             <b>Location:</b> 20.90°N, 86.90°E                      </div>         </div>`)[0];
+                popup_754050551682d98c65b5626c27b3b792.setContent(html_0dfe475e2b33541460104d33fdfcc42b);
+            
+        
+
+        circle_marker_1a0de139fa2737c88bc4d71835332f0f.bindPopup(popup_754050551682d98c65b5626c27b3b792)
+        ;
+
+        
+    
+    
+            circle_marker_1a0de139fa2737c88bc4d71835332f0f.bindTooltip(
+                `<div>
+                     Oct 25 00:00 | 55 kts | Severe Cyclonic Storm (48-63 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_538c3355df3d28cf88004fe7d5e58d3f = L.circleMarker(
+                [21.1, 86.8],
+                {"bubblingMouseEvents": true, "color": "#f59e0b", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#f59e0b", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_b5259db65d8249832b0b9c0015b0fa49);
+        
+    
+        var popup_ab60dddf51e7561e19151d1cf8cc45d3 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_ac2b08038da34138150a0f1fc2926d5e = $(`<div id="html_ac2b08038da34138150a0f1fc2926d5e" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #f59e0b; font-size: 14px;">Cyclone DANA</b><br/>             <b>Time:</b> 2024-10-25 03:00 UTC<br/>             <b>Intensity:</b> Severe Cyclonic Storm (48-63 kts)<br/>             <b>Wind:</b> 53.0 kts (98.2 km/h)<br/>             <b>Central Pressure:</b> 992.0 mb<br/>             <b>Location:</b> 21.10°N, 86.80°E                      </div>         </div>`)[0];
+                popup_ab60dddf51e7561e19151d1cf8cc45d3.setContent(html_ac2b08038da34138150a0f1fc2926d5e);
+            
+        
+
+        circle_marker_538c3355df3d28cf88004fe7d5e58d3f.bindPopup(popup_ab60dddf51e7561e19151d1cf8cc45d3)
+        ;
+
+        
+    
+    
+            circle_marker_538c3355df3d28cf88004fe7d5e58d3f.bindTooltip(
+                `<div>
+                     Oct 25 03:00 | 53 kts | Severe Cyclonic Storm (48-63 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_263732f305e247b5b4624e3392423a74 = L.circleMarker(
+                [21.2, 86.7],
+                {"bubblingMouseEvents": true, "color": "#f59e0b", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#f59e0b", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_b5259db65d8249832b0b9c0015b0fa49);
+        
+    
+        var popup_b6769009a7237b569e843f00eaae808f = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_d5bff67c869ca2413cfeb2a158174b79 = $(`<div id="html_d5bff67c869ca2413cfeb2a158174b79" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #f59e0b; font-size: 14px;">Cyclone DANA</b><br/>             <b>Time:</b> 2024-10-25 06:00 UTC<br/>             <b>Intensity:</b> Severe Cyclonic Storm (48-63 kts)<br/>             <b>Wind:</b> 50.0 kts (92.6 km/h)<br/>             <b>Central Pressure:</b> 993.0 mb<br/>             <b>Location:</b> 21.20°N, 86.70°E                      </div>         </div>`)[0];
+                popup_b6769009a7237b569e843f00eaae808f.setContent(html_d5bff67c869ca2413cfeb2a158174b79);
+            
+        
+
+        circle_marker_263732f305e247b5b4624e3392423a74.bindPopup(popup_b6769009a7237b569e843f00eaae808f)
+        ;
+
+        
+    
+    
+            circle_marker_263732f305e247b5b4624e3392423a74.bindTooltip(
+                `<div>
+                     Oct 25 06:00 | 50 kts | Severe Cyclonic Storm (48-63 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_d21ffe231fee3b3564e8a964724456f0 = L.circleMarker(
+                [21.3, 86.6],
+                {"bubblingMouseEvents": true, "color": "#10b981", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#10b981", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_b5259db65d8249832b0b9c0015b0fa49);
+        
+    
+        var popup_184f15bca742dd67033b3fb37ff24dc5 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_d33fb5983416bc60c1abc932bb951c60 = $(`<div id="html_d33fb5983416bc60c1abc932bb951c60" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #10b981; font-size: 14px;">Cyclone DANA</b><br/>             <b>Time:</b> 2024-10-25 09:00 UTC<br/>             <b>Intensity:</b> Cyclonic Storm (34-47 kts)<br/>             <b>Wind:</b> 45.0 kts (83.3 km/h)<br/>             <b>Central Pressure:</b> 995.0 mb<br/>             <b>Location:</b> 21.30°N, 86.60°E                      </div>         </div>`)[0];
+                popup_184f15bca742dd67033b3fb37ff24dc5.setContent(html_d33fb5983416bc60c1abc932bb951c60);
+            
+        
+
+        circle_marker_d21ffe231fee3b3564e8a964724456f0.bindPopup(popup_184f15bca742dd67033b3fb37ff24dc5)
+        ;
+
+        
+    
+    
+            circle_marker_d21ffe231fee3b3564e8a964724456f0.bindTooltip(
+                `<div>
+                     Oct 25 09:00 | 45 kts | Cyclonic Storm (34-47 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_1ac6fa36eed743f8d7c0d9e18e6a16a4 = L.circleMarker(
+                [21.3, 86.5],
+                {"bubblingMouseEvents": true, "color": "#10b981", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#10b981", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_b5259db65d8249832b0b9c0015b0fa49);
+        
+    
+        var popup_495195e0d719591a130f5b6f879c8996 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_563161888fcec80c2d423e741aba3c19 = $(`<div id="html_563161888fcec80c2d423e741aba3c19" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #10b981; font-size: 14px;">Cyclone DANA</b><br/>             <b>Time:</b> 2024-10-25 12:00 UTC<br/>             <b>Intensity:</b> Cyclonic Storm (34-47 kts)<br/>             <b>Wind:</b> 40.0 kts (74.1 km/h)<br/>             <b>Central Pressure:</b> 996.0 mb<br/>             <b>Location:</b> 21.30°N, 86.50°E                      </div>         </div>`)[0];
+                popup_495195e0d719591a130f5b6f879c8996.setContent(html_563161888fcec80c2d423e741aba3c19);
+            
+        
+
+        circle_marker_1ac6fa36eed743f8d7c0d9e18e6a16a4.bindPopup(popup_495195e0d719591a130f5b6f879c8996)
+        ;
+
+        
+    
+    
+            circle_marker_1ac6fa36eed743f8d7c0d9e18e6a16a4.bindTooltip(
+                `<div>
+                     Oct 25 12:00 | 40 kts | Cyclonic Storm (34-47 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_dacdcb3018dae44f79bf636fca0b13ec = L.circleMarker(
+                [21.3, 86.4],
+                {"bubblingMouseEvents": true, "color": "#10b981", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#10b981", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_b5259db65d8249832b0b9c0015b0fa49);
+        
+    
+        var popup_e9aca03099fcfb02637163e42e267ca2 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_b4a1212aff2fc013c6775a4d96a66f15 = $(`<div id="html_b4a1212aff2fc013c6775a4d96a66f15" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #10b981; font-size: 14px;">Cyclone DANA</b><br/>             <b>Time:</b> 2024-10-25 15:00 UTC<br/>             <b>Intensity:</b> Cyclonic Storm (34-47 kts)<br/>             <b>Wind:</b> 35.0 kts (64.8 km/h)<br/>             <b>Central Pressure:</b> 997.0 mb<br/>             <b>Location:</b> 21.30°N, 86.40°E                      </div>         </div>`)[0];
+                popup_e9aca03099fcfb02637163e42e267ca2.setContent(html_b4a1212aff2fc013c6775a4d96a66f15);
+            
+        
+
+        circle_marker_dacdcb3018dae44f79bf636fca0b13ec.bindPopup(popup_e9aca03099fcfb02637163e42e267ca2)
+        ;
+
+        
+    
+    
+            circle_marker_dacdcb3018dae44f79bf636fca0b13ec.bindTooltip(
+                `<div>
+                     Oct 25 15:00 | 35 kts | Cyclonic Storm (34-47 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_5789813c15e85918de1ab92da491850f = L.circleMarker(
+                [21.3, 86.4],
+                {"bubblingMouseEvents": true, "color": "#06b6d4", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#06b6d4", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_b5259db65d8249832b0b9c0015b0fa49);
+        
+    
+        var popup_c99672c0a18ef4cdcbf6cfa824b7ffb0 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_95e7c89eab854d9f5d9d03d737aa91b2 = $(`<div id="html_95e7c89eab854d9f5d9d03d737aa91b2" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #06b6d4; font-size: 14px;">Cyclone DANA</b><br/>             <b>Time:</b> 2024-10-25 18:00 UTC<br/>             <b>Intensity:</b> Deep Depression (28-33 kts)<br/>             <b>Wind:</b> 30.0 kts (55.6 km/h)<br/>             <b>Central Pressure:</b> 997.0 mb<br/>             <b>Location:</b> 21.30°N, 86.40°E                      </div>         </div>`)[0];
+                popup_c99672c0a18ef4cdcbf6cfa824b7ffb0.setContent(html_95e7c89eab854d9f5d9d03d737aa91b2);
+            
+        
+
+        circle_marker_5789813c15e85918de1ab92da491850f.bindPopup(popup_c99672c0a18ef4cdcbf6cfa824b7ffb0)
+        ;
+
+        
+    
+    
+            circle_marker_5789813c15e85918de1ab92da491850f.bindTooltip(
+                `<div>
+                     Oct 25 18:00 | 30 kts | Deep Depression (28-33 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_a0765498b6d6ec5c00780a1ff1fc029d = L.circleMarker(
+                [21.2, 86.5],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_b5259db65d8249832b0b9c0015b0fa49);
+        
+    
+        var popup_45fb0daa95fc55f07882a9fa8b9fa551 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_72a582323dd49afd68eabf826ea035e7 = $(`<div id="html_72a582323dd49afd68eabf826ea035e7" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #3b82f6; font-size: 14px;">Cyclone DANA</b><br/>             <b>Time:</b> 2024-10-25 21:00 UTC<br/>             <b>Intensity:</b> Depression (<28 kts)<br/>             <b>Wind:</b> 25.0 kts (46.3 km/h)<br/>             <b>Central Pressure:</b> 999.0 mb<br/>             <b>Location:</b> 21.20°N, 86.50°E                      </div>         </div>`)[0];
+                popup_45fb0daa95fc55f07882a9fa8b9fa551.setContent(html_72a582323dd49afd68eabf826ea035e7);
+            
+        
+
+        circle_marker_a0765498b6d6ec5c00780a1ff1fc029d.bindPopup(popup_45fb0daa95fc55f07882a9fa8b9fa551)
+        ;
+
+        
+    
+    
+            circle_marker_a0765498b6d6ec5c00780a1ff1fc029d.bindTooltip(
+                `<div>
+                     Oct 25 21:00 | 25 kts | Depression (<28 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_cc800d2936304633d652fa619bbc8ae6 = L.circleMarker(
+                [21.2, 86.4],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_b5259db65d8249832b0b9c0015b0fa49);
+        
+    
+        var popup_232acb70b07795ad9451f97a74496aa2 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_dfce0f8b6aba9d3e48ff7c2294659953 = $(`<div id="html_dfce0f8b6aba9d3e48ff7c2294659953" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #3b82f6; font-size: 14px;">Cyclone DANA</b><br/>             <b>Time:</b> 2024-10-26 00:00 UTC<br/>             <b>Intensity:</b> Depression (<28 kts)<br/>             <b>Wind:</b> 20.0 kts (37.0 km/h)<br/>             <b>Central Pressure:</b> 1000.0 mb<br/>             <b>Location:</b> 21.20°N, 86.40°E                      </div>         </div>`)[0];
+                popup_232acb70b07795ad9451f97a74496aa2.setContent(html_dfce0f8b6aba9d3e48ff7c2294659953);
+            
+        
+
+        circle_marker_cc800d2936304633d652fa619bbc8ae6.bindPopup(popup_232acb70b07795ad9451f97a74496aa2)
+        ;
+
+        
+    
+    
+            circle_marker_cc800d2936304633d652fa619bbc8ae6.bindTooltip(
+                `<div>
+                     Oct 26 00:00 | 20 kts | Depression (<28 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_c8cee8c9e0a016e5f13c5cc0d5f32332 = L.marker(
+                [21.2, 86.4],
+                {
+}
+            ).addTo(map_b5259db65d8249832b0b9c0015b0fa49);
+        
+    
+            var icon_962e614dc31b196e8ad1bb01e9b02f60 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "flag",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+            marker_c8cee8c9e0a016e5f13c5cc0d5f32332.bindTooltip(
+                `<div>
+                     Dissipation / Inland: Oct 26 00:00
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_c8cee8c9e0a016e5f13c5cc0d5f32332.setIcon(icon_962e614dc31b196e8ad1bb01e9b02f60);
+            
+    
+            var layer_control_4b42fa334df088300abce69e0230844a_layers = {
+                base_layers : {
+                    "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" : tile_layer_726d9b43dbff8bd8e3570489613a035a,
+                    "OpenStreetMap" : tile_layer_8489a21fe8b645ef5c9008d44d61d135,
+                },
+                overlays :  {
+                },
+            };
+            let layer_control_4b42fa334df088300abce69e0230844a = L.control.layers(
+                layer_control_4b42fa334df088300abce69e0230844a_layers.base_layers,
+                layer_control_4b42fa334df088300abce69e0230844a_layers.overlays,
+                {
+  "position": "topright",
+  "collapsed": true,
+  "autoZIndex": true,
+}
+            ).addTo(map_b5259db65d8249832b0b9c0015b0fa49);
+
+        
+</script>
+</html>

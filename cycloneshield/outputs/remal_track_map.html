@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_ffd63af76336984e6870582e69dbba31 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+</head>
+<body>
+    
+    
+            <div class="folium-map" id="map_ffd63af76336984e6870582e69dbba31" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_ffd63af76336984e6870582e69dbba31 = L.map(
+                "map_ffd63af76336984e6870582e69dbba31",
+                {
+                    center: [19.64, 89.355],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 6,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_c6885f325fed0df3cea34ec3446bb999 = L.tileLayer(
+                "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 18,
+  "maxNativeZoom": 18,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors \u0026copy; \u003ca href=\"https://carto.com/attributions\"\u003eCARTO\u003c/a\u003e",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_c6885f325fed0df3cea34ec3446bb999.addTo(map_ffd63af76336984e6870582e69dbba31);
+        
+    
+            var tile_layer_c362543b87f906662533e139f1bd6294 = L.tileLayer(
+                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 19,
+  "maxNativeZoom": 19,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_c362543b87f906662533e139f1bd6294.addTo(map_ffd63af76336984e6870582e69dbba31);
+        
+    
+            var poly_line_8f1f0d8140e7b615ed885478979773b3 = L.polyline(
+                [[13.6, 86.6], [13.9, 87.2], [14.3, 87.7], [14.7, 88.2], [15.2, 88.6], [15.5, 89.0], [15.9, 89.3], [16.1, 89.4], [16.4, 89.6], [16.7, 89.7], [17.0, 89.9], [17.2, 89.9], [17.6, 90.0], [17.9, 89.8], [18.2, 89.6], [18.4, 89.5], [18.7, 89.3], [18.9, 89.2], [19.2, 89.2], [19.4, 89.2], [19.6, 89.2], [19.9, 89.1], [20.3, 89.1], [20.6, 89.1], [21.2, 89.1], [21.5, 89.0], [21.6, 89.0], [22.0, 88.9], [22.2, 88.9], [22.6, 89.0], [22.8, 89.1], [23.1, 89.1], [23.3, 89.3], [23.6, 89.6], [23.8, 90.1], [24.1, 90.5], [24.3, 90.8], [24.5, 91.1], [24.7, 91.5], [25.1, 91.8]],
+                {"bubblingMouseEvents": true, "color": "#38bdf8", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#38bdf8", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.8, "smoothFactor": 1.0, "stroke": true, "weight": 4}
+            ).addTo(map_ffd63af76336984e6870582e69dbba31);
+        
+    
+            poly_line_8f1f0d8140e7b615ed885478979773b3.bindTooltip(
+                `<div>
+                     Cyclone REMAL Track Path
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_55eedf47298b27ceb3a15945b0f8e3d1 = L.circleMarker(
+                [13.6, 86.6],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_ffd63af76336984e6870582e69dbba31);
+        
+    
+        var popup_d5e02843800cd60616340b079ee441b9 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_5b3011af1d0e3eac975cd6ae4234e95e = $(`<div id="html_5b3011af1d0e3eac975cd6ae4234e95e" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #3b82f6; font-size: 14px;">Cyclone REMAL</b><br/>             <b>Time:</b> 2024-05-23 12:00 UTC<br/>             <b>Intensity:</b> Depression (<28 kts)<br/>             <b>Wind:</b> 15.0 kts (27.8 km/h)<br/>             <b>Central Pressure:</b> 1000.0 mb<br/>             <b>Location:</b> 13.60°N, 86.60°E                      </div>         </div>`)[0];
+                popup_d5e02843800cd60616340b079ee441b9.setContent(html_5b3011af1d0e3eac975cd6ae4234e95e);
+            
+        
+
+        circle_marker_55eedf47298b27ceb3a15945b0f8e3d1.bindPopup(popup_d5e02843800cd60616340b079ee441b9)
+        ;
+
+        
+    
+    
+            circle_marker_55eedf47298b27ceb3a15945b0f8e3d1.bindTooltip(
+                `<div>
+                     May 23 12:00 | 15 kts | Depression (<28 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_d41c568b580c7e9c01c1fcec2c928619 = L.circleMarker(
+                [13.9, 87.2],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_ffd63af76336984e6870582e69dbba31);
+        
+    
+        var popup_b4646800ade9243b72f6ce99f6564a96 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_92f72cc6c3e63e6052a063d1a22ac02b = $(`<div id="html_92f72cc6c3e63e6052a063d1a22ac02b" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #3b82f6; font-size: 14px;">Cyclone REMAL</b><br/>             <b>Time:</b> 2024-05-23 15:00 UTC<br/>             <b>Intensity:</b> Depression (<28 kts)<br/>             <b>Wind:</b> 15.0 kts (27.8 km/h)<br/>             <b>Central Pressure:</b> 999.0 mb<br/>             <b>Location:</b> 13.90°N, 87.20°E                      </div>         </div>`)[0];
+                popup_b4646800ade9243b72f6ce99f6564a96.setContent(html_92f72cc6c3e63e6052a063d1a22ac02b);
+            
+        
+
+        circle_marker_d41c568b580c7e9c01c1fcec2c928619.bindPopup(popup_b4646800ade9243b72f6ce99f6564a96)
+        ;
+
+        
+    
+    
+            circle_marker_d41c568b580c7e9c01c1fcec2c928619.bindTooltip(
+                `<div>
+                     May 23 15:00 | 15 kts | Depression (<28 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_7ea91937d24b792656aac9b129e7a118 = L.circleMarker(
+                [14.3, 87.7],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_ffd63af76336984e6870582e69dbba31);
+        
+    
+        var popup_cac9721bc907c384cc00018c0fb9b8a8 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_35421c663a5323997d21fb1c39ee2166 = $(`<div id="html_35421c663a5323997d21fb1c39ee2166" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #3b82f6; font-size: 14px;">Cyclone REMAL</b><br/>             <b>Time:</b> 2024-05-23 18:00 UTC<br/>             <b>Intensity:</b> Depression (<28 kts)<br/>             <b>Wind:</b> 15.0 kts (27.8 km/h)<br/>             <b>Central Pressure:</b> 998.0 mb<br/>             <b>Location:</b> 14.30°N, 87.70°E                      </div>         </div>`)[0];
+                popup_cac9721bc907c384cc00018c0fb9b8a8.setContent(html_35421c663a5323997d21fb1c39ee2166);
+            
+        
+
+        circle_marker_7ea91937d24b792656aac9b129e7a118.bindPopup(popup_cac9721bc907c384cc00018c0fb9b8a8)
+        ;
+
+        
+    
+    
+            circle_marker_7ea91937d24b792656aac9b129e7a118.bindTooltip(
+                `<div>
+                     May 23 18:00 | 15 kts | Depression (<28 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_c431d4bcc03f7d00b1c8b6018c2f8c0f = L.circleMarker(
+                [14.7, 88.2],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_ffd63af76336984e6870582e69dbba31);
+        
+    
+        var popup_4b6dd73cd02e7f780e8986ca43d52cc2 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_d12518ce1dc0dbeae12bfbabe9248db4 = $(`<div id="html_d12518ce1dc0dbeae12bfbabe9248db4" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #3b82f6; font-size: 14px;">Cyclone REMAL</b><br/>             <b>Time:</b> 2024-05-23 21:00 UTC<br/>             <b>Intensity:</b> Depression (<28 kts)<br/>             <b>Wind:</b> 18.0 kts (33.3 km/h)<br/>             <b>Central Pressure:</b> 997.0 mb<br/>             <b>Location:</b> 14.70°N, 88.20°E                      </div>         </div>`)[0];
+                popup_4b6dd73cd02e7f780e8986ca43d52cc2.setContent(html_d12518ce1dc0dbeae12bfbabe9248db4);
+            
+        
+
+        circle_marker_c431d4bcc03f7d00b1c8b6018c2f8c0f.bindPopup(popup_4b6dd73cd02e7f780e8986ca43d52cc2)
+        ;
+
+        
+    
+    
+            circle_marker_c431d4bcc03f7d00b1c8b6018c2f8c0f.bindTooltip(
+                `<div>
+                     May 23 21:00 | 18 kts | Depression (<28 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_f4ca79328abcad00fd20f8f02cd0dc6d = L.circleMarker(
+                [15.2, 88.6],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_ffd63af76336984e6870582e69dbba31);
+        
+    
+        var popup_7d7497542db376210d87c222effbe52b = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_5cab5560107c7932cba36c4f3a3e0227 = $(`<div id="html_5cab5560107c7932cba36c4f3a3e0227" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #3b82f6; font-size: 14px;">Cyclone REMAL</b><br/>             <b>Time:</b> 2024-05-24 00:00 UTC<br/>             <b>Intensity:</b> Depression (<28 kts)<br/>             <b>Wind:</b> 25.0 kts (46.3 km/h)<br/>             <b>Central Pressure:</b> 996.0 mb<br/>             <b>Location:</b> 15.20°N, 88.60°E                      </div>         </div>`)[0];
+                popup_7d7497542db376210d87c222effbe52b.setContent(html_5cab5560107c7932cba36c4f3a3e0227);
+            
+        
+
+        circle_marker_f4ca79328abcad00fd20f8f02cd0dc6d.bindPopup(popup_7d7497542db376210d87c222effbe52b)
+        ;
+
+        
+    
+    
+            circle_marker_f4ca79328abcad00fd20f8f02cd0dc6d.bindTooltip(
+                `<div>
+                     May 24 00:00 | 25 kts | Depression (<28 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_50af78d650d5739080886e29c40880a1 = L.circleMarker(
+                [15.5, 89.0],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_ffd63af76336984e6870582e69dbba31);
+        
+    
+        var popup_9b58870f048135e23abaa76987aafda2 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_c30714bda665ce9b58a2be18b8fe11b9 = $(`<div id="html_c30714bda665ce9b58a2be18b8fe11b9" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #3b82f6; font-size: 14px;">Cyclone REMAL</b><br/>             <b>Time:</b> 2024-05-24 03:00 UTC<br/>             <b>Intensity:</b> Depression (<28 kts)<br/>             <b>Wind:</b> 25.0 kts (46.3 km/h)<br/>             <b>Central Pressure:</b> 995.0 mb<br/>             <b>Location:</b> 15.50°N, 89.00°E                      </div>         </div>`)[0];
+                popup_9b58870f048135e23abaa76987aafda2.setContent(html_c30714bda665ce9b58a2be18b8fe11b9);
+            
+        
+
+        circle_marker_50af78d650d5739080886e29c40880a1.bindPopup(popup_9b58870f048135e23abaa76987aafda2)
+        ;
+
+        
+    
+    
+            circle_marker_50af78d650d5739080886e29c40880a1.bindTooltip(
+                `<div>
+                     May 24 03:00 | 25 kts | Depression (<28 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_885fa7cf5bbeca65a1a1906345e00c57 = L.circleMarker(
+                [15.9, 89.3],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_ffd63af76336984e6870582e69dbba31);
+        
+    
+        var popup_cb3c40f2df556464622d96f3dcb9d015 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_165a8ba55dbc45b93fdc3ec71b5f2054 = $(`<div id="html_165a8ba55dbc45b93fdc3ec71b5f2054" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #3b82f6; font-size: 14px;">Cyclone REMAL</b><br/>             <b>Time:</b> 2024-05-24 06:00 UTC<br/>             <b>Intensity:</b> Depression (<28 kts)<br/>             <b>Wind:</b> 25.0 kts (46.3 km/h)<br/>             <b>Central Pressure:</b> 994.0 mb<br/>             <b>Location:</b> 15.90°N, 89.30°E                      </div>         </div>`)[0];
+                popup_cb3c40f2df556464622d96f3dcb9d015.setContent(html_165a8ba55dbc45b93fdc3ec71b5f2054);
+            
+        
+
+        circle_marker_885fa7cf5bbeca65a1a1906345e00c57.bindPopup(popup_cb3c40f2df556464622d96f3dcb9d015)
+        ;
+
+        
+    
+    
+            circle_marker_885fa7cf5bbeca65a1a1906345e00c57.bindTooltip(
+                `<div>
+                     May 24 06:00 | 25 kts | Depression (<28 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_706596c761971cfade9254fe1e4929dc = L.circleMarker(
+                [16.1, 89.4],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_ffd63af76336984e6870582e69dbba31);
+        
+    
+        var popup_4d336639499f5a127ca8491070341bb3 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_14d398931779527c6bfff0dda8e89392 = $(`<div id="html_14d398931779527c6bfff0dda8e89392" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #3b82f6; font-size: 14px;">Cyclone REMAL</b><br/>             <b>Time:</b> 2024-05-24 09:00 UTC<br/>             <b>Intensity:</b> Depression (<28 kts)<br/>             <b>Wind:</b> 25.0 kts (46.3 km/h)<br/>             <b>Central Pressure:</b> 994.0 mb<br/>             <b>Location:</b> 16.10°N, 89.40°E                      </div>         </div>`)[0];
+                popup_4d336639499f5a127ca8491070341bb3.setContent(html_14d398931779527c6bfff0dda8e89392);
+            
+        
+
+        circle_marker_706596c761971cfade9254fe1e4929dc.bindPopup(popup_4d336639499f5a127ca8491070341bb3)
+        ;
+
+        
+    
+    
+            circle_marker_706596c761971cfade9254fe1e4929dc.bindTooltip(
+                `<div>
+                     May 24 09:00 | 25 kts | Depression (<28 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_36b9d0429547bf0ac2c7c8c14dc526da = L.circleMarker(
+                [16.4, 89.6],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_ffd63af76336984e6870582e69dbba31);
+        
+    
+        var popup_7267eded4c4dfba690f748558478601b = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_522a373f807772f3bc353d124e3d121a = $(`<div id="html_522a373f807772f3bc353d124e3d121a" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #3b82f6; font-size: 14px;">Cyclone REMAL</b><br/>             <b>Time:</b> 2024-05-24 12:00 UTC<br/>             <b>Intensity:</b> Depression (<28 kts)<br/>             <b>Wind:</b> 25.0 kts (46.3 km/h)<br/>             <b>Central Pressure:</b> 993.0 mb<br/>             <b>Location:</b> 16.40°N, 89.60°E                      </div>         </div>`)[0];
+                popup_7267eded4c4dfba690f748558478601b.setContent(html_522a373f807772f3bc353d124e3d121a);
+            
+        
+
+        circle_marker_36b9d0429547bf0ac2c7c8c14dc526da.bindPopup(popup_7267eded4c4dfba690f748558478601b)
+        ;
+
+        
+    
+    
+            circle_marker_36b9d0429547bf0ac2c7c8c14dc526da.bindTooltip(
+                `<div>
+                     May 24 12:00 | 25 kts | Depression (<28 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_35fe54de8d055755ade84701e7c50497 = L.circleMarker(
+                [16.7, 89.7],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_ffd63af76336984e6870582e69dbba31);
+        
+    
+        var popup_50845159888771db5a3320367d70df2b = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_117f0350e9a4863de45ab2ba47d33cdf = $(`<div id="html_117f0350e9a4863de45ab2ba47d33cdf" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #3b82f6; font-size: 14px;">Cyclone REMAL</b><br/>             <b>Time:</b> 2024-05-24 15:00 UTC<br/>             <b>Intensity:</b> Depression (<28 kts)<br/>             <b>Wind:</b> 25.0 kts (46.3 km/h)<br/>             <b>Central Pressure:</b> 993.0 mb<br/>             <b>Location:</b> 16.70°N, 89.70°E                      </div>         </div>`)[0];
+                popup_50845159888771db5a3320367d70df2b.setContent(html_117f0350e9a4863de45ab2ba47d33cdf);
+            
+        
+
+        circle_marker_35fe54de8d055755ade84701e7c50497.bindPopup(popup_50845159888771db5a3320367d70df2b)
+        ;
+
+        
+    
+    
+            circle_marker_35fe54de8d055755ade84701e7c50497.bindTooltip(
+                `<div>
+                     May 24 15:00 | 25 kts | Depression (<28 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_4de7fd887f3da7f4859df49d70ac6ce7 = L.circleMarker(
+                [17.0, 89.9],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_ffd63af76336984e6870582e69dbba31);
+        
+    
+        var popup_818881a1d240045c5443985fd4334179 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_d9eae7b595f454a39d64908988d33257 = $(`<div id="html_d9eae7b595f454a39d64908988d33257" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #3b82f6; font-size: 14px;">Cyclone REMAL</b><br/>             <b>Time:</b> 2024-05-24 18:00 UTC<br/>             <b>Intensity:</b> Depression (<28 kts)<br/>             <b>Wind:</b> 25.0 kts (46.3 km/h)<br/>             <b>Central Pressure:</b> 992.0 mb<br/>             <b>Location:</b> 17.00°N, 89.90°E                      </div>         </div>`)[0];
+                popup_818881a1d240045c5443985fd4334179.setContent(html_d9eae7b595f454a39d64908988d33257);
+            
+        
+
+        circle_marker_4de7fd887f3da7f4859df49d70ac6ce7.bindPopup(popup_818881a1d240045c5443985fd4334179)
+        ;
+
+        
+    
+    
+            circle_marker_4de7fd887f3da7f4859df49d70ac6ce7.bindTooltip(
+                `<div>
+                     May 24 18:00 | 25 kts | Depression (<28 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_fd6d1e71caa2fc8b163465e3c79e9231 = L.circleMarker(
+                [17.2, 89.9],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_ffd63af76336984e6870582e69dbba31);
+        
+    
+        var popup_b60d6ac648acfd129af05cca35dd9c30 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_880cbd8200d3e0afd9ce497d3eca8c19 = $(`<div id="html_880cbd8200d3e0afd9ce497d3eca8c19" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #3b82f6; font-size: 14px;">Cyclone REMAL</b><br/>             <b>Time:</b> 2024-05-24 21:00 UTC<br/>             <b>Intensity:</b> Depression (<28 kts)<br/>             <b>Wind:</b> 25.0 kts (46.3 km/h)<br/>             <b>Central Pressure:</b> 992.0 mb<br/>             <b>Location:</b> 17.20°N, 89.90°E                      </div>         </div>`)[0];
+                popup_b60d6ac648acfd129af05cca35dd9c30.setContent(html_880cbd8200d3e0afd9ce497d3eca8c19);
+            
+        
+
+        circle_marker_fd6d1e71caa2fc8b163465e3c79e9231.bindPopup(popup_b60d6ac648acfd129af05cca35dd9c30)
+        ;
+
+        
+    
+    
+            circle_marker_fd6d1e71caa2fc8b163465e3c79e9231.bindTooltip(
+                `<div>
+                     May 24 21:00 | 25 kts | Depression (<28 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_689e5d97b663d3961c13a9b82fe660d4 = L.circleMarker(
+                [17.6, 90.0],
+                {"bubblingMouseEvents": true, "color": "#06b6d4", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#06b6d4", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_ffd63af76336984e6870582e69dbba31);
+        
+    
+        var popup_9fb5fb68d2dd9306ae366cdd4a3d05d2 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_c971266889dbc43e791ad318c1f8f725 = $(`<div id="html_c971266889dbc43e791ad318c1f8f725" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #06b6d4; font-size: 14px;">Cyclone REMAL</b><br/>             <b>Time:</b> 2024-05-25 00:00 UTC<br/>             <b>Intensity:</b> Deep Depression (28-33 kts)<br/>             <b>Wind:</b> 30.0 kts (55.6 km/h)<br/>             <b>Central Pressure:</b> 991.0 mb<br/>             <b>Location:</b> 17.60°N, 90.00°E                      </div>         </div>`)[0];
+                popup_9fb5fb68d2dd9306ae366cdd4a3d05d2.setContent(html_c971266889dbc43e791ad318c1f8f725);
+            
+        
+
+        circle_marker_689e5d97b663d3961c13a9b82fe660d4.bindPopup(popup_9fb5fb68d2dd9306ae366cdd4a3d05d2)
+        ;
+
+        
+    
+    
+            circle_marker_689e5d97b663d3961c13a9b82fe660d4.bindTooltip(
+                `<div>
+                     May 25 00:00 | 30 kts | Deep Depression (28-33 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_5ff130719753cceb9b8602c2bd5563be = L.circleMarker(
+                [17.9, 89.8],
+                {"bubblingMouseEvents": true, "color": "#06b6d4", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#06b6d4", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_ffd63af76336984e6870582e69dbba31);
+        
+    
+        var popup_29557404cedd5c8770ed62364d68a5f2 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_35b7feb0672df6066fd717b41e5a56a1 = $(`<div id="html_35b7feb0672df6066fd717b41e5a56a1" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #06b6d4; font-size: 14px;">Cyclone REMAL</b><br/>             <b>Time:</b> 2024-05-25 03:00 UTC<br/>             <b>Intensity:</b> Deep Depression (28-33 kts)<br/>             <b>Wind:</b> 30.0 kts (55.6 km/h)<br/>             <b>Central Pressure:</b> 991.0 mb<br/>             <b>Location:</b> 17.90°N, 89.80°E                      </div>         </div>`)[0];
+                popup_29557404cedd5c8770ed62364d68a5f2.setContent(html_35b7feb0672df6066fd717b41e5a56a1);
+            
+        
+
+        circle_marker_5ff130719753cceb9b8602c2bd5563be.bindPopup(popup_29557404cedd5c8770ed62364d68a5f2)
+        ;
+
+        
+    
+    
+            circle_marker_5ff130719753cceb9b8602c2bd5563be.bindTooltip(
+                `<div>
+                     May 25 03:00 | 30 kts | Deep Depression (28-33 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_7c6382b3a93669f87aaf2ab0d650a820 = L.circleMarker(
+                [18.2, 89.6],
+                {"bubblingMouseEvents": true, "color": "#06b6d4", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#06b6d4", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_ffd63af76336984e6870582e69dbba31);
+        
+    
+        var popup_f59310c7859d04d0e16c5dffab5101f6 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_273dd076e6efeefae5de1ca5140ca885 = $(`<div id="html_273dd076e6efeefae5de1ca5140ca885" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #06b6d4; font-size: 14px;">Cyclone REMAL</b><br/>             <b>Time:</b> 2024-05-25 06:00 UTC<br/>             <b>Intensity:</b> Deep Depression (28-33 kts)<br/>             <b>Wind:</b> 30.0 kts (55.6 km/h)<br/>             <b>Central Pressure:</b> 990.0 mb<br/>             <b>Location:</b> 18.20°N, 89.60°E                      </div>         </div>`)[0];
+                popup_f59310c7859d04d0e16c5dffab5101f6.setContent(html_273dd076e6efeefae5de1ca5140ca885);
+            
+        
+
+        circle_marker_7c6382b3a93669f87aaf2ab0d650a820.bindPopup(popup_f59310c7859d04d0e16c5dffab5101f6)
+        ;
+
+        
+    
+    
+            circle_marker_7c6382b3a93669f87aaf2ab0d650a820.bindTooltip(
+                `<div>
+                     May 25 06:00 | 30 kts | Deep Depression (28-33 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_579f941890262ae212062983398556ba = L.circleMarker(
+                [18.4, 89.5],
+                {"bubblingMouseEvents": true, "color": "#06b6d4", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#06b6d4", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_ffd63af76336984e6870582e69dbba31);
+        
+    
+        var popup_364d0536d5853e06d621429dafa62a40 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_38f5fdce07a1400130d72fb1ca2ed66f = $(`<div id="html_38f5fdce07a1400130d72fb1ca2ed66f" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #06b6d4; font-size: 14px;">Cyclone REMAL</b><br/>             <b>Time:</b> 2024-05-25 09:00 UTC<br/>             <b>Intensity:</b> Deep Depression (28-33 kts)<br/>             <b>Wind:</b> 28.0 kts (51.9 km/h)<br/>             <b>Central Pressure:</b> 989.0 mb<br/>             <b>Location:</b> 18.40°N, 89.50°E                      </div>         </div>`)[0];
+                popup_364d0536d5853e06d621429dafa62a40.setContent(html_38f5fdce07a1400130d72fb1ca2ed66f);
+            
+        
+
+        circle_marker_579f941890262ae212062983398556ba.bindPopup(popup_364d0536d5853e06d621429dafa62a40)
+        ;
+
+        
+    
+    
+            circle_marker_579f941890262ae212062983398556ba.bindTooltip(
+                `<div>
+                     May 25 09:00 | 28 kts | Deep Depression (28-33 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_be74373e085b475255a169bdbd224a7d = L.circleMarker(
+                [18.7, 89.3],
+                {"bubblingMouseEvents": true, "color": "#10b981", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#10b981", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_ffd63af76336984e6870582e69dbba31);
+        
+    
+        var popup_d6ddcc7e2b07876947bb279e8c49d646 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_935e8d126bd3d9ff732bcbe550d1a089 = $(`<div id="html_935e8d126bd3d9ff732bcbe550d1a089" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #10b981; font-size: 14px;">Cyclone REMAL</b><br/>             <b>Time:</b> 2024-05-25 12:00 UTC<br/>             <b>Intensity:</b> Cyclonic Storm (34-47 kts)<br/>             <b>Wind:</b> 35.0 kts (64.8 km/h)<br/>             <b>Central Pressure:</b> 987.0 mb<br/>             <b>Location:</b> 18.70°N, 89.30°E                      </div>         </div>`)[0];
+                popup_d6ddcc7e2b07876947bb279e8c49d646.setContent(html_935e8d126bd3d9ff732bcbe550d1a089);
+            
+        
+
+        circle_marker_be74373e085b475255a169bdbd224a7d.bindPopup(popup_d6ddcc7e2b07876947bb279e8c49d646)
+        ;
+
+        
+    
+    
+            circle_marker_be74373e085b475255a169bdbd224a7d.bindTooltip(
+                `<div>
+                     May 25 12:00 | 35 kts | Cyclonic Storm (34-47 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_2c690e140e325b8358c16c1edb011189 = L.circleMarker(
+                [18.9, 89.2],
+                {"bubblingMouseEvents": true, "color": "#10b981", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#10b981", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_ffd63af76336984e6870582e69dbba31);
+        
+    
+        var popup_1d1cc717171de87ba9d293a15624212c = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_bbd0f0a31fc80da5d1cc8488f9e94760 = $(`<div id="html_bbd0f0a31fc80da5d1cc8488f9e94760" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #10b981; font-size: 14px;">Cyclone REMAL</b><br/>             <b>Time:</b> 2024-05-25 15:00 UTC<br/>             <b>Intensity:</b> Cyclonic Storm (34-47 kts)<br/>             <b>Wind:</b> 35.0 kts (64.8 km/h)<br/>             <b>Central Pressure:</b> 987.0 mb<br/>             <b>Location:</b> 18.90°N, 89.20°E                      </div>         </div>`)[0];
+                popup_1d1cc717171de87ba9d293a15624212c.setContent(html_bbd0f0a31fc80da5d1cc8488f9e94760);
+            
+        
+
+        circle_marker_2c690e140e325b8358c16c1edb011189.bindPopup(popup_1d1cc717171de87ba9d293a15624212c)
+        ;
+
+        
+    
+    
+            circle_marker_2c690e140e325b8358c16c1edb011189.bindTooltip(
+                `<div>
+                     May 25 15:00 | 35 kts | Cyclonic Storm (34-47 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_d2d0ca119635d815c08b26b59b2128de = L.circleMarker(
+                [19.2, 89.2],
+                {"bubblingMouseEvents": true, "color": "#10b981", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#10b981", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_ffd63af76336984e6870582e69dbba31);
+        
+    
+        var popup_3a7e6f3f39a717ccb4e1bc6e3a39fe71 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_e592bf41db359d12f97ca760875064b9 = $(`<div id="html_e592bf41db359d12f97ca760875064b9" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #10b981; font-size: 14px;">Cyclone REMAL</b><br/>             <b>Time:</b> 2024-05-25 18:00 UTC<br/>             <b>Intensity:</b> Cyclonic Storm (34-47 kts)<br/>             <b>Wind:</b> 40.0 kts (74.1 km/h)<br/>             <b>Central Pressure:</b> 986.0 mb<br/>             <b>Location:</b> 19.20°N, 89.20°E                      </div>         </div>`)[0];
+                popup_3a7e6f3f39a717ccb4e1bc6e3a39fe71.setContent(html_e592bf41db359d12f97ca760875064b9);
+            
+        
+
+        circle_marker_d2d0ca119635d815c08b26b59b2128de.bindPopup(popup_3a7e6f3f39a717ccb4e1bc6e3a39fe71)
+        ;
+
+        
+    
+    
+            circle_marker_d2d0ca119635d815c08b26b59b2128de.bindTooltip(
+                `<div>
+                     May 25 18:00 | 40 kts | Cyclonic Storm (34-47 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_4fb84d7bf7ef8b78b000dbe2d8fd3c2c = L.circleMarker(
+                [19.4, 89.2],
+                {"bubblingMouseEvents": true, "color": "#10b981", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#10b981", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_ffd63af76336984e6870582e69dbba31);
+        
+    
+        var popup_8f92b2f0d0bb05b29d8b7199381cdc77 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_f9fbbf9842ed3265a9dc86da03ab492f = $(`<div id="html_f9fbbf9842ed3265a9dc86da03ab492f" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #10b981; font-size: 14px;">Cyclone REMAL</b><br/>             <b>Time:</b> 2024-05-25 21:00 UTC<br/>             <b>Intensity:</b> Cyclonic Storm (34-47 kts)<br/>             <b>Wind:</b> 45.0 kts (83.3 km/h)<br/>             <b>Central Pressure:</b> 986.0 mb<br/>             <b>Location:</b> 19.40°N, 89.20°E                      </div>         </div>`)[0];
+                popup_8f92b2f0d0bb05b29d8b7199381cdc77.setContent(html_f9fbbf9842ed3265a9dc86da03ab492f);
+            
+        
+
+        circle_marker_4fb84d7bf7ef8b78b000dbe2d8fd3c2c.bindPopup(popup_8f92b2f0d0bb05b29d8b7199381cdc77)
+        ;
+
+        
+    
+    
+            circle_marker_4fb84d7bf7ef8b78b000dbe2d8fd3c2c.bindTooltip(
+                `<div>
+                     May 25 21:00 | 45 kts | Cyclonic Storm (34-47 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_f4f9d722590c6b2876f97cb4be485d17 = L.circleMarker(
+                [19.6, 89.2],
+                {"bubblingMouseEvents": true, "color": "#f59e0b", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#f59e0b", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_ffd63af76336984e6870582e69dbba31);
+        
+    
+        var popup_bec1c52c2b28937b2f54bc91f4f22581 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_10a2a6eadc2faa1c5b165264699f76f2 = $(`<div id="html_10a2a6eadc2faa1c5b165264699f76f2" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #f59e0b; font-size: 14px;">Cyclone REMAL</b><br/>             <b>Time:</b> 2024-05-26 00:00 UTC<br/>             <b>Intensity:</b> Severe Cyclonic Storm (48-63 kts)<br/>             <b>Wind:</b> 50.0 kts (92.6 km/h)<br/>             <b>Central Pressure:</b> 984.0 mb<br/>             <b>Location:</b> 19.60°N, 89.20°E                      </div>         </div>`)[0];
+                popup_bec1c52c2b28937b2f54bc91f4f22581.setContent(html_10a2a6eadc2faa1c5b165264699f76f2);
+            
+        
+
+        circle_marker_f4f9d722590c6b2876f97cb4be485d17.bindPopup(popup_bec1c52c2b28937b2f54bc91f4f22581)
+        ;
+
+        
+    
+    
+            circle_marker_f4f9d722590c6b2876f97cb4be485d17.bindTooltip(
+                `<div>
+                     May 26 00:00 | 50 kts | Severe Cyclonic Storm (48-63 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_26cb5373cfbba22ac354be1fb880b7e7 = L.circleMarker(
+                [19.9, 89.1],
+                {"bubblingMouseEvents": true, "color": "#f59e0b", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#f59e0b", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_ffd63af76336984e6870582e69dbba31);
+        
+    
+        var popup_3325336c426da416b6a82b31884e86a4 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_b01c0ecf9cf55484ed8a2829a0c87974 = $(`<div id="html_b01c0ecf9cf55484ed8a2829a0c87974" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #f59e0b; font-size: 14px;">Cyclone REMAL</b><br/>             <b>Time:</b> 2024-05-26 03:00 UTC<br/>             <b>Intensity:</b> Severe Cyclonic Storm (48-63 kts)<br/>             <b>Wind:</b> 50.0 kts (92.6 km/h)<br/>             <b>Central Pressure:</b> 984.0 mb<br/>             <b>Location:</b> 19.90°N, 89.10°E                      </div>         </div>`)[0];
+                popup_3325336c426da416b6a82b31884e86a4.setContent(html_b01c0ecf9cf55484ed8a2829a0c87974);
+            
+        
+
+        circle_marker_26cb5373cfbba22ac354be1fb880b7e7.bindPopup(popup_3325336c426da416b6a82b31884e86a4)
+        ;
+
+        
+    
+    
+            circle_marker_26cb5373cfbba22ac354be1fb880b7e7.bindTooltip(
+                `<div>
+                     May 26 03:00 | 50 kts | Severe Cyclonic Storm (48-63 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_db21effc7056cfec7d8a95ae51753f91 = L.circleMarker(
+                [20.3, 89.1],
+                {"bubblingMouseEvents": true, "color": "#f59e0b", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#f59e0b", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_ffd63af76336984e6870582e69dbba31);
+        
+    
+        var popup_215ac80e0585662c1d6b293932643d01 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_d4a9351963d8d850d905dc5e99df7af3 = $(`<div id="html_d4a9351963d8d850d905dc5e99df7af3" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #f59e0b; font-size: 14px;">Cyclone REMAL</b><br/>             <b>Time:</b> 2024-05-26 06:00 UTC<br/>             <b>Intensity:</b> Severe Cyclonic Storm (48-63 kts)<br/>             <b>Wind:</b> 50.0 kts (92.6 km/h)<br/>             <b>Central Pressure:</b> 983.0 mb<br/>             <b>Location:</b> 20.30°N, 89.10°E                      </div>         </div>`)[0];
+                popup_215ac80e0585662c1d6b293932643d01.setContent(html_d4a9351963d8d850d905dc5e99df7af3);
+            
+        
+
+        circle_marker_db21effc7056cfec7d8a95ae51753f91.bindPopup(popup_215ac80e0585662c1d6b293932643d01)
+        ;
+
+        
+    
+    
+            circle_marker_db21effc7056cfec7d8a95ae51753f91.bindTooltip(
+                `<div>
+                     May 26 06:00 | 50 kts | Severe Cyclonic Storm (48-63 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_a8a744f7d7b73928b782c749c3753394 = L.circleMarker(
+                [20.6, 89.1],
+                {"bubblingMouseEvents": true, "color": "#f59e0b", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#f59e0b", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_ffd63af76336984e6870582e69dbba31);
+        
+    
+        var popup_0b9a5c4d778f2700590d46a5a62e59e0 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_7e40ce3f23058741ee7fca1eebd632a1 = $(`<div id="html_7e40ce3f23058741ee7fca1eebd632a1" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #f59e0b; font-size: 14px;">Cyclone REMAL</b><br/>             <b>Time:</b> 2024-05-26 09:00 UTC<br/>             <b>Intensity:</b> Severe Cyclonic Storm (48-63 kts)<br/>             <b>Wind:</b> 55.0 kts (101.9 km/h)<br/>             <b>Central Pressure:</b> 981.0 mb<br/>             <b>Location:</b> 20.60°N, 89.10°E                      </div>         </div>`)[0];
+                popup_0b9a5c4d778f2700590d46a5a62e59e0.setContent(html_7e40ce3f23058741ee7fca1eebd632a1);
+            
+        
+
+        circle_marker_a8a744f7d7b73928b782c749c3753394.bindPopup(popup_0b9a5c4d778f2700590d46a5a62e59e0)
+        ;
+
+        
+    
+    
+            circle_marker_a8a744f7d7b73928b782c749c3753394.bindTooltip(
+                `<div>
+                     May 26 09:00 | 55 kts | Severe Cyclonic Storm (48-63 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_39acec031325eab00e359a8bd8a37c98 = L.circleMarker(
+                [21.2, 89.1],
+                {"bubblingMouseEvents": true, "color": "#ffffff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#f59e0b", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(map_ffd63af76336984e6870582e69dbba31);
+        
+    
+        var popup_8e00bbaf143e1945828b968bcd2c4cc0 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_def75143c2e1d3cdd5248938eac6af2d = $(`<div id="html_def75143c2e1d3cdd5248938eac6af2d" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #f59e0b; font-size: 14px;">Cyclone REMAL</b><br/>             <b>Time:</b> 2024-05-26 12:00 UTC<br/>             <b>Intensity:</b> Severe Cyclonic Storm (48-63 kts)<br/>             <b>Wind:</b> 60.0 kts (111.1 km/h)<br/>             <b>Central Pressure:</b> 978.0 mb<br/>             <b>Location:</b> 21.20°N, 89.10°E             <br/><b style="color: #ef4444;">★ PEAK INTENSITY</b>         </div>         </div>`)[0];
+                popup_8e00bbaf143e1945828b968bcd2c4cc0.setContent(html_def75143c2e1d3cdd5248938eac6af2d);
+            
+        
+
+        circle_marker_39acec031325eab00e359a8bd8a37c98.bindPopup(popup_8e00bbaf143e1945828b968bcd2c4cc0)
+        ;
+
+        
+    
+    
+            circle_marker_39acec031325eab00e359a8bd8a37c98.bindTooltip(
+                `<div>
+                     May 26 12:00 | 60 kts | Severe Cyclonic Storm (48-63 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_cbf89c814d4e449c93c44569d4f5a799 = L.circleMarker(
+                [21.5, 89.0],
+                {"bubblingMouseEvents": true, "color": "#f59e0b", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#f59e0b", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_ffd63af76336984e6870582e69dbba31);
+        
+    
+        var popup_a7c2c97a9dbb2dd8a10c2f1c22d1bd23 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_f682782d44b659a63e1956f39bd09ca7 = $(`<div id="html_f682782d44b659a63e1956f39bd09ca7" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #f59e0b; font-size: 14px;">Cyclone REMAL</b><br/>             <b>Time:</b> 2024-05-26 14:00 UTC<br/>             <b>Intensity:</b> Severe Cyclonic Storm (48-63 kts)<br/>             <b>Wind:</b> 60.0 kts (111.1 km/h)<br/>             <b>Central Pressure:</b> 977.0 mb<br/>             <b>Location:</b> 21.50°N, 89.00°E                      </div>         </div>`)[0];
+                popup_a7c2c97a9dbb2dd8a10c2f1c22d1bd23.setContent(html_f682782d44b659a63e1956f39bd09ca7);
+            
+        
+
+        circle_marker_cbf89c814d4e449c93c44569d4f5a799.bindPopup(popup_a7c2c97a9dbb2dd8a10c2f1c22d1bd23)
+        ;
+
+        
+    
+    
+            circle_marker_cbf89c814d4e449c93c44569d4f5a799.bindTooltip(
+                `<div>
+                     May 26 14:00 | 60 kts | Severe Cyclonic Storm (48-63 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_c93e33f4851964dca9602afa3826e8c2 = L.circleMarker(
+                [21.6, 89.0],
+                {"bubblingMouseEvents": true, "color": "#f59e0b", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#f59e0b", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_ffd63af76336984e6870582e69dbba31);
+        
+    
+        var popup_8ed1fc1f9ccaecb8b507935b7c5be6e9 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_3e261240451df6e55e856aeec2ae95be = $(`<div id="html_3e261240451df6e55e856aeec2ae95be" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #f59e0b; font-size: 14px;">Cyclone REMAL</b><br/>             <b>Time:</b> 2024-05-26 15:00 UTC<br/>             <b>Intensity:</b> Severe Cyclonic Storm (48-63 kts)<br/>             <b>Wind:</b> 60.0 kts (111.1 km/h)<br/>             <b>Central Pressure:</b> 977.0 mb<br/>             <b>Location:</b> 21.60°N, 89.00°E                      </div>         </div>`)[0];
+                popup_8ed1fc1f9ccaecb8b507935b7c5be6e9.setContent(html_3e261240451df6e55e856aeec2ae95be);
+            
+        
+
+        circle_marker_c93e33f4851964dca9602afa3826e8c2.bindPopup(popup_8ed1fc1f9ccaecb8b507935b7c5be6e9)
+        ;
+
+        
+    
+    
+            circle_marker_c93e33f4851964dca9602afa3826e8c2.bindTooltip(
+                `<div>
+                     May 26 15:00 | 60 kts | Severe Cyclonic Storm (48-63 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_369211412aac70bd7d55c670c192c011 = L.circleMarker(
+                [22.0, 88.9],
+                {"bubblingMouseEvents": true, "color": "#f59e0b", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#f59e0b", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_ffd63af76336984e6870582e69dbba31);
+        
+    
+        var popup_a64bdfd03530fc014ba09c34d19dfd77 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_a7bb0a666060a6675cbbe17191741f01 = $(`<div id="html_a7bb0a666060a6675cbbe17191741f01" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #f59e0b; font-size: 14px;">Cyclone REMAL</b><br/>             <b>Time:</b> 2024-05-26 18:00 UTC<br/>             <b>Intensity:</b> Severe Cyclonic Storm (48-63 kts)<br/>             <b>Wind:</b> 60.0 kts (111.1 km/h)<br/>             <b>Central Pressure:</b> 978.0 mb<br/>             <b>Location:</b> 22.00°N, 88.90°E                      </div>         </div>`)[0];
+                popup_a64bdfd03530fc014ba09c34d19dfd77.setContent(html_a7bb0a666060a6675cbbe17191741f01);
+            
+        
+
+        circle_marker_369211412aac70bd7d55c670c192c011.bindPopup(popup_a64bdfd03530fc014ba09c34d19dfd77)
+        ;
+
+        
+    
+    
+            circle_marker_369211412aac70bd7d55c670c192c011.bindTooltip(
+                `<div>
+                     May 26 18:00 | 60 kts | Severe Cyclonic Storm (48-63 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_c7a641b49857f8def94daa925f831807 = L.circleMarker(
+                [22.2, 88.9],
+                {"bubblingMouseEvents": true, "color": "#f59e0b", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#f59e0b", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_ffd63af76336984e6870582e69dbba31);
+        
+    
+        var popup_8b3d1d2cbe810914195d9ea464ecca17 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_36175a138f4609a19f165592bac0d6cc = $(`<div id="html_36175a138f4609a19f165592bac0d6cc" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #f59e0b; font-size: 14px;">Cyclone REMAL</b><br/>             <b>Time:</b> 2024-05-26 21:00 UTC<br/>             <b>Intensity:</b> Severe Cyclonic Storm (48-63 kts)<br/>             <b>Wind:</b> 55.0 kts (101.9 km/h)<br/>             <b>Central Pressure:</b> 980.0 mb<br/>             <b>Location:</b> 22.20°N, 88.90°E                      </div>         </div>`)[0];
+                popup_8b3d1d2cbe810914195d9ea464ecca17.setContent(html_36175a138f4609a19f165592bac0d6cc);
+            
+        
+
+        circle_marker_c7a641b49857f8def94daa925f831807.bindPopup(popup_8b3d1d2cbe810914195d9ea464ecca17)
+        ;
+
+        
+    
+    
+            circle_marker_c7a641b49857f8def94daa925f831807.bindTooltip(
+                `<div>
+                     May 26 21:00 | 55 kts | Severe Cyclonic Storm (48-63 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_911b6ce6b911125f2a53558e9933cd0e = L.circleMarker(
+                [22.6, 89.0],
+                {"bubblingMouseEvents": true, "color": "#f59e0b", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#f59e0b", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_ffd63af76336984e6870582e69dbba31);
+        
+    
+        var popup_73c40612eb5ada82ed9935a056ea0a1d = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_6fbfd2370a2a98612f45be578d5e114c = $(`<div id="html_6fbfd2370a2a98612f45be578d5e114c" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #f59e0b; font-size: 14px;">Cyclone REMAL</b><br/>             <b>Time:</b> 2024-05-27 00:00 UTC<br/>             <b>Intensity:</b> Severe Cyclonic Storm (48-63 kts)<br/>             <b>Wind:</b> 50.0 kts (92.6 km/h)<br/>             <b>Central Pressure:</b> 980.0 mb<br/>             <b>Location:</b> 22.60°N, 89.00°E                      </div>         </div>`)[0];
+                popup_73c40612eb5ada82ed9935a056ea0a1d.setContent(html_6fbfd2370a2a98612f45be578d5e114c);
+            
+        
+
+        circle_marker_911b6ce6b911125f2a53558e9933cd0e.bindPopup(popup_73c40612eb5ada82ed9935a056ea0a1d)
+        ;
+
+        
+    
+    
+            circle_marker_911b6ce6b911125f2a53558e9933cd0e.bindTooltip(
+                `<div>
+                     May 27 00:00 | 50 kts | Severe Cyclonic Storm (48-63 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_92a12908fb4a9a66440f3c3d0369a4a4 = L.circleMarker(
+                [22.8, 89.1],
+                {"bubblingMouseEvents": true, "color": "#f59e0b", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#f59e0b", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_ffd63af76336984e6870582e69dbba31);
+        
+    
+        var popup_437e2a239c6051255d94481b8714dceb = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_722ddaf623b679f100a34f81723c9f9a = $(`<div id="html_722ddaf623b679f100a34f81723c9f9a" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #f59e0b; font-size: 14px;">Cyclone REMAL</b><br/>             <b>Time:</b> 2024-05-27 03:00 UTC<br/>             <b>Intensity:</b> Severe Cyclonic Storm (48-63 kts)<br/>             <b>Wind:</b> 48.0 kts (88.9 km/h)<br/>             <b>Central Pressure:</b> 981.0 mb<br/>             <b>Location:</b> 22.80°N, 89.10°E                      </div>         </div>`)[0];
+                popup_437e2a239c6051255d94481b8714dceb.setContent(html_722ddaf623b679f100a34f81723c9f9a);
+            
+        
+
+        circle_marker_92a12908fb4a9a66440f3c3d0369a4a4.bindPopup(popup_437e2a239c6051255d94481b8714dceb)
+        ;
+
+        
+    
+    
+            circle_marker_92a12908fb4a9a66440f3c3d0369a4a4.bindTooltip(
+                `<div>
+                     May 27 03:00 | 48 kts | Severe Cyclonic Storm (48-63 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_045953b8d33deb704e9e57e4d9194652 = L.circleMarker(
+                [23.1, 89.1],
+                {"bubblingMouseEvents": true, "color": "#10b981", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#10b981", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_ffd63af76336984e6870582e69dbba31);
+        
+    
+        var popup_c545e90cc0e4dc5ef341e4b59219b5aa = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_b4ebff4a1829323101900a8328f73ff4 = $(`<div id="html_b4ebff4a1829323101900a8328f73ff4" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #10b981; font-size: 14px;">Cyclone REMAL</b><br/>             <b>Time:</b> 2024-05-27 06:00 UTC<br/>             <b>Intensity:</b> Cyclonic Storm (34-47 kts)<br/>             <b>Wind:</b> 45.0 kts (83.3 km/h)<br/>             <b>Central Pressure:</b> 981.0 mb<br/>             <b>Location:</b> 23.10°N, 89.10°E                      </div>         </div>`)[0];
+                popup_c545e90cc0e4dc5ef341e4b59219b5aa.setContent(html_b4ebff4a1829323101900a8328f73ff4);
+            
+        
+
+        circle_marker_045953b8d33deb704e9e57e4d9194652.bindPopup(popup_c545e90cc0e4dc5ef341e4b59219b5aa)
+        ;
+
+        
+    
+    
+            circle_marker_045953b8d33deb704e9e57e4d9194652.bindTooltip(
+                `<div>
+                     May 27 06:00 | 45 kts | Cyclonic Storm (34-47 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_00bf37853fef9211007fe87cf22d1ebe = L.circleMarker(
+                [23.3, 89.3],
+                {"bubblingMouseEvents": true, "color": "#10b981", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#10b981", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_ffd63af76336984e6870582e69dbba31);
+        
+    
+        var popup_abd744c2e748553772dbf5825794f506 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_c56c904efa3ffc3d4bfbe935eaf48205 = $(`<div id="html_c56c904efa3ffc3d4bfbe935eaf48205" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #10b981; font-size: 14px;">Cyclone REMAL</b><br/>             <b>Time:</b> 2024-05-27 09:00 UTC<br/>             <b>Intensity:</b> Cyclonic Storm (34-47 kts)<br/>             <b>Wind:</b> 40.0 kts (74.1 km/h)<br/>             <b>Central Pressure:</b> 983.0 mb<br/>             <b>Location:</b> 23.30°N, 89.30°E                      </div>         </div>`)[0];
+                popup_abd744c2e748553772dbf5825794f506.setContent(html_c56c904efa3ffc3d4bfbe935eaf48205);
+            
+        
+
+        circle_marker_00bf37853fef9211007fe87cf22d1ebe.bindPopup(popup_abd744c2e748553772dbf5825794f506)
+        ;
+
+        
+    
+    
+            circle_marker_00bf37853fef9211007fe87cf22d1ebe.bindTooltip(
+                `<div>
+                     May 27 09:00 | 40 kts | Cyclonic Storm (34-47 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_2cd8188941d1ffa107006090e56729bb = L.circleMarker(
+                [23.6, 89.6],
+                {"bubblingMouseEvents": true, "color": "#10b981", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#10b981", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_ffd63af76336984e6870582e69dbba31);
+        
+    
+        var popup_6f9a7775e5b3629e0a81ecc0d4e6f93e = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_0614fe6ef88cab8e3483c92b69a1336f = $(`<div id="html_0614fe6ef88cab8e3483c92b69a1336f" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #10b981; font-size: 14px;">Cyclone REMAL</b><br/>             <b>Time:</b> 2024-05-27 12:00 UTC<br/>             <b>Intensity:</b> Cyclonic Storm (34-47 kts)<br/>             <b>Wind:</b> 35.0 kts (64.8 km/h)<br/>             <b>Central Pressure:</b> 985.0 mb<br/>             <b>Location:</b> 23.60°N, 89.60°E                      </div>         </div>`)[0];
+                popup_6f9a7775e5b3629e0a81ecc0d4e6f93e.setContent(html_0614fe6ef88cab8e3483c92b69a1336f);
+            
+        
+
+        circle_marker_2cd8188941d1ffa107006090e56729bb.bindPopup(popup_6f9a7775e5b3629e0a81ecc0d4e6f93e)
+        ;
+
+        
+    
+    
+            circle_marker_2cd8188941d1ffa107006090e56729bb.bindTooltip(
+                `<div>
+                     May 27 12:00 | 35 kts | Cyclonic Storm (34-47 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_b788b205a252e51da497b84ad4f82546 = L.circleMarker(
+                [23.8, 90.1],
+                {"bubblingMouseEvents": true, "color": "#06b6d4", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#06b6d4", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_ffd63af76336984e6870582e69dbba31);
+        
+    
+        var popup_65d53289ec1317cafd67d9532786a7c0 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_1b1f0b0e36931edf8671a1ac3f4b672d = $(`<div id="html_1b1f0b0e36931edf8671a1ac3f4b672d" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #06b6d4; font-size: 14px;">Cyclone REMAL</b><br/>             <b>Time:</b> 2024-05-27 15:00 UTC<br/>             <b>Intensity:</b> Deep Depression (28-33 kts)<br/>             <b>Wind:</b> 33.0 kts (61.1 km/h)<br/>             <b>Central Pressure:</b> 986.0 mb<br/>             <b>Location:</b> 23.80°N, 90.10°E                      </div>         </div>`)[0];
+                popup_65d53289ec1317cafd67d9532786a7c0.setContent(html_1b1f0b0e36931edf8671a1ac3f4b672d);
+            
+        
+
+        circle_marker_b788b205a252e51da497b84ad4f82546.bindPopup(popup_65d53289ec1317cafd67d9532786a7c0)
+        ;
+
+        
+    
+    
+            circle_marker_b788b205a252e51da497b84ad4f82546.bindTooltip(
+                `<div>
+                     May 27 15:00 | 33 kts | Deep Depression (28-33 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_55e02a06f00cd3d8aed9757bbcd5791b = L.circleMarker(
+                [24.1, 90.5],
+                {"bubblingMouseEvents": true, "color": "#06b6d4", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#06b6d4", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_ffd63af76336984e6870582e69dbba31);
+        
+    
+        var popup_be844e3247eb8a5df53f6292eb3de9af = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_6589cb75c5baf00d7078b916ccfb5e61 = $(`<div id="html_6589cb75c5baf00d7078b916ccfb5e61" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #06b6d4; font-size: 14px;">Cyclone REMAL</b><br/>             <b>Time:</b> 2024-05-27 18:00 UTC<br/>             <b>Intensity:</b> Deep Depression (28-33 kts)<br/>             <b>Wind:</b> 30.0 kts (55.6 km/h)<br/>             <b>Central Pressure:</b> 987.0 mb<br/>             <b>Location:</b> 24.10°N, 90.50°E                      </div>         </div>`)[0];
+                popup_be844e3247eb8a5df53f6292eb3de9af.setContent(html_6589cb75c5baf00d7078b916ccfb5e61);
+            
+        
+
+        circle_marker_55e02a06f00cd3d8aed9757bbcd5791b.bindPopup(popup_be844e3247eb8a5df53f6292eb3de9af)
+        ;
+
+        
+    
+    
+            circle_marker_55e02a06f00cd3d8aed9757bbcd5791b.bindTooltip(
+                `<div>
+                     May 27 18:00 | 30 kts | Deep Depression (28-33 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_78373b1ba36f283c86b8f3b60715d432 = L.circleMarker(
+                [24.3, 90.8],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_ffd63af76336984e6870582e69dbba31);
+        
+    
+        var popup_cfb4b885ea4b61f17028f1d6daef2259 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_7eb12ce19568c2cc5add397f6630a664 = $(`<div id="html_7eb12ce19568c2cc5add397f6630a664" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #3b82f6; font-size: 14px;">Cyclone REMAL</b><br/>             <b>Time:</b> 2024-05-27 21:00 UTC<br/>             <b>Intensity:</b> Depression (<28 kts)<br/>             <b>Wind:</b> 25.0 kts (46.3 km/h)<br/>             <b>Central Pressure:</b> 991.0 mb<br/>             <b>Location:</b> 24.30°N, 90.80°E                      </div>         </div>`)[0];
+                popup_cfb4b885ea4b61f17028f1d6daef2259.setContent(html_7eb12ce19568c2cc5add397f6630a664);
+            
+        
+
+        circle_marker_78373b1ba36f283c86b8f3b60715d432.bindPopup(popup_cfb4b885ea4b61f17028f1d6daef2259)
+        ;
+
+        
+    
+    
+            circle_marker_78373b1ba36f283c86b8f3b60715d432.bindTooltip(
+                `<div>
+                     May 27 21:00 | 25 kts | Depression (<28 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_fa599e5409e9009f513671107ef5cb56 = L.circleMarker(
+                [24.5, 91.1],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_ffd63af76336984e6870582e69dbba31);
+        
+    
+        var popup_6a264d78e08875ca1a9535327d6834f4 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_6be5d40baa0e4fe7ab7b54881ae2b232 = $(`<div id="html_6be5d40baa0e4fe7ab7b54881ae2b232" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #3b82f6; font-size: 14px;">Cyclone REMAL</b><br/>             <b>Time:</b> 2024-05-28 00:00 UTC<br/>             <b>Intensity:</b> Depression (<28 kts)<br/>             <b>Wind:</b> 20.0 kts (37.0 km/h)<br/>             <b>Central Pressure:</b> 991.0 mb<br/>             <b>Location:</b> 24.50°N, 91.10°E                      </div>         </div>`)[0];
+                popup_6a264d78e08875ca1a9535327d6834f4.setContent(html_6be5d40baa0e4fe7ab7b54881ae2b232);
+            
+        
+
+        circle_marker_fa599e5409e9009f513671107ef5cb56.bindPopup(popup_6a264d78e08875ca1a9535327d6834f4)
+        ;
+
+        
+    
+    
+            circle_marker_fa599e5409e9009f513671107ef5cb56.bindTooltip(
+                `<div>
+                     May 28 00:00 | 20 kts | Depression (<28 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_2575507c630049296bfbc181dd140971 = L.circleMarker(
+                [24.7, 91.5],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_ffd63af76336984e6870582e69dbba31);
+        
+    
+        var popup_0b181ecc3b0e9ee15d3d0376a20408c7 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_54d41595953cad81be614de9e917509e = $(`<div id="html_54d41595953cad81be614de9e917509e" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #3b82f6; font-size: 14px;">Cyclone REMAL</b><br/>             <b>Time:</b> 2024-05-28 03:00 UTC<br/>             <b>Intensity:</b> Depression (<28 kts)<br/>             <b>Wind:</b> 20.0 kts (37.0 km/h)<br/>             <b>Central Pressure:</b> 992.0 mb<br/>             <b>Location:</b> 24.70°N, 91.50°E                      </div>         </div>`)[0];
+                popup_0b181ecc3b0e9ee15d3d0376a20408c7.setContent(html_54d41595953cad81be614de9e917509e);
+            
+        
+
+        circle_marker_2575507c630049296bfbc181dd140971.bindPopup(popup_0b181ecc3b0e9ee15d3d0376a20408c7)
+        ;
+
+        
+    
+    
+            circle_marker_2575507c630049296bfbc181dd140971.bindTooltip(
+                `<div>
+                     May 28 03:00 | 20 kts | Depression (<28 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_dc7976cd297d626c75516b75b7d7c0a3 = L.circleMarker(
+                [25.1, 91.8],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 1}
+            ).addTo(map_ffd63af76336984e6870582e69dbba31);
+        
+    
+        var popup_187648b5ddc208cc3ca67bf251bfea24 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_89a89aca515a98aa1deed9529a52082b = $(`<div id="html_89a89aca515a98aa1deed9529a52082b" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; min-width: 200px;">             <b style="color: #3b82f6; font-size: 14px;">Cyclone REMAL</b><br/>             <b>Time:</b> 2024-05-28 06:00 UTC<br/>             <b>Intensity:</b> Depression (<28 kts)<br/>             <b>Wind:</b> 20.0 kts (37.0 km/h)<br/>             <b>Central Pressure:</b> 993.0 mb<br/>             <b>Location:</b> 25.10°N, 91.80°E                      </div>         </div>`)[0];
+                popup_187648b5ddc208cc3ca67bf251bfea24.setContent(html_89a89aca515a98aa1deed9529a52082b);
+            
+        
+
+        circle_marker_dc7976cd297d626c75516b75b7d7c0a3.bindPopup(popup_187648b5ddc208cc3ca67bf251bfea24)
+        ;
+
+        
+    
+    
+            circle_marker_dc7976cd297d626c75516b75b7d7c0a3.bindTooltip(
+                `<div>
+                     May 28 06:00 | 20 kts | Depression (<28 kts)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_0c76d740aa566075c2233606ec455e4a = L.marker(
+                [25.1, 91.8],
+                {
+}
+            ).addTo(map_ffd63af76336984e6870582e69dbba31);
+        
+    
+            var icon_d292fefcbb03a6bd63f6b7420d4f9330 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "flag",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+            marker_0c76d740aa566075c2233606ec455e4a.bindTooltip(
+                `<div>
+                     Dissipation / Inland: May 28 06:00
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_0c76d740aa566075c2233606ec455e4a.setIcon(icon_d292fefcbb03a6bd63f6b7420d4f9330);
+            
+    
+            var layer_control_5fe0a66167fa74856e1cf80c96ff2c9e_layers = {
+                base_layers : {
+                    "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" : tile_layer_c6885f325fed0df3cea34ec3446bb999,
+                    "OpenStreetMap" : tile_layer_c362543b87f906662533e139f1bd6294,
+                },
+                overlays :  {
+                },
+            };
+            let layer_control_5fe0a66167fa74856e1cf80c96ff2c9e = L.control.layers(
+                layer_control_5fe0a66167fa74856e1cf80c96ff2c9e_layers.base_layers,
+                layer_control_5fe0a66167fa74856e1cf80c96ff2c9e_layers.overlays,
+                {
+  "position": "topright",
+  "collapsed": true,
+  "autoZIndex": true,
+}
+            ).addTo(map_ffd63af76336984e6870582e69dbba31);
+
+        
+</script>
+</html>

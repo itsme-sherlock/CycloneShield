@@ -1,0 +1,4 @@
+Hazard Zone,Threat Level,Wind Threshold (kts),Wind Threshold (km/h),Base Radius (km),Peak Scaled Radius (km),Total Swath Area (sq km),Peak Observed Wind,Min Central Pressure,Recommended Action
+Core Destructive Swath (>48 kts),CRITICAL,>= 48 kts,>= 88.9 km/h,60 km,67.1 km,"58,079.7",60.0 kts,977.0 mb,"Immediate mandatory evacuation to cyclone shelters; complete shutdown of ports, airports, and transport."
+Moderate Gale Swath (34-47 kts),HIGH,>= 34 kts,>= 63.0 km/h,120 km,159.4 km,"219,261.3",60.0 kts,977.0 mb,Relocate vulnerable coastal populations; reinforce temporary dwellings and clear storm drainage canals.
+Outer Squall Swath (25-33 kts),MODERATE,>= 25 kts,>= 46.3 km/h,200 km,283.9 km,"683,815.4",60.0 kts,977.0 mb,Total ban on offshore fishing; secure harbor vessels and activate district emergency response teams.
