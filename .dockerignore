@@ -1,0 +1,40 @@
+# Git version control
+.git
+.gitignore
+.github
+
+# Virtual Environments & Caches
+.venv
+venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+
+# IDE & System Files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Secrets & Local Overrides
+.env
+.env.*
+service-account*.json
+*.key
+
+# Large raw archive files (app uses cached noaa_sample_tracks.json or live BigQuery)
+cycloneshield/data/ibtracs_ni.csv
+data/ibtracs_ni.csv
+
+# Temporary test & scratch artifacts
+scratch/
+tmp/
+*.log

@@ -1,0 +1,312 @@
+{
+  "storm_name": "REMAL",
+  "generated_timestamp": "2026-09-28 03:16:26 UTC",
+  "total_audio_clips": 30,
+  "languages": [
+    "en",
+    "hi",
+    "bn"
+  ],
+  "districts": {
+    "South 24 Parganas": {
+      "slug": "south_24_parganas",
+      "threat_level": "CRITICAL",
+      "audio": {
+        "en": {
+          "filename": "remal_south_24_parganas_en.mp3",
+          "path": "C:\\Users\\LENOVO\\devfest\\cycloneshield\\outputs\\audio\\remal_south_24_parganas_en.mp3",
+          "relative_path": "outputs/audio/remal_south_24_parganas_en.mp3",
+          "file_size_kb": 378.6,
+          "tier": "CACHED",
+          "char_length": 529
+        },
+        "hi": {
+          "filename": "remal_south_24_parganas_hi.mp3",
+          "path": "C:\\Users\\LENOVO\\devfest\\cycloneshield\\outputs\\audio\\remal_south_24_parganas_hi.mp3",
+          "relative_path": "outputs/audio/remal_south_24_parganas_hi.mp3",
+          "file_size_kb": 379.7,
+          "tier": "CACHED",
+          "char_length": 480
+        },
+        "bn": {
+          "filename": "remal_south_24_parganas_bn.mp3",
+          "path": "C:\\Users\\LENOVO\\devfest\\cycloneshield\\outputs\\audio\\remal_south_24_parganas_bn.mp3",
+          "relative_path": "outputs/audio/remal_south_24_parganas_bn.mp3",
+          "file_size_kb": 454.7,
+          "tier": "CACHED",
+          "char_length": 534
+        }
+      }
+    },
+    "Satkhira": {
+      "slug": "satkhira",
+      "threat_level": "CRITICAL",
+      "audio": {
+        "en": {
+          "filename": "remal_satkhira_en.mp3",
+          "path": "C:\\Users\\LENOVO\\devfest\\cycloneshield\\outputs\\audio\\remal_satkhira_en.mp3",
+          "relative_path": "outputs/audio/remal_satkhira_en.mp3",
+          "file_size_kb": 334.5,
+          "tier": "CACHED",
+          "char_length": 450
+        },
+        "hi": {
+          "filename": "remal_satkhira_hi.mp3",
+          "path": "C:\\Users\\LENOVO\\devfest\\cycloneshield\\outputs\\audio\\remal_satkhira_hi.mp3",
+          "relative_path": "outputs/audio/remal_satkhira_hi.mp3",
+          "file_size_kb": 279.4,
+          "tier": "CACHED",
+          "char_length": 382
+        },
+        "bn": {
+          "filename": "remal_satkhira_bn.mp3",
+          "path": "C:\\Users\\LENOVO\\devfest\\cycloneshield\\outputs\\audio\\remal_satkhira_bn.mp3",
+          "relative_path": "outputs/audio/remal_satkhira_bn.mp3",
+          "file_size_kb": 344.1,
+          "tier": "CACHED",
+          "char_length": 436
+        }
+      }
+    },
+    "North 24 Parganas": {
+      "slug": "north_24_parganas",
+      "threat_level": "HIGH",
+      "audio": {
+        "en": {
+          "filename": "remal_north_24_parganas_en.mp3",
+          "path": "C:\\Users\\LENOVO\\devfest\\cycloneshield\\outputs\\audio\\remal_north_24_parganas_en.mp3",
+          "relative_path": "outputs/audio/remal_north_24_parganas_en.mp3",
+          "file_size_kb": 302.8,
+          "tier": "CACHED",
+          "char_length": 440
+        },
+        "hi": {
+          "filename": "remal_north_24_parganas_hi.mp3",
+          "path": "C:\\Users\\LENOVO\\devfest\\cycloneshield\\outputs\\audio\\remal_north_24_parganas_hi.mp3",
+          "relative_path": "outputs/audio/remal_north_24_parganas_hi.mp3",
+          "file_size_kb": 251.6,
+          "tier": "CACHED",
+          "char_length": 342
+        },
+        "bn": {
+          "filename": "remal_north_24_parganas_bn.mp3",
+          "path": "C:\\Users\\LENOVO\\devfest\\cycloneshield\\outputs\\audio\\remal_north_24_parganas_bn.mp3",
+          "relative_path": "outputs/audio/remal_north_24_parganas_bn.mp3",
+          "file_size_kb": 322.3,
+          "tier": "CACHED",
+          "char_length": 396
+        }
+      }
+    },
+    "Khulna": {
+      "slug": "khulna",
+      "threat_level": "HIGH",
+      "audio": {
+        "en": {
+          "filename": "remal_khulna_en.mp3",
+          "path": "C:\\Users\\LENOVO\\devfest\\cycloneshield\\outputs\\audio\\remal_khulna_en.mp3",
+          "relative_path": "outputs/audio/remal_khulna_en.mp3",
+          "file_size_kb": 294.6,
+          "tier": "CACHED",
+          "char_length": 426
+        },
+        "hi": {
+          "filename": "remal_khulna_hi.mp3",
+          "path": "C:\\Users\\LENOVO\\devfest\\cycloneshield\\outputs\\audio\\remal_khulna_hi.mp3",
+          "relative_path": "outputs/audio/remal_khulna_hi.mp3",
+          "file_size_kb": 197.2,
+          "tier": "CACHED",
+          "char_length": 286
+        },
+        "bn": {
+          "filename": "remal_khulna_bn.mp3",
+          "path": "C:\\Users\\LENOVO\\devfest\\cycloneshield\\outputs\\audio\\remal_khulna_bn.mp3",
+          "relative_path": "outputs/audio/remal_khulna_bn.mp3",
+          "file_size_kb": 278.1,
+          "tier": "CACHED",
+          "char_length": 375
+        }
+      }
+    },
+    "Bagerhat": {
+      "slug": "bagerhat",
+      "threat_level": "MODERATE",
+      "audio": {
+        "en": {
+          "filename": "remal_bagerhat_en.mp3",
+          "path": "C:\\Users\\LENOVO\\devfest\\cycloneshield\\outputs\\audio\\remal_bagerhat_en.mp3",
+          "relative_path": "outputs/audio/remal_bagerhat_en.mp3",
+          "file_size_kb": 237.0,
+          "tier": "CACHED",
+          "char_length": 362
+        },
+        "hi": {
+          "filename": "remal_bagerhat_hi.mp3",
+          "path": "C:\\Users\\LENOVO\\devfest\\cycloneshield\\outputs\\audio\\remal_bagerhat_hi.mp3",
+          "relative_path": "outputs/audio/remal_bagerhat_hi.mp3",
+          "file_size_kb": 193.7,
+          "tier": "CACHED",
+          "char_length": 275
+        },
+        "bn": {
+          "filename": "remal_bagerhat_bn.mp3",
+          "path": "C:\\Users\\LENOVO\\devfest\\cycloneshield\\outputs\\audio\\remal_bagerhat_bn.mp3",
+          "relative_path": "outputs/audio/remal_bagerhat_bn.mp3",
+          "file_size_kb": 231.0,
+          "tier": "CACHED",
+          "char_length": 278
+        }
+      }
+    },
+    "Purba Medinipur": {
+      "slug": "purba_medinipur",
+      "threat_level": "LOW",
+      "audio": {
+        "en": {
+          "filename": "remal_purba_medinipur_en.mp3",
+          "path": "C:\\Users\\LENOVO\\devfest\\cycloneshield\\outputs\\audio\\remal_purba_medinipur_en.mp3",
+          "relative_path": "outputs/audio/remal_purba_medinipur_en.mp3",
+          "file_size_kb": 225.6,
+          "tier": "CACHED",
+          "char_length": 387
+        },
+        "hi": {
+          "filename": "remal_purba_medinipur_hi.mp3",
+          "path": "C:\\Users\\LENOVO\\devfest\\cycloneshield\\outputs\\audio\\remal_purba_medinipur_hi.mp3",
+          "relative_path": "outputs/audio/remal_purba_medinipur_hi.mp3",
+          "file_size_kb": 205.1,
+          "tier": "CACHED",
+          "char_length": 275
+        },
+        "bn": {
+          "filename": "remal_purba_medinipur_bn.mp3",
+          "path": "C:\\Users\\LENOVO\\devfest\\cycloneshield\\outputs\\audio\\remal_purba_medinipur_bn.mp3",
+          "relative_path": "outputs/audio/remal_purba_medinipur_bn.mp3",
+          "file_size_kb": 253.7,
+          "tier": "CACHED",
+          "char_length": 307
+        }
+      }
+    },
+    "Patuakhali": {
+      "slug": "patuakhali",
+      "threat_level": "MINIMAL",
+      "audio": {
+        "en": {
+          "filename": "remal_patuakhali_en.mp3",
+          "path": "C:\\Users\\LENOVO\\devfest\\cycloneshield\\outputs\\audio\\remal_patuakhali_en.mp3",
+          "relative_path": "outputs/audio/remal_patuakhali_en.mp3",
+          "file_size_kb": 220.9,
+          "tier": "CACHED",
+          "char_length": 350
+        },
+        "hi": {
+          "filename": "remal_patuakhali_hi.mp3",
+          "path": "C:\\Users\\LENOVO\\devfest\\cycloneshield\\outputs\\audio\\remal_patuakhali_hi.mp3",
+          "relative_path": "outputs/audio/remal_patuakhali_hi.mp3",
+          "file_size_kb": 183.6,
+          "tier": "CACHED",
+          "char_length": 250
+        },
+        "bn": {
+          "filename": "remal_patuakhali_bn.mp3",
+          "path": "C:\\Users\\LENOVO\\devfest\\cycloneshield\\outputs\\audio\\remal_patuakhali_bn.mp3",
+          "relative_path": "outputs/audio/remal_patuakhali_bn.mp3",
+          "file_size_kb": 214.7,
+          "tier": "CACHED",
+          "char_length": 264
+        }
+      }
+    },
+    "Barguna": {
+      "slug": "barguna",
+      "threat_level": "MINIMAL",
+      "audio": {
+        "en": {
+          "filename": "remal_barguna_en.mp3",
+          "path": "C:\\Users\\LENOVO\\devfest\\cycloneshield\\outputs\\audio\\remal_barguna_en.mp3",
+          "relative_path": "outputs/audio/remal_barguna_en.mp3",
+          "file_size_kb": 209.1,
+          "tier": "CACHED",
+          "char_length": 339
+        },
+        "hi": {
+          "filename": "remal_barguna_hi.mp3",
+          "path": "C:\\Users\\LENOVO\\devfest\\cycloneshield\\outputs\\audio\\remal_barguna_hi.mp3",
+          "relative_path": "outputs/audio/remal_barguna_hi.mp3",
+          "file_size_kb": 179.1,
+          "tier": "CACHED",
+          "char_length": 239
+        },
+        "bn": {
+          "filename": "remal_barguna_bn.mp3",
+          "path": "C:\\Users\\LENOVO\\devfest\\cycloneshield\\outputs\\audio\\remal_barguna_bn.mp3",
+          "relative_path": "outputs/audio/remal_barguna_bn.mp3",
+          "file_size_kb": 203.4,
+          "tier": "CACHED",
+          "char_length": 246
+        }
+      }
+    },
+    "Kolkata": {
+      "slug": "kolkata",
+      "threat_level": "MINIMAL",
+      "audio": {
+        "en": {
+          "filename": "remal_kolkata_en.mp3",
+          "path": "C:\\Users\\LENOVO\\devfest\\cycloneshield\\outputs\\audio\\remal_kolkata_en.mp3",
+          "relative_path": "outputs/audio/remal_kolkata_en.mp3",
+          "file_size_kb": 225.9,
+          "tier": "CACHED",
+          "char_length": 384
+        },
+        "hi": {
+          "filename": "remal_kolkata_hi.mp3",
+          "path": "C:\\Users\\LENOVO\\devfest\\cycloneshield\\outputs\\audio\\remal_kolkata_hi.mp3",
+          "relative_path": "outputs/audio/remal_kolkata_hi.mp3",
+          "file_size_kb": 185.4,
+          "tier": "CACHED",
+          "char_length": 252
+        },
+        "bn": {
+          "filename": "remal_kolkata_bn.mp3",
+          "path": "C:\\Users\\LENOVO\\devfest\\cycloneshield\\outputs\\audio\\remal_kolkata_bn.mp3",
+          "relative_path": "outputs/audio/remal_kolkata_bn.mp3",
+          "file_size_kb": 222.0,
+          "tier": "CACHED",
+          "char_length": 269
+        }
+      }
+    },
+    "Howrah": {
+      "slug": "howrah",
+      "threat_level": "MINIMAL",
+      "audio": {
+        "en": {
+          "filename": "remal_howrah_en.mp3",
+          "path": "C:\\Users\\LENOVO\\devfest\\cycloneshield\\outputs\\audio\\remal_howrah_en.mp3",
+          "relative_path": "outputs/audio/remal_howrah_en.mp3",
+          "file_size_kb": 190.7,
+          "tier": "CACHED",
+          "char_length": 321
+        },
+        "hi": {
+          "filename": "remal_howrah_hi.mp3",
+          "path": "C:\\Users\\LENOVO\\devfest\\cycloneshield\\outputs\\audio\\remal_howrah_hi.mp3",
+          "relative_path": "outputs/audio/remal_howrah_hi.mp3",
+          "file_size_kb": 168.8,
+          "tier": "CACHED",
+          "char_length": 225
+        },
+        "bn": {
+          "filename": "remal_howrah_bn.mp3",
+          "path": "C:\\Users\\LENOVO\\devfest\\cycloneshield\\outputs\\audio\\remal_howrah_bn.mp3",
+          "relative_path": "outputs/audio/remal_howrah_bn.mp3",
+          "file_size_kb": 209.1,
+          "tier": "CACHED",
+          "char_length": 255
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "displayName": "cycloneshield-lifeline-risk-predictor",
+  "description": "Multi-target Calibrated Gradient Boosting Classifier predicting coastal highway cutoff and healthcare facility inundation probabilities during severe cyclonic events.",
+  "artifactUri": "gs://cycloneshield-models/v1.0/",
+  "containerSpec": {
+    "imageUri": "us-docker.pkg.dev/vertex-ai/prediction/sklearn-cpu.1-4:latest",
+    "healthRoute": "/v1/models/cycloneshield:predict",
+    "predictRoute": "/v1/models/cycloneshield:predict",
+    "ports": [
+      {
+        "containerPort": 8080
+      }
+    ]
+  },
+  "predictSchemata": {
+    "instanceSchemaUri": "gs://cycloneshield-models/schemas/instance_v1.json",
+    "predictionSchemaUri": "gs://cycloneshield-models/schemas/prediction_v1.json",
+    "inputFeatures": [
+      {
+        "name": "elevation_m",
+        "type": "FLOAT",
+        "description": "Digital Elevation Model height above mean sea level (meters)"
+      },
+      {
+        "name": "distance_to_coastline_km",
+        "type": "FLOAT",
+        "description": "Euclidean distance to active coastline/bay shoreline (km)"
+      },
+      {
+        "name": "storm_surge_m",
+        "type": "FLOAT",
+        "description": "Peak hydrodynamic storm surge inundation height above tide (meters)"
+      },
+      {
+        "name": "max_wind_speed_kts",
+        "type": "FLOAT",
+        "description": "Maximum sustained 1-minute wind gust speed (knots)"
+      },
+      {
+        "name": "accumulated_rain_mm",
+        "type": "FLOAT",
+        "description": "24-48hr cumulative precipitation from cyclone spiral bands (mm)"
+      },
+      {
+        "name": "soil_saturation_idx",
+        "type": "FLOAT",
+        "description": "Antecedent soil moisture saturation index (0.0 to 1.0)"
+      },
+      {
+        "name": "drainage_capacity_score",
+        "type": "FLOAT",
+        "description": "Local sluice gate & drainage infrastructure capacity (0.0 to 1.0)"
+      },
+      {
+        "name": "embankment_height_m",
+        "type": "FLOAT",
+        "description": "Engineered roadway embankment or facility floodwall elevation (meters)"
+      }
+    ]
+  },
+  "modelEvaluation": {
+    "evaluationDataset": "Bay of Bengal Historical Calibrated Coastal Benchmark (n=3,600)",
+    "highwayCutoffModel": {
+      "rocAuc": 0.9739,
+      "prAuc": 0.9042,
+      "f1Score": 0.7984,
+      "accuracy": 0.9306,
+      "brierScore": 0.0497
+    },
+    "hospitalInundationModel": {
+      "rocAuc": 0.9758,
+      "prAuc": 0.8877,
+      "f1Score": 0.8,
+      "accuracy": 0.9347,
+      "brierScore": 0.0457
+    }
+  },
+  "labels": {
+    "project": "cycloneshield",
+    "event": "devfest-2026",
+    "framework": "scikit-learn",
+    "model_type": "calibrated_gradient_boosting",
+    "serving_platform": "vertex_ai_endpoints",
+    "tier": "mission_critical_disaster_response"
+  },
+  "metadata": {
+    "targetHardware": "n1-standard-2",
+    "estimatedLatencyMs": 4.2,
+    "maxBatchSize": 256,
+    "createdTimestampUtc": "2026-09-28T09:30:00Z",
+    "author": "CycloneShield AI Engineering Team"
+  }
+}

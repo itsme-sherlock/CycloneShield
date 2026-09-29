@@ -1,0 +1,9 @@
+{
+  "name": "cycloneshield",
+  "version": "1.0.0",
+  "description": "CycloneShield - Track-Based Cyclone Impact & Infrastructure Vulnerability Forecaster",
+  "scripts": {
+    "dev": ".\\.venv\\Scripts\\python.exe -m streamlit run app.py",
+    "start": ".\\.venv\\Scripts\\python.exe -m streamlit run app.py"
+  }
+}

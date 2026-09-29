@@ -1,0 +1,150 @@
+[
+  {
+    "damage_type": "Road Submersion",
+    "severity_score": 4,
+    "threat_tier": "HIGH",
+    "estimated_water_depth_m": 1.2,
+    "access_impediment": "Complete Blockage",
+    "affected_infrastructure": "State Highway SH-3 (Basanti Arterial Highway) / R760 Coastal Link",
+    "visual_observations": [
+      "Severe saline floodwaters (~1.2m deep) completely inundating two-lane paved arterial highway",
+      "Civilian utility truck partially submerged up to bonnet level; wheel traction entirely lost",
+      "Fallen tree branches and tangled mangrove debris obstructing roadside drainage culverts",
+      "NDRF surveyor on scene verifying dangerous subsurface currents; light vehicular transit impossible"
+    ],
+    "recommended_ndrf_action": "Deploy 2nd Bn NDRF Boat Assault Unit with inflatable motorized craft (IRB). Establish heavy barricade checkpoint at elevated interchange and divert all medical convoys to designated bypass.",
+    "required_equipment": [
+      "Inflatable Rescue Boats (IRB) with 40HP Outboard Motors",
+      "High-capacity mobile dewatering pumps (2000 LPM)",
+      "Heavy towing winches and recovery haulers",
+      "Reflective solar-powered hazard beacons"
+    ],
+    "urgency_window_hours": "Immediate (< 2 hrs)",
+    "confidence_score": 0.95,
+    "incident_id": "INC-TRIAGE-FLOO-01",
+    "model_used": "offline-calibrated-vision-heuristics",
+    "processing_source": "CycloneShield Calibrated Disaster Vision Engine (Zero-Key Mode)",
+    "filename": "flooded_highway.jpg",
+    "mime_type": "image/jpeg",
+    "file_size_kb": 967.1,
+    "sample_meta": {
+      "id": "flooded_highway",
+      "name": "State Highway SH-3 (Basanti Corridor Submersion)",
+      "filename": "flooded_highway.jpg",
+      "scenario": "Severed arterial highway under 1.2m storm surge with stranded pickup truck",
+      "expected_tier": "HIGH",
+      "path": "C:\\Users\\LENOVO\\devfest\\cycloneshield\\data\\sample_damage\\flooded_highway.jpg"
+    }
+  },
+  {
+    "damage_type": "Embankment Breach",
+    "severity_score": 5,
+    "threat_tier": "CRITICAL",
+    "estimated_water_depth_m": 2.2,
+    "access_impediment": "Complete Blockage",
+    "affected_infrastructure": "Saline Coastal Embankment Polder 14/15 Dyke & Agricultural Bund",
+    "visual_observations": [
+      "Catastrophic 25-30 meter breach in earthen saline protective dyke during peak high-tide storm surge",
+      "High-velocity saltwater surge actively cascading into low-lying agricultural polder and settlements",
+      "Earthen mud and thatch homes flooded up to eave level with severe erosion of structural foundations",
+      "Local coastal residents wading through waist-to-chest deep turbulent water carrying salvaged relief rations"
+    ],
+    "recommended_ndrf_action": "Execute priority Mass Evacuation protocol for downstream coastal villages. Coordinate emergency dyke reinforcement with geotextile sandbags, boulders, and wire mesh gabions in coordination with Army Engineering Task Force.",
+    "required_equipment": [
+      "Deep-draft motorized tactical assault boats",
+      "10,000 Heavy geotextile sandbags & wire gabion cages",
+      "Helicopter rescue winching harnesses",
+      "High-buoyancy SOLAS life vests and satellite walkie-talkies"
+    ],
+    "urgency_window_hours": "Immediate (< 2 hrs)",
+    "confidence_score": 0.98,
+    "incident_id": "INC-TRIAGE-BROK-01",
+    "model_used": "offline-calibrated-vision-heuristics",
+    "processing_source": "CycloneShield Calibrated Disaster Vision Engine (Zero-Key Mode)",
+    "filename": "broken_embankment.jpg",
+    "mime_type": "image/jpeg",
+    "file_size_kb": 1058.2,
+    "sample_meta": {
+      "id": "broken_embankment",
+      "name": "Sundarbans Saline Embankment Dyke Breach",
+      "filename": "broken_embankment.jpg",
+      "scenario": "30-meter catastrophic dyke breach with saltwater surge flooding village huts",
+      "expected_tier": "CRITICAL",
+      "path": "C:\\Users\\LENOVO\\devfest\\cycloneshield\\data\\sample_damage\\broken_embankment.jpg"
+    }
+  },
+  {
+    "damage_type": "Healthcare Facility Inundation",
+    "severity_score": 5,
+    "threat_tier": "CRITICAL",
+    "estimated_water_depth_m": 0.9,
+    "access_impediment": "Partial Passage (Emergency Boats Only)",
+    "affected_infrastructure": "Sundarbans Rural Primary Health Centre (PHC) & Emergency Maternity Clinic",
+    "visual_observations": [
+      "Ground-floor clinical entrance, emergency ramp, and triage porch flooded under ~0.9m brackish water",
+      "Emergency ambulance immobilized in facility courtyard with water submerged past wheel axles",
+      "Vital medical oxygen cylinders and triage supply cartons emergency-relocated to elevated steps",
+      "Healthcare personnel and emergency responders wading through thigh-deep surge water to deliver care"
+    ],
+    "recommended_ndrf_action": "Deploy high-output submersible sludge dewatering pumps to clear emergency clinic wards. Air-drop emergency backup diesel fuel for cold-chain vaccine refrigeration and evacuate acute intensive care patients.",
+    "required_equipment": [
+      "Heavy submersible sludge dewatering pump sets (3-phase)",
+      "125 kVA Silent mobile diesel generator",
+      "Cold-chain insulated medical carriers & anti-venom supplies",
+      "Amphibious tracked all-terrain casualty transport"
+    ],
+    "urgency_window_hours": "Immediate (< 2 hrs)",
+    "confidence_score": 0.96,
+    "incident_id": "INC-TRIAGE-SUBM-01",
+    "model_used": "offline-calibrated-vision-heuristics",
+    "processing_source": "CycloneShield Calibrated Disaster Vision Engine (Zero-Key Mode)",
+    "filename": "submerged_clinic.jpg",
+    "mime_type": "image/jpeg",
+    "file_size_kb": 930.2,
+    "sample_meta": {
+      "id": "submerged_clinic",
+      "name": "Sundarbans Rural Hospital & PHC Inundation",
+      "filename": "submerged_clinic.jpg",
+      "scenario": "Flooded healthcare entrance, waterlogged ambulance & oxygen supply triage",
+      "expected_tier": "CRITICAL",
+      "path": "C:\\Users\\LENOVO\\devfest\\cycloneshield\\data\\sample_damage\\submerged_clinic.jpg"
+    }
+  },
+  {
+    "damage_type": "Electrical Grid Hazard",
+    "severity_score": 4,
+    "threat_tier": "HIGH",
+    "estimated_water_depth_m": 0.5,
+    "access_impediment": "Complete Blockage",
+    "affected_infrastructure": "33kV Rural Power Transmission Feeder & Village Arterial Access Road",
+    "visual_observations": [
+      "Multiple snapped reinforced concrete utility poles collapsed across flooded village roadway",
+      "High-voltage electrical transmission conductors lying directly in standing floodwater creating electrocution hazard",
+      "Massive uprooted banyan tree completely crushing roadway and entangling overhead distribution lines",
+      "Red-and-white hazard caution tape deployed; road completely impassable for relief trucks and ambulances"
+    ],
+    "recommended_ndrf_action": "Coordinate immediate transmission feeder de-energization with State Electricity Distribution Board. Deploy NDRF Heavy Debris & Tree Clearance Task Force equipped with insulated tools and hydraulic pole cranes.",
+    "required_equipment": [
+      "High-voltage certified insulating gloves, boots, and line detector rods",
+      "Hydraulic chainsaws and telescoping tree-pruning saws",
+      "Heavy mobile crane with winch hoist",
+      "Reflective road closure barriers and flashing beacons"
+    ],
+    "urgency_window_hours": "Urgent (< 6 hrs)",
+    "confidence_score": 0.93,
+    "incident_id": "INC-TRIAGE-DOWN-01",
+    "model_used": "offline-calibrated-vision-heuristics",
+    "processing_source": "CycloneShield Calibrated Disaster Vision Engine (Zero-Key Mode)",
+    "filename": "downed_power_grid.jpg",
+    "mime_type": "image/jpeg",
+    "file_size_kb": 1115.4,
+    "sample_meta": {
+      "id": "downed_power_grid",
+      "name": "33kV Feeder Grid & Downed Transmission Lines",
+      "filename": "downed_power_grid.jpg",
+      "scenario": "Snapped concrete poles and live cables submerged across flooded village road",
+      "expected_tier": "HIGH",
+      "path": "C:\\Users\\LENOVO\\devfest\\cycloneshield\\data\\sample_damage\\downed_power_grid.jpg"
+    }
+  }
+]

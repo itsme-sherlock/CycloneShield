@@ -1,0 +1,247 @@
+{
+  "dataset_samples": 3600,
+  "features": [
+    "elevation_m",
+    "distance_to_coastline_km",
+    "storm_surge_m",
+    "max_wind_speed_kts",
+    "accumulated_rain_mm",
+    "soil_saturation_idx",
+    "drainage_capacity_score",
+    "embankment_height_m"
+  ],
+  "feature_descriptions": {
+    "elevation_m": "Digital Elevation Model height above mean sea level (meters)",
+    "distance_to_coastline_km": "Euclidean distance to active coastline/bay shoreline (km)",
+    "storm_surge_m": "Peak hydrodynamic storm surge inundation height above tide (meters)",
+    "max_wind_speed_kts": "Maximum sustained 1-minute wind gust speed (knots)",
+    "accumulated_rain_mm": "24-48hr cumulative precipitation from cyclone spiral bands (mm)",
+    "soil_saturation_idx": "Antecedent soil moisture saturation index (0.0 to 1.0)",
+    "drainage_capacity_score": "Local sluice gate & drainage infrastructure capacity (0.0 to 1.0)",
+    "embankment_height_m": "Engineered roadway embankment or facility floodwall elevation (meters)"
+  },
+  "highway_cutoff": {
+    "Baseline (Logistic Regression)": {
+      "roc_auc": 0.9798,
+      "pr_auc": 0.9211,
+      "f1_score": 0.8514,
+      "accuracy": 0.9486,
+      "precision": 0.8983,
+      "recall": 0.8092,
+      "brier_score": 0.043,
+      "confusion_matrix": [
+        [
+          577,
+          12
+        ],
+        [
+          25,
+          106
+        ]
+      ]
+    },
+    "Random Forest Classifier": {
+      "roc_auc": 0.9746,
+      "pr_auc": 0.9081,
+      "f1_score": 0.7256,
+      "accuracy": 0.9181,
+      "precision": 0.9286,
+      "recall": 0.5954,
+      "brier_score": 0.0596,
+      "confusion_matrix": [
+        [
+          583,
+          6
+        ],
+        [
+          53,
+          78
+        ]
+      ]
+    },
+    "Gradient Boosting (Raw)": {
+      "roc_auc": 0.9752,
+      "pr_auc": 0.9097,
+      "f1_score": 0.8,
+      "accuracy": 0.9306,
+      "precision": 0.8403,
+      "recall": 0.7634,
+      "brier_score": 0.0489,
+      "confusion_matrix": [
+        [
+          570,
+          19
+        ],
+        [
+          31,
+          100
+        ]
+      ]
+    },
+    "Gradient Boosting (Calibrated)": {
+      "roc_auc": 0.9739,
+      "pr_auc": 0.9042,
+      "f1_score": 0.7984,
+      "accuracy": 0.9306,
+      "precision": 0.8462,
+      "recall": 0.7557,
+      "brier_score": 0.0497,
+      "confusion_matrix": [
+        [
+          571,
+          18
+        ],
+        [
+          32,
+          99
+        ]
+      ]
+    }
+  },
+  "hospital_inundation": {
+    "Baseline (Logistic Regression)": {
+      "roc_auc": 0.9765,
+      "pr_auc": 0.8936,
+      "f1_score": 0.8067,
+      "accuracy": 0.9361,
+      "precision": 0.7934,
+      "recall": 0.8205,
+      "brier_score": 0.0456,
+      "confusion_matrix": [
+        [
+          578,
+          25
+        ],
+        [
+          21,
+          96
+        ]
+      ]
+    },
+    "Random Forest Classifier": {
+      "roc_auc": 0.9741,
+      "pr_auc": 0.8834,
+      "f1_score": 0.7317,
+      "accuracy": 0.9236,
+      "precision": 0.8523,
+      "recall": 0.641,
+      "brier_score": 0.0548,
+      "confusion_matrix": [
+        [
+          590,
+          13
+        ],
+        [
+          42,
+          75
+        ]
+      ]
+    },
+    "Gradient Boosting (Raw)": {
+      "roc_auc": 0.9751,
+      "pr_auc": 0.8799,
+      "f1_score": 0.7932,
+      "accuracy": 0.9319,
+      "precision": 0.7833,
+      "recall": 0.8034,
+      "brier_score": 0.0489,
+      "confusion_matrix": [
+        [
+          577,
+          26
+        ],
+        [
+          23,
+          94
+        ]
+      ]
+    },
+    "Gradient Boosting (Calibrated)": {
+      "roc_auc": 0.9758,
+      "pr_auc": 0.8877,
+      "f1_score": 0.8,
+      "accuracy": 0.9347,
+      "precision": 0.7966,
+      "recall": 0.8034,
+      "brier_score": 0.0457,
+      "confusion_matrix": [
+        [
+          579,
+          24
+        ],
+        [
+          23,
+          94
+        ]
+      ]
+    }
+  },
+  "feature_importances_road": {
+    "elevation_m": {
+      "mean": 0.2244,
+      "std": 0.01651
+    },
+    "distance_to_coastline_km": {
+      "mean": 0.05779,
+      "std": 0.00652
+    },
+    "storm_surge_m": {
+      "mean": 0.17073,
+      "std": 0.01444
+    },
+    "max_wind_speed_kts": {
+      "mean": 0.00155,
+      "std": 0.00101
+    },
+    "accumulated_rain_mm": {
+      "mean": 0.00453,
+      "std": 0.00203
+    },
+    "soil_saturation_idx": {
+      "mean": 0.00177,
+      "std": 0.00083
+    },
+    "drainage_capacity_score": {
+      "mean": -0.00019,
+      "std": 0.00068
+    },
+    "embankment_height_m": {
+      "mean": 0.02133,
+      "std": 0.00403
+    }
+  },
+  "feature_importances_hospital": {
+    "elevation_m": {
+      "mean": 0.28479,
+      "std": 0.02086
+    },
+    "distance_to_coastline_km": {
+      "mean": 0.05567,
+      "std": 0.00825
+    },
+    "storm_surge_m": {
+      "mean": 0.13719,
+      "std": 0.01346
+    },
+    "max_wind_speed_kts": {
+      "mean": -0.00015,
+      "std": 0.0005
+    },
+    "accumulated_rain_mm": {
+      "mean": 0.00438,
+      "std": 0.00138
+    },
+    "soil_saturation_idx": {
+      "mean": 0.00061,
+      "std": 0.00062
+    },
+    "drainage_capacity_score": {
+      "mean": -0.00018,
+      "std": 0.00032
+    },
+    "embankment_height_m": {
+      "mean": 0.00487,
+      "std": 0.001
+    }
+  }
+}

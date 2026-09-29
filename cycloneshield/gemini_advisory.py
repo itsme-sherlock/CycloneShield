@@ -37,14 +37,34 @@ from typing import Dict, Any, List, Optional, Tuple
 import pandas as pd
 import requests
 
-# Set UTF-8 encoding for standard output on Windows
-if sys.platform.startswith("win"):
-    import io
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
+# Safe print helper to prevent "ValueError: I/O operation on closed file" in Streamlit runtime
+def _safe_print(*args, **kwargs):
     try:
-        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
-        sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
+        text = " ".join(str(a) for a in args) + kwargs.get("end", "\n")
+        if sys.__stdout__ and not getattr(sys.__stdout__, "closed", False):
+            try:
+                sys.__stdout__.write(text)
+                sys.__stdout__.flush()
+                return
+            except Exception:
+                pass
+        if sys.stdout and not getattr(sys.stdout, "closed", False):
+            try:
+                sys.stdout.write(text)
+                sys.stdout.flush()
+                return
+            except Exception:
+                pass
     except Exception:
         pass
+
+print = _safe_print
 
 # Base directory paths
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -55,8 +75,8 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # Google AI Studio API Endpoint
 GEMINI_API_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models"
-DEFAULT_MODEL = "gemini-2.5-flash"
-FALLBACK_MODEL = "gemini-1.5-flash"
+DEFAULT_MODEL = "gemini-3.7-flash"
+FALLBACK_MODEL = "gemini-3.5-flash"
 
 
 # ==============================================================================
@@ -420,19 +440,23 @@ def call_gemini_api(
         from google import genai
         from google.genai import types
         client = genai.Client(api_key=api_key)
-        response = client.models.generate_content(
-            model=model_name,
-            contents=prompt_payload,
-            config=types.GenerateContentConfig(
-                response_mime_type="application/json",
-                temperature=0.2,
-            )
-        )
-        if response and response.text:
-            parsed = json.loads(response.text)
-            if isinstance(parsed, list) and len(parsed) > 0:
-                print(f"[CycloneShield Gemini] Successfully generated advisories using `google-genai` SDK!")
-                return parsed
+        for target_model in [model_name, "gemini-3.5-flash", "gemini-3.8-flash", "gemini-3.7-flash"]:
+            try:
+                response = client.models.generate_content(
+                    model=target_model,
+                    contents=prompt_payload,
+                    config=types.GenerateContentConfig(
+                        response_mime_type="application/json",
+                        temperature=0.2,
+                    )
+                )
+                if response and response.text:
+                    parsed = json.loads(response.text)
+                    if isinstance(parsed, list) and len(parsed) > 0:
+                        print(f"[CycloneShield Gemini] Successfully generated advisories using `google-genai` SDK ({target_model})!")
+                        return parsed
+            except Exception as m_err:
+                print(f"[CycloneShield Gemini] SDK model '{target_model}' note: {str(m_err)[:100]}")
     except ImportError:
         pass
     except Exception as e:

@@ -1,0 +1,59 @@
+# ==============================================================================
+# CycloneShield - Google Cloud Build CI/CD Pipeline
+# ==============================================================================
+# Automated Container Build, Artifact Registry Push & Google Cloud Run Deploy
+# Free Tier Architecture: 120 build-minutes/day free + 2M Cloud Run requests/mo
+# ==============================================================================
+
+steps:
+  # Step 1: Build production Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-container'
+    args:
+      - 'build'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPOSITORY}/cycloneshield:$COMMIT_SHA'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPOSITORY}/cycloneshield:latest'
+      - '-f'
+      - 'Dockerfile'
+      - '.'
+
+  # Step 2: Push container images to Google Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-artifact-registry'
+    args:
+      - 'push'
+      - '--all-tags'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPOSITORY}/cycloneshield'
+
+  # Step 3: Deploy directly to Google Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'deploy-cloud-run'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'cycloneshield'
+      - '--image=${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPOSITORY}/cycloneshield:$COMMIT_SHA'
+      - '--region=${_REGION}'
+      - '--platform=managed'
+      - '--allow-unauthenticated'
+      - '--port=8080'
+      - '--memory=2Gi'
+      - '--cpu=2'
+      - '--min-instances=0'
+      - '--max-instances=10'
+      - '--timeout=300'
+      - '--set-env-vars=STREAMLIT_SERVER_HEADLESS=true,STREAMLIT_BROWSER_GATHER_USAGE_STATS=false'
+
+images:
+  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPOSITORY}/cycloneshield:$COMMIT_SHA'
+  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPOSITORY}/cycloneshield:latest'
+
+substitutions:
+  _REGION: 'asia-south1'
+  _AR_REPOSITORY: 'cycloneshield-repo'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
