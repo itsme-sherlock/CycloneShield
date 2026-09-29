@@ -147,7 +147,7 @@
         
     
             var tile_layer_202ac4f231251cf3c5c38660d70ca228 = L.tileLayer(
-                "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+                "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
                 {
   "minZoom": 0,
   "maxZoom": 20,
@@ -167,13 +167,13 @@
         
     
             var tile_layer_385636e008c1325852f6c795f8c869ac = L.tileLayer(
-                "https://mt1.google.com/vt/lyrs=m\u0026x={x}\u0026y={y}\u0026z={z}",
+                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
                 {
   "minZoom": 0,
   "maxZoom": 18,
   "maxNativeZoom": 18,
   "noWrap": false,
-  "attribution": "Google Maps Standard",
+  "attribution": "OpenStreetMap",
   "subdomains": "abc",
   "detectRetina": false,
   "tms": false,
@@ -187,13 +187,13 @@
         
     
             var tile_layer_c604da0f87e81e02d06ff69ede7a5fbc = L.tileLayer(
-                "https://mt1.google.com/vt/lyrs=p\u0026x={x}\u0026y={y}\u0026z={z}",
+                "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png",
                 {
   "minZoom": 0,
   "maxZoom": 18,
   "maxNativeZoom": 18,
   "noWrap": false,
-  "attribution": "Google Maps Terrain",
+  "attribution": "CartoDB Voyager",
   "subdomains": "abc",
   "detectRetina": false,
   "tms": false,
@@ -207,7 +207,7 @@
         
     
             var tile_layer_ce3d2f038ca46eca04de9acbfa597a1e = L.tileLayer(
-                "https://mt1.google.com/vt/lyrs=y\u0026x={x}\u0026y={y}\u0026z={z}",
+                "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
                 {
   "minZoom": 0,
   "maxZoom": 18,
@@ -6123,9 +6123,9 @@
             var layer_control_373d437f6f83b8710f2100ada2697709_layers = {
                 base_layers : {
                     "Disaster Ops Dark Mode" : tile_layer_202ac4f231251cf3c5c38660d70ca228,
-                    "Google Maps Road" : tile_layer_385636e008c1325852f6c795f8c869ac,
-                    "Google Maps Terrain" : tile_layer_c604da0f87e81e02d06ff69ede7a5fbc,
-                    "Google Satellite Hybrid (Default)" : tile_layer_ce3d2f038ca46eca04de9acbfa597a1e,
+                    "OpenStreetMap" : tile_layer_385636e008c1325852f6c795f8c869ac,
+                    "CartoDB Voyager" : tile_layer_c604da0f87e81e02d06ff69ede7a5fbc,
+                    "Disaster Ops Dark" : tile_layer_ce3d2f038ca46eca04de9acbfa597a1e,
                 },
                 overlays :  {
                     "Administrative Coastal Districts (Exposure Status)" : feature_group_e03e950435157d46bb5d61a26af5c9c3,

@@ -301,34 +301,15 @@ def plot_wind_swaths_map(
         tiles=None
     )
 
-    # Google Satellite Hybrid Layer (100% Free Google Maps Tile Server)
-    folium.TileLayer(
-        tiles="https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}",
-        attr="Google Maps Satellite Hybrid",
-        name="Google Satellite Hybrid",
-        overlay=False,
-        control=True
-    ).add_to(m)
-
-    # Google Standard Roadmap Layer
-    folium.TileLayer(
-        tiles="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
-        attr="Google Maps Roadmap",
-        name="Google Streets",
-        overlay=False,
-        control=True
-    ).add_to(m)
-
-    # CartoDB Dark Matter
+    # 100% Free Basemaps (No API Key Required)
     folium.TileLayer(
         tiles="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-        attr='&copy; <a href="https://carto.com/">CARTO</a>',
+        attr='&copy; <a href="https://carto.com/">CARTO</a> &copy; OpenStreetMap',
         name="CartoDB Dark Matter",
         overlay=False,
         control=True
     ).add_to(m)
 
-    # OpenStreetMap
     folium.TileLayer("OpenStreetMap", name="OpenStreetMap Standard").add_to(m)
 
     # 2. Add Wind Swaths (Render from Outer -> Moderate -> Core)

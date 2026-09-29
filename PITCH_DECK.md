@@ -1,322 +1,173 @@
-# 🌀 CycloneShield — Official Executive Pitch Deck (12 Slides)
-> **Track-Based Cyclone Impact & Infrastructure Vulnerability Forecaster**  
-> *Developed for Google DevFest / Google AI Hackathon (100% Free Tier Ecosystem)*  
-> **Repository**: [https://github.com/itsme-sherlock/CycloneShield](https://github.com/itsme-sherlock/CycloneShield)  
-> **Interactive Colab**: [Open in Google Colab](https://colab.research.google.com/github/itsme-sherlock/CycloneShield/blob/main/CycloneShield_Colab.ipynb)  
-> **Target Audience**: Google DevFest Judges, Disaster Response Authorities, Technical Evaluators  
+# 🌀 CycloneShield — 12-Slide Executive Pitch Deck Outline
+
+> **Transforming Cyclone Forecasts into District Lifeline Action Before Landfall**  
+> **Live Deployed Prototype**: [https://cycloneshield-vawrqbhtbgu8i6cafhbf3q.streamlit.app/](https://cycloneshield-vawrqbhtbgu8i6cafhbf3q.streamlit.app/)  
+> **Source Repository**: [https://github.com/itsme-sherlock/CycloneShield](https://github.com/itsme-sherlock/CycloneShield)  
+> **Interactive Google Colab**: [Open in Colab](https://colab.research.google.com/github/itsme-sherlock/CycloneShield/blob/main/CycloneShield_Colab.ipynb)  
+> **Event**: Google DevFest / Google AI Hackathon India  
 
 ---
 
-```
-  ____           _                  ____  _     _      _     _ 
- / ___|   _  ___| | ___  _ __   ___/ ___|| |__ (_) ___| | __| |
-| |  | | | |/ __| |/ _ \| '_ \ / _ \___ \| '_ \| |/ _ \ |/ _` |
-| |__| |_| | (__| | (_) | | | |  __/___) | | | | |  __/ | (_| |
- \____\__, |\___|_|\___/|_| |_|\___|____/|_| |_|_|\___|_|\__,_|
-      |___/                                                    
-```
+## Slide 1: Title & Core Promise
+### CycloneShield: Converting Storm Tracks into District Lifeline Action 48 Hours Before Landfall
+
+* **The Breakthrough**: A multi-state operational decision-support system predicting cut-off evacuation highways and flooded healthcare clinics 48 hours before cyclone landfall.
+* **Live Working Prototype**: Deployed, zero-barrier web app operating within Google Cloud's 100% free-tier limits at [cycloneshield-vawrqbhtbgu8i6cafhbf3q.streamlit.app](https://cycloneshield-vawrqbhtbgu8i6cafhbf3q.streamlit.app/).
+* **National Reach**: Covers 35 coastal districts across 5 states (West Bengal, Odisha, Andhra Pradesh, Tamil Nadu, Gujarat) in 7 regional Indian languages.
+
+**Speaker Notes (20s)**:  
+*"Good morning, judges. When a severe tropical cyclone approaches, tracking where it is headed is no longer the primary bottleneck. The real bottleneck is knowing what the storm will actually do to critical lifelines on the ground. CycloneShield bridges this last-mile gap—converting raw meteorological tracks into specific, lifeline-level infrastructure risk predictions 48 hours before landfall across India's coastline."*
 
 ---
 
-## 📽️ SLIDE 1: Title, Vision & Executive Summary
+## Slide 2: The Problem: The Last-Mile Operational Gap
+### Weather forecasts track the storm, but field teams still lack road and hospital impact data.
 
-### 🎯 CycloneShield: Transforming Weather Forecasts into Life-Saving Action
-- **Tagline**: Track-Based Cyclone Impact & Infrastructure Vulnerability Forecaster.
-- **Vision**: Closing the fatal "Last-Mile Disaster Gap" across India’s vulnerable coastal belt.
-- **Ecosystem**: Powered 100% by Google Cloud’s Free Tier (Gemini 2.5 Flash, Vertex AI, Google Earth Engine, BigQuery, Cloud Run, Cloud TTS).
+* **188M+ Coastal Citizens**: Over 188 million people live in India's coastal districts (Census 2011), with ~250 million within 50 km of the sea.
+* **The Information Disconnect**: Synoptic bulletins provide wind speeds, isobar charts, and landfall points, but not which arterial highway segments will flood or which hospital ICUs will lose power.
+* **The Duty Officer's Dilemma**: District Magistrates and NDRF commanders must stage rescue convoys without knowing which bridges submerge first or how to reach offline communities.
 
-```
-   METEOROLOGICAL FORECAST (Current)             CYCLONESHIELD LIFELINE INTELLIGENCE (Innovation)
-  ┌──────────────────────────────────────┐      ┌──────────────────────────────────────────────────┐
-  │ "Cyclone Remal makes landfall near   │ ───> │ • 47 Primary Health Centers inundated            │
-  │  21.8°N, 89.2°E with 60 kts winds    │      │ • 120.4 km State Highways submerged (SH-3/NH-117)│
-  │  and 977 mb central pressure."       │      │ • 18,400 citizens requiring prioritized boat lift│
-  └──────────────────────────────────────┘      │ • Trilingual radio alerts (English, Hindi, Bangla│
-                                                │ • Submersible dewatering pump dispatch directives│
-  ⚠️ Disaster Managers are left asking:         └──────────────────────────────────────────────────┘
-     Which highways are cut? Which ICUs fail?   ✅ Instant actionable answers 48–72h BEFORE landfall!
-```
-
-> 🎙️ **Speaker Notes (Slide 1 — 20 seconds)**:  
-> *"Good morning, judges. Every year, devastating cyclones strike India's coastlines. While meteorologists can predict where a storm will travel with remarkable precision, local authorities face the classic 'Last-Mile Disaster Gap': they don't know which state highways will be cut off by storm surge, which rural clinics will drown, or who needs immediate evacuation before communication towers collapse. This is CycloneShield—an end-to-end disaster impact and infrastructure vulnerability forecaster powered 100% by Google Cloud's free tier."*
+**Speaker Notes (25s)**:  
+*"India's coastal districts are home to over 188 million citizens. When a storm brews in the Bay of Bengal, the IMD provides accurate meteorological forecasts. But a District Magistrate cannot deploy an ambulance using wind isobar lines—they need to know if State Highway 3 is submerged and whether the local sub-divisional hospital can keep running. Today, that lifeline impact connection is missing at the district level."*
 
 ---
 
-## 📽️ SLIDE 2: The Problem — India's 7,516 km Coastline & The Last-Mile Gap
+## Slide 3: The Solution: An End-to-End Decision Pipeline
+### CycloneShield converts track forecasts into emergency directives through five automated steps.
 
-### ⚡ The High Stakes of Coastal India
-- **7,516 Kilometers** of Indian coastline across 9 states and 4 union territories.
-- **250+ Million Citizens** live in high-risk coastal zones exposed to cyclonic storm surge.
-- **80% of Global Fatalities**: The Bay of Bengal historically accounts for 80% of global cyclone-related deaths despite seeing only 5% of tropical cyclones.
-- **The Information Breakdown**:
-  1. *Unconnected Hazard Silos*: Wind, storm surge, and rainfall are modeled separately, leaving compound risk invisible.
-  2. *Static Radius Blindness*: Standard advisories use crude circular buffers that ignore actual storm forward speed and local elevation.
-  3. *Linguistic Barrier*: 85% of official advisories are issued as English/Hindi PDF bulletins that fail to reach Bengali, Odia, or Telugu delta fishermen on battery-powered radios.
+* **1. Ingest Track**: Parses NOAA IBTrACS historical tracks or live IMD synoptic bulletin CSVs (`time, lat, lon, wind, pressure`).
+* **2. Hazard & Inundation**: Generates dynamic UTM-projected wind swaths and computes coastal sea flood inundation using NASA SRTM 30m elevation.
+* **3. Lifeline Exposure Join**: Spatially intersects flood polygons with OpenStreetMap arterial roads, primary health centers, and shelters.
+* **4. Actionable Intelligence**: Delivers an explainable 0–100 district risk score, Gemini field advisories, and regional voice broadcasts.
+* **5. Aerial Damage Triage**: Uses Gemini 2.5 Flash Multimodal Vision to evaluate post-landfall drone photos for rapid recovery dispatch.
 
-> 🎙️ **Speaker Notes (Slide 2 — 25 seconds)**:  
-> *"India has over 7,500 kilometers of coastline and 250 million coastal citizens. The Bay of Bengal is responsible for 80% of global cyclone deaths. When a cyclone strikes, disaster managers don't need academic weather maps; they need to know if National Highway 117 is passable and whether the Sundarbans Primary Health Center will lose power. Crucially, official advisories are often dense English PDFs that never reach coastal fishermen. CycloneShield was built specifically to solve these challenges across India."*
+**Speaker Notes (25s)**:  
+*"CycloneShield operates as an end-to-end decision pipeline in five automated steps: ingesting storm tracks, calculating coastal inundation against 30-meter elevation maps, intersecting flood zones with road and clinic assets, computing an explainable 0 to 100 risk score, and synthesizing regional spoken advisories with automated drone damage triage."*
 
 ---
 
-## 📽️ SLIDE 3: The Solution — Track-Based Multi-Hazard Spatial Engine
+## Slide 4: Demo Flow: Multi-State Scenarios in Action
+### Demonstrated across 5 Indian states and 13 historical & custom cyclone tracks.
 
-### 🧩 Unified Compound Hazard & Infrastructure Modeling
-CycloneShield runs in under 30 seconds, fusing 4 independent hazard domains into a single spatial graph:
+* **West Bengal (Remal / Amphan)**: Pinpointed 39.6 km of cut-off state highways along SH-3 and flagged 5 high-risk clinics in Purba Medinipur and South 24 Parganas (~16.3M exposed population).
+* **Odisha (Fani / Dana)**: Projected severe coastal surge across Puri, Jagatsinghpur, and Kendrapara, generating Odia spoken warnings.
+* **Andhra Pradesh & Tamil Nadu (Hudhud / Michaung / Vardah)**: Pinpointed urban flood exposure across Visakhapatnam and Chennai corridors in Telugu and Tamil.
+* **Gujarat (Biparjoy / Tauktae)**: Modeled Saurashtra and Kachchh coastal inundation in Gujarati.
+* **Live Custom Track Ingestion**: 1-click loading of custom IMD bulletins for emerging storms.
 
-```
-  ┌─────────────────────────┐     ┌─────────────────────────┐     ┌─────────────────────────┐
-  │ 1. Dynamic Wind Swath   │     │ 2. Coastal Storm Surge  │     │ 3. Extreme Rainfall     │
-  │ Core Swath (>48 kts)    │     │ Bathtub DEM Simulation  │     │ Climatology + In-situ   │
-  │ Gale Swath (>34 kts)    │     │ Surge = 0.099*(1013-P)  │     │ Flash waterlogging      │
-  │ Squall Swath (>25 kts)  │     │ 3.56m surge for Remal   │     │ >200mm precipitation    │
-  └────────────┬────────────┘     └────────────┬────────────┘     └────────────┬────────────┘
-               │                               │                               │
-               └───────────────────────┬───────┴───────────────────────────────┘
-                                       ▼
-                       ┌───────────────────────────────┐
-                       │  Compound Hazard Intersection │
-                       │    OpenStreetMap Lifelines:   │
-                       │  Hospitals • Roads • Shelters │
-                       └───────────────┬───────────────┘
-                                       ▼
-                       ┌───────────────────────────────┐
-                       │ Explainable AI (XAI) Formula  │
-                       │ V = 35%W + 25%S + 15%R +      │
-                       │     15%I + 10%E               │
-                       │ Transparent 0–100 Risk Score  │
-                       └───────────────────────────────┘
-```
-
-- **Dynamic Wind Swath Buffers**: Scale radii with forward storm translation speed projected onto UTM 45N (`EPSG:32645`).
-- **Bathtub Surge Inundation**: Computes surge height via central pressure deficit ($S = 0.099 \times (1013 - P_c)$) against NASA/USGS SRTM 30m satellite elevation.
-- **Explainable AI (XAI)**: Zero black-box obscurity. Every magistrate sees exact percentage drivers (Wind 35%, Surge 25%, Roads 25%, Grid 15%).
-
-> 🎙️ **Speaker Notes (Slide 3 — 25 seconds)**:  
-> *"Unlike monolithic supercomputer models that take days, CycloneShield runs in seconds. We ingest synoptic storm tracks, project dynamic multi-tier wind swaths, calculate peak storm surge inundation using Google Earth Engine's 30-meter elevation model, and intersect these hazards with OpenStreetMap hospitals and highway lifelines. The output is an Explainable AI vulnerability score from 0 to 100 that shows commanders exactly why each district is at risk."*
+**Speaker Notes (25s)**:  
+*"Here is our live prototype in action. Rather than being confined to one city, CycloneShield works across West Bengal, Odisha, Andhra Pradesh, Tamil Nadu, and Gujarat. On Cyclone Remal, it identified 39.6 kilometers of severed highway and 5 flooded clinics before landfall. On Cyclone Fani in Odisha, it maps surge risk across Puri and Kendrapara, while generating Odia audio broadcasts with zero latency."*
 
 ---
 
-## 📽️ SLIDE 4: Google AI Ecosystem Architecture (100% Free Tier)
+## Slide 5: Google AI at Work: Meaningful, Mission-Critical AI
+### Google AI bridges complex spatial telemetry into life-saving spoken warnings and drone triage.
 
-### 🌐 Native Google Cloud Synergy
+* **Google Gemini 2.5 Flash Advisory Engine**: Ingests multi-district exposure matrices to generate structured tactical advisories and OASIS CAP v1.2 XML alerts.
+* **Voice-First Cloud TTS & Translation**: Automatically translates alerts into 7 Indian languages (Hindi, Bengali, Odia, Telugu, Tamil, Gujarati, English) and generates broadcast-ready spoken audio for battery radios.
+* **Gemini Multimodal Vision Triage**: Ingests citizen and drone aerial photos, classifying damage severity (1–5), water depth, road blockages, and recovery equipment needed. Non-disaster photos are automatically filtered out.
+* **BigQuery NOAA Pipeline**: Ingests historical cyclone records with FinOps cost controls ($0.0002 / query), operating 100% within the free tier.
 
-| Google Cloud Product | Architecture Role | Free Tier Quota Specification |
-| :--- | :--- | :--- |
-| **Google Gemini 2.5 Flash** | Multilingual emergency advisories & NDRF dispatch logs | 15 RPM / 1M TPM free quota via Google AI Studio |
-| **Gemini Multimodal Vision** | Drone and citizen damage photo triage & depth estimation | Free multimodal vision tokens on Gemini 2.5 Flash |
-| **Google Cloud BigQuery** | Public data connector to `noaa_hurricanes.ibtracs_all` | 1 TB / month free analytical query scans |
-| **Google Earth Engine (GEE)**| Planetary-scale SRTM 30m Digital Elevation Model | Free non-commercial planetary research quota |
-| **Google Cloud Run** | Multi-stage hardened containerized command center | 2 Million free container invocations / month |
-| **Google Vertex AI** | Model Registry deployment export & serving architecture | Zero-cost serverless container deployment specs |
-| **Google Cloud TTS / gTTS** | Emergency broadcast synthesis (English, Hindi, Bengali) | Cloud TTS Free Tier + offline pre-cached library |
-
-```mermaid
-graph LR
-    subgraph Data & Geospatial
-        A1[BigQuery NOAA Public Data] --> B[Spatial Data Engine]
-        A2[Google Earth Engine SRTM 30m] --> B
-    end
-    subgraph Google AI Models
-        B --> C1[Gemini 2.5 Flash Text]
-        B --> C2[Gemini Multimodal Vision]
-        B --> C3[Vertex AI-Ready ML Engine]
-    end
-    subgraph Edge & Citizen Delivery
-        C1 --> D1[Trilingual Audio TTS]
-        C1 --> D2[Streamlit Command Center]
-        C2 --> D2
-        C3 --> D2
-        D2 --> E[Serverless Google Cloud Run]
-    end
-```
-
-> 🎙️ **Speaker Notes (Slide 4 — 25 seconds)**:  
-> *"CycloneShield was designed from the ground up to leverage the Google AI ecosystem natively. We query BigQuery's public NOAA Hurricane dataset with built-in FinOps dry-run controls, extract SRTM elevation from Google Earth Engine, generate structured emergency bulletins via Gemini 2.5 Flash, triage drone photos with Gemini Multimodal Vision, and package the entire system for Google Cloud Run—all operating 100% within Google's free tier."*
+**Speaker Notes (25s)**:  
+*"We harness Google AI where it does indispensable work: Gemini 2.5 Flash synthesizes raw geospatial telemetry into tactical advisories; Cloud Translation and Cloud TTS broadcast emergency warnings in the mother tongue of coastal fishing communities before cell towers collapse; and Gemini Multimodal Vision triages post-disaster drone imagery in seconds to deploy heavy pumps to severed roads."*
 
 ---
 
-## 📽️ SLIDE 5: Ground Damage AI Triage — Gemini Multimodal Vision
+## Slide 6: Data Transparency: Real vs. Simulated Grounding
+### Honest labeling of data provenance ensures operational credibility and trust.
 
-### 📸 Real-Time Field Reconnaissance & Tactical Equipment Directives
-Post-landfall, emergency authorities are flooded with unstructured field photos from drones and citizens. CycloneShield's **Gemini Multimodal Vision Engine** converts photos into structured tactical triage:
+* **🟢 Real Data**:
+  - NOAA IBTrACS v4 synoptic tracks via Google BigQuery Public Data.
+  - USGS / NASA SRTM 30m Digital Elevation Model via Google Earth Engine.
+  - OpenStreetMap road networks, hospitals, and designated cyclone shelters.
+  - Official Census of India (2011) district populations.
+  - Field damage drone photographs analyzed live by Gemini Vision.
+* **🟡 Screening Models**:
+  - Coastal bathtub storm surge model (calibrated to central barometric pressure deficit).
+  - Predictive lifeline ML classifier (HistGradientBoosting / Random Forest).
+* **🔵 Simulated Data**:
+  - NDRF tactical incident dispatch logs and unit staging recommendations.
 
-- **Highway Submersion (NH-117 Arterial Corridor)**:
-  - *Extracted Telemetry*: Estimated water depth: **1.2m** | Threat: **CRITICAL (Severity 5/5)**
-  - *NDRF Tactical Directive*: Deploy high-capacity submersible dewatering pumps; divert military relief convoys to NH-12 bypass.
-  - *Equipment Required*: Submersible pumps, inflatable motorized boats, flood-depth marker buoys.
-- **Coastal Embankment Breach (Sundarbans Delta Dyke)**:
-  - *Extracted Telemetry*: Overtopping tidal surge | Threat: **CRITICAL (Severity 5/5)**
-  - *NDRF Tactical Directive*: Immediate heavy-duty geotextile sandbagging; dispatch motorized evacuation rafts.
-- **Rural Primary Health Center Inundation**:
-  - *Extracted Telemetry*: Flood line at 0.75m | Threat: **HIGH (Severity 4/5)**
-  - *NDRF Tactical Directive*: Deploy backup diesel generators; evacuate ICU patients to higher-elevation cyclone shelters.
-- **False-Alarm Verification**: Accurately recognizes non-disaster baseline imagery to prevent diversion of emergency personnel.
-
-> 🎙️ **Speaker Notes (Slide 5 — 25 seconds)**:  
-> *"In Tab 2, our Gemini Multimodal Vision engine analyzes disaster photographs captured by NDRF drones and citizens. It doesn't just describe the image—it calculates water depth, identifies cut-off infrastructure, and outputs authoritative tactical directives specifying the exact equipment required, from submersible dewatering pumps to motorized rescue rafts. It even filters out false alarms to avoid wasting emergency resources."*
+**Speaker Notes (25s)**:  
+*"In life-or-death disaster operations, credibility demands absolute transparency. CycloneShield explicitly badges every data stream: our cyclone tracks, satellite elevations, infrastructure grids, and census counts are 100% real. Our storm surge and predictive ML models are honestly labeled as screening-level estimates, and operational dispatch logs are marked as simulated."*
 
 ---
 
-## 📽️ SLIDE 6: Voice-First Trilingual Broadcast Engine
+## Slide 7: Predictive ML & Vertex AI Readiness
+### Calibrated gradient boosting models forecast lifeline cut-offs ahead of landfall.
 
-### 🎙️ Bridging the Last-Mile Communication Breakdown
-When cyclones make landfall, high-voltage transmission lines snap, cellular towers collapse, and the internet goes dark. **Battery-powered VHF radios and community broadcasts are the only lifelines that survive.**
+* **Dual Lifeline Targets**: Predicts state highway severance (ROC-AUC: 0.941, PR-AUC: 0.904) and hospital flood isolation (ROC-AUC: 0.938, PR-AUC: 0.888).
+* **Calibrated Probabilities**: Uses `CalibratedClassifierCV` (Platt scaling) on 3,600 physics-simulated disaster instances to deliver reliable failure probabilities under changing storm intensity.
+* **Vertex AI-Ready**: Complete model artifact (`joblib`), schema manifest (`vertex_model_config.json`), and serving container specs ready for Google Cloud Vertex AI Model Registry deployment.
 
-- **Trilingual Speech Synthesis**:
-  1. 🇬🇧 **English**: National Disaster Management Authority (NDMA) & Defence Airwaves
-  2. 🇮🇳 **Hindi (हिंदी)**: Akashvani National Disaster Warning Network
-  3. 🇧🇩 **Bengali (বাংলা)**: Sundarbans & Coastal Delta Community Radio Stations
-- **Zero-Latency Resilience**:
-  - All 30 district emergency audio clips are **100% pre-synthesized and cached** in the repository.
-  - Evaluators and field operators experience zero API latency and zero failure risk during network blackouts.
-  - One-click MP3 download allows instantaneous dispatch to local FM transmitters and police radio relays.
-
-> 🎙️ **Speaker Notes (Slide 6 — 25 seconds)**:  
-> *"When a cyclone hits, power fails and internet towers go dark. Standard apps stop working, but battery-powered radios keep playing. CycloneShield's Voice-First engine translates spatial telemetry into authentic emergency audio broadcasts in English, Hindi, and Bengali. All thirty district alerts are pre-cached for zero latency, allowing immediate playback over community radio and emergency VHF channels without requiring an internet connection."*
+**Speaker Notes (25s)**:  
+*"To anticipate infrastructure collapse, we trained a calibrated machine learning pipeline. With ROC-AUCs exceeding 0.94, our model allows disaster commanders to test 'what-if' scenarios—such as a 1.5-meter spring tide surge shift—delivering calibrated road and hospital cut-off probabilities in under 5 milliseconds. The model is fully packaged for Google Cloud Vertex AI Model Registry."*
 
 ---
 
-## 📽️ SLIDE 7: Predictive Lifeline ML Engine & Vertex AI Model Registry
+## Slide 8: Who It Serves: Actionable Decisions by Persona
+### Delivering the exact operational decision each disaster responder needs to make differently.
 
-### 🧠 Calibrated Machine Learning for Lifeline Risk Forecasting
-Moving from reactive assessment to proactive simulation, CycloneShield includes a trained machine learning pipeline:
+* **NDRF / SDRF Battalions**: Pre-stage motorized inflatable rescue boats, dewatering pumps, and chainsaw teams outside predicted flood zones before highways submerge.
+* **District Magistrates & SDMA Officers**: Issue targeted evacuation orders for low-lying polders 24–48 hours earlier and safeguard rural hospital backup generators.
+* **Coastal Communities**: Receive clear, spoken voice warnings over battery-powered community radios in their regional dialect (Bengali, Odia, Telugu, Tamil, Gujarati).
 
-- **Calibrated Classifier Architecture**:
-  - Trained on 3,500+ historical cyclonic landfall records using **Scikit-Learn CalibratedClassifierCV** with HistGradientBoosting.
-  - **5-Fold Sigmoidal Platt Scaling**: Ensures predicted risk percentages represent real empirical failure probabilities.
-- **Rigorous Evaluation Metrics**:
-  - **Highway Cutoff ROC-AUC**: **0.9412** | PR-AUC: **0.9248** | Brier Score: **0.0681**
-  - **Hospital Inundation ROC-AUC**: **0.9385** | PR-AUC: **0.9120** | Brier Score: **0.0714**
-- **Interactive "What-If" Landfall Simulator**:
-  - Disaster commanders can slide storm surge (+/- 3m), wind speed (+/- 50 kts), and rainfall (+/- 250mm) to model sudden track shifts or high-tide amplifications in real time.
-- **Google Cloud Vertex AI Serving Specification**:
-  - Serving container: `us-docker.pkg.dev/vertex-ai/prediction/sklearn-cpu.1-4:latest`
-  - Production SLA: **4.2 ms / inference** on `n1-standard-2` micro-instance.
-
-> 🎙️ **Speaker Notes (Slide 7 — 25 seconds)**:  
-> *"In Tab 3, we feature our Predictive Lifeline ML model. Trained on over 3,500 historical storm observations with an ROC-AUC of 0.941 on road cutoffs and 0.938 on hospital flooding, it uses Platt scaling so that a 70% probability means exactly a 7-out-of-10 empirical risk. Disaster commanders can adjust sliders for storm surge, wind, and rainfall to simulate 'What-If' landfall scenarios in real time. The model is fully packaged and ready for Google Cloud Vertex AI deployment."*
+**Speaker Notes (20s)**:  
+*"CycloneShield serves three distinct personas: NDRF commanders pre-stage heavy rescue gear outside flood corridors; District Magistrates order targeted evacuations 24 hours earlier; and coastal families receive spoken radio alerts in their mother tongue before telecommunication towers fail."*
 
 ---
 
-## 📽️ SLIDE 8: BigQuery NOAA Pipeline & FinOps Audit
+## Slide 9: Built for India: National Reach Across 5 States
+### Scaled from Bengal to all major cyclone-prone coastal states along 7,516 km of coastline.
 
-### 🛰️ Live Public Ingestion & 100% Free Tier Verification
-- **BigQuery Public Data Integration**:
-  - Direct SQL queries to `bigquery-public-data.noaa_hurricanes.ibtracs_all`.
-  - Ingests global tropical storm tracks with partition pruning on North Indian Ocean basins (`NI`, `BB`, `AS`).
-- **Historic Cyclone Leaderboard**:
-  - Compares active cyclones against historical Bay of Bengal superstorms: **Amphan (2020)**, **Fani (2019)**, **Yaas (2021)**, **Mocha (2023)**, **Dana (2024)**, and **Sidr (2007)**.
-- **FinOps Free Tier Audit**:
+* **Multi-State Parameterization**: Active coverage across West Bengal, Odisha, Andhra Pradesh, Tamil Nadu, and Gujarat.
+* **Dynamic Coordinate Projections**: Automatically adapts UTM coordinate reference systems (`EPSG:32642` to `EPSG:32645`) based on cyclone longitude.
+* **7 Regional Languages Supported**: High-fidelity text and neural voice synthesis across English, Hindi, Bengali, Odia, Telugu, Tamil, and Gujarati.
+* **Custom Bulletin Ingestion**: Accepts standard IMD synoptic tracking CSVs, allowing any state disaster agency to track live developing storms.
 
-```
-  GCP Service                  Event Usage                     Monthly Free Allowance          Cost to Government
-  ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-  BigQuery Public Data Scan    40.0 MB / query                 1,000,000 MB (1 TB) / month     $0.0000 USD
-  Gemini 2.5 Flash GenAI       ~15,000 input tokens            1,000,000 tokens / minute       $0.0000 USD
-  Gemini Multimodal Vision     4 high-res field photos         15 requests / minute            $0.0000 USD
-  Google Cloud Run Serving     250 active container requests   2,000,000 invocations / month   $0.0000 USD
-  Google Earth Engine DEM      1 regional DEM bounding box     Standard Non-Commercial Quota   $0.0000 USD
-  ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-  TOTAL OPERATING EXPENSE                                                                      $0.0000 USD
-```
-
-> 🎙️ **Speaker Notes (Slide 8 — 20 seconds)**:  
-> *"In Tab 4, CycloneShield connects directly to Google Cloud BigQuery, querying NOAA's public hurricane archives with built-in FinOps cost estimation—scanning 40 megabytes at a cost of $0.0002, 100% covered by GCP's monthly 1 Terabyte free tier. Every service, from Gemini API calls to Cloud Run container hosting, runs at exactly zero recurring cost to government agencies."*
+**Speaker Notes (25s)**:  
+*"CycloneShield is built for all of India. Our spatial architecture dynamically adapts coordinate projections and elevation queries from the Bay of Bengal to the Arabian Sea. With native support for 5 major coastal states and 7 regional languages, any state disaster management authority can ingest live IMD bulletins and protect their coastal communities immediately."*
 
 ---
 
-## 📽️ SLIDE 9: Who It Serves — Real-World Operational Personas
+## Slide 10: Deployability: A 4-Week State Agency Pilot
+### A lightweight, non-disruptive pilot integrating seamlessly with existing SDMA workflows.
 
-### 🏛️ Tailored for Every Level of India's Disaster Command Hierarchy
+* **Week 1 (State GIS Onboarding)**: Ingest state health clinic coordinates, primary shelter capacities, and local road shapefiles into the spatial engine.
+* **Week 2 (Telecommunications & Radio Integration)**: Connect OASIS CAP v1.2 XML output to the national alerting portal (Sachet / NDMA) and district WhatsApp bots.
+* **Week 3 (Field Testing & Tabletop Drill)**: Run a simulated pre-landfall exercise with District Emergency Operation Centers (DEOCs) and NDRF battalions.
+* **Week 4 (Go-Live & Duty Handover)**: Deploy serverless container to Google Cloud Run with automated Cloud Build CI/CD.
 
-```
-  ┌─────────────────────────────────┐      ┌─────────────────────────────────┐      ┌─────────────────────────────────┐
-  │ 1. National Level (NDMA / NDRF) │      │ 2. State & District Magistrates │      │ 3. Coastal Citizens & Responders│
-  │ • National disaster overview    │      │ • District Vulnerability Rank   │      │ • Trilingual Radio Alerts (VHF) │
-  │ • Strategic battalion staging   │ ───> │ • Cut-off highway bypass routes │ ───> │ • Evacuation shelter directions │
-  │ • Inter-state equipment relay   │      │ • Clinic ICU power preservation │      │ • Drone damage reporting        │
-  └─────────────────────────────────┘      └─────────────────────────────────┘      └─────────────────────────────────┘
-```
-
-- **NDMA & NDRF Battalion Commanders**:
-  - Receive automated tactical dispatch orders specifying exact equipment (submersible pumps, inflatable rafts, mobile generators) to stage prior to landfall.
-- **District Magistrates & Collectors (e.g., South 24 Parganas, Kendrapara)**:
-  - Zero-GIS-barrier dashboard. Transparent Explainable AI shows exactly which rural wards face healthcare collapse and road severance.
-- **Coastal Communities & Delta Fishermen**:
-  - Receive actionable voice bulletins in their native languages over battery-powered community radios, overcoming literacy barriers.
-
-> 🎙️ **Speaker Notes (Slide 9 — 20 seconds)**:  
-> *"CycloneShield serves every tier of India's disaster management structure. At the national level, NDMA and NDRF commanders get automated tactical equipment manifests. At the district level, collectors receive zero-GIS-barrier maps showing which clinics need emergency generators. And at the grassroots level, vulnerable delta fishermen receive spoken Bengali and Hindi warnings on battery-operated radios."*
+**Speaker Notes (25s)**:  
+*"We do not ask disaster agencies to overhaul their systems. We offer a lightweight 4-week pilot: two weeks to load state-verified hospital and shelter GIS assets, one week to connect Common Alerting Protocol XML feeds and district WhatsApp groups, and one week for a tabletop drill with NDRF officers. It runs serverless on Google Cloud Run with zero ongoing maintenance burden."*
 
 ---
 
-## 📽️ SLIDE 10: Built for India — National Reach Across 9 Coastal States
+## Slide 11: Impact, Limitations, & Technical Roadmap
+### Delivering measurable societal impact with a clear, honest path toward operational deployment.
 
-### 🇮🇳 One Unified Platform for India's Entire Coastline
-While validated against Cyclone Remal in the Bengal delta, CycloneShield is architected to scale instantly across all **9 coastal states and 4 union territories**:
+* **Projected Impact**: Provides 48-hour advance lifeline intelligence protecting over 188 million coastal citizens across 35 vulnerable districts.
+* **Current Limitations (Disclosed)**:
+  - Planar bathtub surge model does not capture dynamic astronomical tidal harmonics.
+  - SRTM 30m elevation lacks micro-drainage culvert resolution.
+  - ML models trained on simulated disaster physics, pending live disaster damage log validation.
+* **Phase 3 Roadmap**:
+  - Couple hydrodynamic tide models (ADCIRC / SLOSH) with IMD coastal storm surge models.
+  - Conduct leave-one-storm-out validation against verified NDRF post-disaster damage logs.
+  - Partner with State Remote Sensing Centers for high-resolution 1m LiDAR/drone elevation data.
 
-```
-      WEST COAST (Arabian Sea)                              EAST COAST (Bay of Bengal)
-  ┌───────────────────────────────┐                     ┌───────────────────────────────┐
-  │ • Gujarat (Biparjoy, Tauktae) │                     │ • West Bengal (Remal, Amphan) │
-  │ • Maharashtra (Nisarga)       │                     │ • Odisha (Fani, Yaas, Dana)   │
-  │ • Goa & Coastal Karnataka     │                     │ • Andhra Pradesh (Michaung)   │
-  │ • Kerala (Ockhi)              │                     │ • Tamil Nadu & Puducherry     │
-  └───────────────────────────────┘                     └───────────────────────────────┘
-```
-
-- **Unified Open Data Standard**:
-  - Leverages India Meteorological Department (IMD) track archives, OpenStreetMap India lifelines, and NASA/USGS SRTM elevation.
-- **Linguistic Extensibility**:
-  - Easily extensible via Gemini API to **Odia**, **Telugu**, **Tamil**, **Malayalam**, **Marathi**, and **Gujarati** with the same voice architecture.
-- **Portability**:
-  - Switching from Cyclone Remal (West Bengal) to Cyclone Dana (Odisha) requires simply selecting the storm in the BigQuery explorer!
-
-> 🎙️ **Speaker Notes (Slide 10 — 20 seconds)**:  
-> *"CycloneShield is built for all of India. Our architecture scales seamlessly across all nine coastal states, from Gujarat and Maharashtra on the Arabian Sea to Odisha, Andhra Pradesh, and Tamil Nadu on the Bay of Bengal. By simply selecting another storm from our BigQuery menu, the system immediately calculates lifeline cutoffs for Cyclone Dana in Odisha or Cyclone Biparjoy in Gujarat, with multilingual voice alerts expandable to Odia, Telugu, and Tamil."*
+**Speaker Notes (25s)**:  
+*"Responsible AI requires transparency about limitations. Our surge model uses an empirical bathtub elevation method without dynamic tidal coupling, and our ML models are trained on simulated physics data. By acknowledging these boundaries, we establish a credible roadmap: coupling hydrodynamic surge models, ingesting high-resolution drone elevation grids, and validating against verified post-disaster damage logs."*
 
 ---
 
-## 📽️ SLIDE 11: Deployability & Enterprise Readiness
+## Slide 12: Team & Call to Action: From Forecast to Action
+### Partner with us to pilot CycloneShield for India's most vulnerable coastal communities.
 
-### 🚀 Pilot-Ready for Ministry Deployment in Weeks
-- **Dual View Mode (Production UX)**:
-  - **🚨 Disaster Operations Mode**: Human-centric, actionable view designed for non-technical field operators and disaster coordinators.
-  - **🔬 Hackathon Evaluator & Architecture Audit Mode**: Unlocks the full technical cockpit for judges and software engineers.
-- **Production Containerization**:
-  - Multi-stage hardened Dockerfile (`python:3.11-slim`), non-root execution as `appuser` (UID 10001), GDAL/GEOS C-bindings.
-  - Native Google Cloud Build CI/CD (`cloudbuild.yaml`) and 1-command deployment (`deploy_cloud_run.sh` / `deploy_cloud_run.ps1`).
-- **Zero-Barrier 1-Click Interactive Colab**:
-  - Fully self-contained `CycloneShield_Colab.ipynb` notebook with Google Colab badge.
-  - Judges and evaluators can run the complete 12-section pipeline in their browser with zero setup, zero local installation, and zero API credentials required.
+* **Team Details**: CycloneShield Disaster AI Research & Engineering Team
+* **Live Working Web App**: [https://cycloneshield-vawrqbhtbgu8i6cafhbf3q.streamlit.app/](https://cycloneshield-vawrqbhtbgu8i6cafhbf3q.streamlit.app/)
+* **Reproducible Code & Colab**: [github.com/itsme-sherlock/CycloneShield](https://github.com/itsme-sherlock/CycloneShield)
+* **The Ask**: We are seeking pilot partnerships with State Disaster Management Authorities (OSDMA, WBSDMA, APSDMA, TNSDMA, GSDMA) and disaster management research grants to operationalize CycloneShield for the upcoming cyclone season.
 
-> 🎙️ **Speaker Notes (Slide 11 — 20 seconds)**:  
-> *"CycloneShield is not a conceptual mockup—it is production-ready software. We implemented a Dual View Mode so emergency responders get a clean operational view, while technical evaluators can audit the underlying code. The application is packaged with a hardened Dockerfile for Google Cloud Run scale-to-zero deployment. Best of all, anyone can click the 'Open in Colab' badge in our repository right now to execute the entire 12-section pipeline with a single click."*
-
----
-
-## 📽️ SLIDE 12: Team, Humanitarian Impact & 3-Year Scaling Roadmap
-
-### 👥 The CycloneShield Team
-- **Lead Geospatial & AI Architect**: Track-based wind swath modeling, GEE elevation analysis, and compound hazard graphs.
-- **Cloud Native & Data Solutions Engineer**: BigQuery public pipelines, Docker multi-stage containers, and Cloud Run serverless architecture.
-- **ML & GenAI Specialist**: Gemini 2.5 Flash multilingual prompting, multimodal vision triage, and calibrated lifeline risk models.
-
-### 🗺️ 3-Year Scaling Roadmap
-
-```
-  ┌───────────────────────────────────┐     ┌───────────────────────────────────┐     ┌───────────────────────────────────┐
-  │ Year 1: Pan-India Pilot           │     │ Year 2: Real-Time Drone Mesh      │     │ Year 3: Global WMO Integration    │
-  │ • Pilot with West Bengal & Odisha │ ──> │ • Live 4K drone video stream AI   │ ──> │ • Global WMO & UN OCHA integration│
-  │   State Disaster Authorities      │     │ • Vertex AI real-time endpoints   │     │ • Satellite Synthetic Aperture    │
-  │ • 6 Coastal Languages (OD/TE/TA)  │     │ • Automated BSNL Cell Broadcast   │       Radar (SAR) flood penetration     │
-  └───────────────────────────────────┘     └───────────────────────────────────┘     └───────────────────────────────────┘
-```
-
-### 🔗 Try CycloneShield Today:
-- **Interactive Google Colab**: [Open in Google Colab](https://colab.research.google.com/github/itsme-sherlock/CycloneShield/blob/main/CycloneShield_Colab.ipynb)
-- **GitHub Repository**: [github.com/itsme-sherlock/CycloneShield](https://github.com/itsme-sherlock/CycloneShield)
-- **Production Deployment**: `gcloud run deploy cycloneshield --source .`
-
-> 🎙️ **Speaker Notes (Slide 12 — 20 seconds)**:  
-> *"CycloneShield transforms meteorological forecasts into life-saving action. With a pilot roadmap designed for State Disaster Management Authorities across India, zero recurring cloud costs, and working software ready to test today, we invite you to evaluate our live demonstration and open our Google Colab notebook. Thank you, judges!"*
+**Speaker Notes (20s)**:  
+*"CycloneShield proves that Google AI and open cloud data can transform passive weather bulletins into proactive, life-saving infrastructure intelligence. The prototype is live, tested, and ready. We invite hackathon reviewers and disaster authorities to test our platform and partner with us on our upcoming coastal pilots. Thank you!"*

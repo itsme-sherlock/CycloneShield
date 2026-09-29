@@ -828,23 +828,7 @@ def plot_vulnerability_folium_map(
         control_scale=True
     )
     
-    # 1. Google Basemap Layers
-    folium.TileLayer(
-        tiles="https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}",
-        attr="Google Satellite Hybrid",
-        name="Google Satellite Hybrid",
-        overlay=False,
-        control=True
-    ).add_to(m)
-    
-    folium.TileLayer(
-        tiles="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
-        attr="Google Maps Standard",
-        name="Google Maps Road",
-        overlay=False,
-        control=True
-    ).add_to(m)
-    
+    # 1. 100% Free Disaster Ops Basemap Layers (No API Key Required)
     folium.TileLayer(
         tiles="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
         attr="&copy; OpenStreetMap contributors &copy; CARTO",
@@ -853,6 +837,14 @@ def plot_vulnerability_folium_map(
         control=True,
         subdomains="abcd",
         max_zoom=20
+    ).add_to(m)
+
+    folium.TileLayer(
+        tiles="https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+        attr="&copy; OpenStreetMap contributors",
+        name="OpenStreetMap Standard",
+        overlay=False,
+        control=True
     ).add_to(m)
     
     # 2. District Choropleth Layer

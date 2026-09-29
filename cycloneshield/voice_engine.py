@@ -108,7 +108,7 @@ except ImportError:
 # Google Cloud Text-to-Speech API Endpoint
 GOOGLE_TTS_API_URL = "https://texttospeech.googleapis.com/v1/text:synthesize"
 
-# Language and Voice Definitions
+# Language and Voice Definitions for Disaster-Prone Indian Coastal States
 LANGUAGE_CONFIGS = {
     "en": {
         "code": "en",
@@ -142,8 +142,77 @@ LANGUAGE_CONFIGS = {
         "cloud_lang": "bn-IN",
         "cloud_voice": "bn-IN-Wavenet-A",
         "announcement_prefix": "সাইক্লোনশিল্ড জরুরি দুর্যোগ বেতার সতর্কতা। "
+    },
+    "or": {
+        "code": "or",
+        "name": "Odia (ଓଡ଼ିଆ)",
+        "flag": "🇮🇳",
+        "station": "ଆକାଶବାଣୀ କଟକ ଏବଂ ଓଡ଼ିଶା ରାଜ୍ୟ ବିପର୍ଯ୍ୟୟ ପରିଚାଳନା ପ୍ରସାରଣ",
+        "gtts_lang": "hi",  # gTTS lacks Odia; uses phonetics / Cloud TTS primary
+        "gtts_tld": "co.in",
+        "cloud_lang": "or-IN",
+        "cloud_voice": "or-IN-Standard-A",
+        "announcement_prefix": "ସାଇକ୍ଲୋନଶିଲ୍ଡ ଜରୁରୀକାଳୀନ ବିପର୍ଯ୍ୟୟ ପ୍ରସାରଣ ସେବା। ଜାତୀୟ ବିପର୍ଯ୍ୟୟ ଚେତାବନୀ। "
+    },
+    "te": {
+        "code": "te",
+        "name": "Telugu (తెలుగు)",
+        "flag": "🇮🇳",
+        "station": "ఆకాశవాణి విశాఖపట్నం మరియు ఆంధ్రప్రదేశ్ విపత్తు నిర్వహణ విభాగం",
+        "gtts_lang": "te",
+        "gtts_tld": "co.in",
+        "cloud_lang": "te-IN",
+        "cloud_voice": "te-IN-Standard-A",
+        "announcement_prefix": "సైక్లోన్‌షీల్డ్ అత్యవసర విపత్తు ప్రసార సేవ. తీవ్ర తుఫాను హెచ్చరిక. "
+    },
+    "ta": {
+        "code": "ta",
+        "name": "Tamil (தமிழ்)",
+        "flag": "🇮🇳",
+        "station": "அகில இந்திய வானொலி சென்னை மற்றும் தமிழ்நாடு பேரிடர் மேலாண்மை",
+        "gtts_lang": "ta",
+        "gtts_tld": "co.in",
+        "cloud_lang": "ta-IN",
+        "cloud_voice": "ta-IN-Wavenet-A",
+        "announcement_prefix": "சைக்ளோன்ஷீல்ட் அவசரகால பேரிடர் எச்சரிக்கை ஒலிபரப்பு. புயல் எச்சரிக்கை. "
+    },
+    "gu": {
+        "code": "gu",
+        "name": "Gujarati (ગુજરાતી)",
+        "flag": "🇮🇳",
+        "station": "આકાશવાણી રાજકોટ અને ગુજરાત રાજ્ય આપત્તિ વ્યવસ્થાપન સેવા",
+        "gtts_lang": "gu",
+        "gtts_tld": "co.in",
+        "cloud_lang": "gu-IN",
+        "cloud_voice": "gu-IN-Standard-A",
+        "announcement_prefix": "સાયક્લોનશીલ્ડ આપત્તિ વ્યવસ્થાપન આપાતકાલીન પ્રસારણ સેવા. વાવાઝોડાની ચેતવણી. "
+    },
+    "ml": {
+        "code": "ml",
+        "name": "Malayalam (മലയാളം)",
+        "flag": "🇮🇳",
+        "station": "ആകാശവാണി തിരുവനന്തപുരം ദുരന്ത നിവാരണ മുന്നറിയിപ്പ്",
+        "gtts_lang": "ml",
+        "gtts_tld": "co.in",
+        "cloud_lang": "ml-IN",
+        "cloud_voice": "ml-IN-Standard-A",
+        "announcement_prefix": "സൈക്ലോൺഷീൽഡ് അടിയന്തര ദുരന്ത മുന്നറിയിപ്പ് സേവനം. ചുഴലിക്കാറ്റ് മുന്നറിയിപ്പ്. "
     }
 }
+
+
+def get_resolved_api_key() -> Optional[str]:
+    """Safely retrieves API key from Streamlit secrets or OS environment."""
+    try:
+        import streamlit as st
+        if hasattr(st, "secrets"):
+            if "GEMINI_API_KEY" in st.secrets:
+                return str(st.secrets["GEMINI_API_KEY"])
+            if "GOOGLE_API_KEY" in st.secrets:
+                return str(st.secrets["GOOGLE_API_KEY"])
+    except Exception:
+        pass
+    return os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
 
 
 # ==============================================================================
@@ -186,7 +255,7 @@ def synthesize_with_google_cloud_tts(
     if not REQUESTS_AVAILABLE:
         return False
 
-    key = api_key or os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
+    key = api_key or get_resolved_api_key()
     if not key:
         return False
 
@@ -212,7 +281,7 @@ def synthesize_with_google_cloud_tts(
     }
 
     try:
-        resp = requests.post(url, json=payload, timeout=12)
+        resp = requests.post(url, json=payload, timeout=3)
         if resp.status_code == 200:
             data = resp.json()
             audio_b64 = data.get("audioContent")

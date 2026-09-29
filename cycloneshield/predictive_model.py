@@ -733,27 +733,61 @@ class LifelineRiskPredictor:
 def batch_predict_coastal_districts(
     surge_delta_m: float = 0.0,
     wind_delta_kts: float = 0.0,
-    rain_delta_mm: float = 0.0
+    rain_delta_mm: float = 0.0,
+    state_name: Optional[str] = "West Bengal"
 ) -> pd.DataFrame:
     """
-    Run the trained ML predictor across all 10 Bay of Bengal coastal districts
-    under Remal landfall conditions with optional dynamic scenario offsets.
+    Run the trained ML predictor across coastal districts of the selected state
+    under landfall conditions with dynamic scenario deltas.
     """
     predictor = LifelineRiskPredictor.get_instance()
     
-    # Calibrated baseline geographic & hazard parameters for the 10 coastal districts
-    districts_profile = [
-        {"name": "South 24 Parganas", "elev": 2.2, "dist": 4.5, "surge": 3.56, "wind": 68.0, "rain": 240.0, "soil": 0.95, "drain": 0.25, "embank": 1.1},
-        {"name": "Satkhira", "elev": 2.5, "dist": 6.0, "surge": 3.56, "wind": 70.0, "rain": 260.0, "soil": 0.96, "drain": 0.20, "embank": 0.9},
-        {"name": "North 24 Parganas", "elev": 4.8, "dist": 28.0, "surge": 1.40, "wind": 58.0, "rain": 190.0, "soil": 0.88, "drain": 0.40, "embank": 1.2},
-        {"name": "Khulna", "elev": 4.2, "dist": 32.0, "surge": 1.50, "wind": 62.0, "rain": 210.0, "soil": 0.90, "drain": 0.35, "embank": 1.0},
-        {"name": "Bagerhat", "elev": 3.8, "dist": 22.0, "surge": 2.10, "wind": 52.0, "rain": 160.0, "soil": 0.82, "drain": 0.45, "embank": 1.2},
-        {"name": "Purba Medinipur", "elev": 5.5, "dist": 14.0, "surge": 0.85, "wind": 42.0, "rain": 95.0, "soil": 0.70, "drain": 0.55, "embank": 1.5},
-        {"name": "Patuakhali", "elev": 3.1, "dist": 8.0, "surge": 1.10, "wind": 40.0, "rain": 85.0, "soil": 0.75, "drain": 0.50, "embank": 1.1},
-        {"name": "Barguna", "elev": 2.9, "dist": 9.5, "surge": 1.05, "wind": 38.0, "rain": 80.0, "soil": 0.72, "drain": 0.50, "embank": 1.1},
-        {"name": "Kolkata", "elev": 9.0, "dist": 65.0, "surge": 0.00, "wind": 45.0, "rain": 140.0, "soil": 0.80, "drain": 0.60, "embank": 1.8},
-        {"name": "Howrah", "elev": 8.5, "dist": 68.0, "surge": 0.00, "wind": 42.0, "rain": 130.0, "soil": 0.78, "drain": 0.55, "embank": 1.6},
-    ]
+    # State-specific coastal district profiles for realistic multi-state simulation
+    state_profiles = {
+        "West Bengal": [
+            {"name": "South 24 Parganas", "elev": 2.2, "dist": 4.5, "surge": 3.56, "wind": 68.0, "rain": 240.0, "soil": 0.95, "drain": 0.25, "embank": 1.1},
+            {"name": "North 24 Parganas", "elev": 4.8, "dist": 28.0, "surge": 1.40, "wind": 58.0, "rain": 190.0, "soil": 0.88, "drain": 0.40, "embank": 1.2},
+            {"name": "Purba Medinipur", "elev": 5.5, "dist": 14.0, "surge": 1.20, "wind": 52.0, "rain": 120.0, "soil": 0.75, "drain": 0.55, "embank": 1.5},
+            {"name": "Kolkata", "elev": 9.0, "dist": 65.0, "surge": 0.00, "wind": 45.0, "rain": 140.0, "soil": 0.80, "drain": 0.60, "embank": 1.8},
+            {"name": "Howrah", "elev": 8.5, "dist": 68.0, "surge": 0.00, "wind": 42.0, "rain": 130.0, "soil": 0.78, "drain": 0.55, "embank": 1.6},
+        ],
+        "Odisha": [
+            {"name": "Puri", "elev": 3.0, "dist": 3.0, "surge": 3.80, "wind": 75.0, "rain": 260.0, "soil": 0.95, "drain": 0.25, "embank": 1.1},
+            {"name": "Jagatsinghpur", "elev": 2.8, "dist": 5.0, "surge": 3.20, "wind": 70.0, "rain": 240.0, "soil": 0.92, "drain": 0.30, "embank": 1.2},
+            {"name": "Kendrapara", "elev": 3.2, "dist": 8.0, "surge": 2.80, "wind": 65.0, "rain": 210.0, "soil": 0.90, "drain": 0.35, "embank": 1.0},
+            {"name": "Bhadrak", "elev": 4.1, "dist": 12.0, "surge": 2.20, "wind": 60.0, "rain": 190.0, "soil": 0.85, "drain": 0.40, "embank": 1.2},
+            {"name": "Balasore", "elev": 4.8, "dist": 16.0, "surge": 1.80, "wind": 55.0, "rain": 170.0, "soil": 0.80, "drain": 0.45, "embank": 1.4},
+            {"name": "Ganjam", "elev": 5.5, "dist": 6.0, "surge": 1.50, "wind": 50.0, "rain": 140.0, "soil": 0.75, "drain": 0.50, "embank": 1.5},
+        ],
+        "Andhra Pradesh": [
+            {"name": "Visakhapatnam", "elev": 6.5, "dist": 2.0, "surge": 3.40, "wind": 78.0, "rain": 220.0, "soil": 0.85, "drain": 0.45, "embank": 1.6},
+            {"name": "Srikakulam", "elev": 4.2, "dist": 5.0, "surge": 2.90, "wind": 68.0, "rain": 200.0, "soil": 0.88, "drain": 0.35, "embank": 1.2},
+            {"name": "Vizianagaram", "elev": 5.8, "dist": 12.0, "surge": 1.80, "wind": 58.0, "rain": 180.0, "soil": 0.82, "drain": 0.40, "embank": 1.3},
+            {"name": "East Godavari", "elev": 3.1, "dist": 6.0, "surge": 2.60, "wind": 62.0, "rain": 230.0, "soil": 0.92, "drain": 0.30, "embank": 1.1},
+            {"name": "Krishna", "elev": 2.9, "dist": 4.0, "surge": 3.10, "wind": 66.0, "rain": 250.0, "soil": 0.94, "drain": 0.28, "embank": 1.0},
+            {"name": "Bapatla", "elev": 3.5, "dist": 5.5, "surge": 2.70, "wind": 64.0, "rain": 210.0, "soil": 0.90, "drain": 0.32, "embank": 1.2},
+            {"name": "SPSR Nellore", "elev": 4.5, "dist": 8.0, "surge": 2.10, "wind": 56.0, "rain": 190.0, "soil": 0.86, "drain": 0.38, "embank": 1.3},
+        ],
+        "Tamil Nadu": [
+            {"name": "Chennai", "elev": 5.2, "dist": 2.5, "surge": 2.80, "wind": 72.0, "rain": 280.0, "soil": 0.92, "drain": 0.30, "embank": 1.4},
+            {"name": "Chengalpattu", "elev": 6.0, "dist": 6.0, "surge": 2.30, "wind": 65.0, "rain": 240.0, "soil": 0.88, "drain": 0.36, "embank": 1.3},
+            {"name": "Cuddalore", "elev": 3.8, "dist": 4.0, "surge": 3.10, "wind": 68.0, "rain": 260.0, "soil": 0.93, "drain": 0.28, "embank": 1.1},
+            {"name": "Nagapattinam", "elev": 2.6, "dist": 3.0, "surge": 3.50, "wind": 74.0, "rain": 270.0, "soil": 0.96, "drain": 0.22, "embank": 1.0},
+            {"name": "Thiruvarur", "elev": 4.2, "dist": 14.0, "surge": 1.60, "wind": 58.0, "rain": 220.0, "soil": 0.85, "drain": 0.40, "embank": 1.2},
+            {"name": "Ramanathapuram", "elev": 3.1, "dist": 5.0, "surge": 2.50, "wind": 62.0, "rain": 190.0, "soil": 0.87, "drain": 0.35, "embank": 1.2},
+        ],
+        "Gujarat": [
+            {"name": "Kutch", "elev": 4.5, "dist": 5.0, "surge": 3.60, "wind": 80.0, "rain": 220.0, "soil": 0.88, "drain": 0.32, "embank": 1.2},
+            {"name": "Devbhumi Dwarka", "elev": 5.1, "dist": 3.0, "surge": 3.40, "wind": 78.0, "rain": 210.0, "soil": 0.85, "drain": 0.35, "embank": 1.3},
+            {"name": "Jamnagar", "elev": 6.2, "dist": 8.0, "surge": 2.40, "wind": 68.0, "rain": 180.0, "soil": 0.80, "drain": 0.42, "embank": 1.4},
+            {"name": "Porbandar", "elev": 3.9, "dist": 2.0, "surge": 3.20, "wind": 74.0, "rain": 200.0, "soil": 0.86, "drain": 0.36, "embank": 1.3},
+            {"name": "Gir Somnath", "elev": 4.2, "dist": 4.0, "surge": 3.00, "wind": 72.0, "rain": 230.0, "soil": 0.89, "drain": 0.30, "embank": 1.2},
+            {"name": "Bhavnagar", "elev": 5.8, "dist": 10.0, "surge": 2.10, "wind": 60.0, "rain": 170.0, "soil": 0.82, "drain": 0.40, "embank": 1.5},
+        ]
+    }
+    
+    clean_state = state_name if state_name in state_profiles else "West Bengal"
+    districts_profile = state_profiles[clean_state]
     
     rows = []
     for d in districts_profile:

@@ -532,29 +532,11 @@ def plot_infrastructure_exposure_map(
         control=True
     ).add_to(m)
 
-    # Basemap 2: Google Maps Road
+    # Basemap 2: OpenStreetMap Standard
     folium.TileLayer(
-        tiles="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
-        attr="Google Maps Standard",
-        name="Google Maps Road",
-        overlay=False,
-        control=True
-    ).add_to(m)
-
-    # Basemap 3: Google Maps Terrain
-    folium.TileLayer(
-        tiles="https://mt1.google.com/vt/lyrs=p&x={x}&y={y}&z={z}",
-        attr="Google Maps Terrain",
-        name="Google Maps Terrain",
-        overlay=False,
-        control=True
-    ).add_to(m)
-
-    # Basemap 4: Google Satellite Hybrid (Default Active Basemap)
-    folium.TileLayer(
-        tiles="https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}",
-        attr="Google Maps Satellite Hybrid",
-        name="Google Satellite Hybrid (Default)",
+        tiles="https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+        attr="&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors",
+        name="OpenStreetMap Standard",
         overlay=False,
         control=True
     ).add_to(m)

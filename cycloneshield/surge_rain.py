@@ -324,25 +324,26 @@ def generate_coastal_inundation_contours(
         # Generate multi-estuary realistic flood footprint
         # Polygon encompassing Hooghly estuary, Matla, Raimangal, and Meghna entrances
         # Base coastal boundary (south) to inland flood limit (north)
+        # Dynamic coastal inundation polygon anchored to actual landfall coordinates (c_lat, c_lon)
         poly_coords = [
-            # South border (oceanic shoreline)
-            (c_lon - lateral_spread, 21.55),
-            (c_lon - lateral_spread * 0.6, 21.58),
-            (c_lon - lateral_spread * 0.2, 21.62),
-            (c_lon + lateral_spread * 0.2, 21.65),
-            (c_lon + lateral_spread * 0.6, 21.70),
-            (c_lon + lateral_spread, 21.75),
-            # East inward along tidal rivers
-            (c_lon + lateral_spread * 0.85, 21.85 + penetration * 0.7),
-            (c_lon + lateral_spread * 0.5, 21.90 + penetration),
-            # Inland maximum inundation line (North)
-            (c_lon + lateral_spread * 0.2, 21.95 + penetration),
-            (c_lon, 21.98 + penetration),
-            (c_lon - lateral_spread * 0.2, 21.95 + penetration * 0.9),
-            (c_lon - lateral_spread * 0.5, 21.90 + penetration * 0.8),
-            (c_lon - lateral_spread * 0.8, 21.80 + penetration * 0.6),
+            # South border (oceanic / coastal shoreline)
+            (c_lon - lateral_spread, c_lat - 0.25),
+            (c_lon - lateral_spread * 0.6, c_lat - 0.22),
+            (c_lon - lateral_spread * 0.2, c_lat - 0.18),
+            (c_lon + lateral_spread * 0.2, c_lat - 0.15),
+            (c_lon + lateral_spread * 0.6, c_lat - 0.10),
+            (c_lon + lateral_spread, c_lat - 0.05),
+            # Eastward along tidal rivers & inshore estuaries
+            (c_lon + lateral_spread * 0.85, c_lat + 0.05 + penetration * 0.7),
+            (c_lon + lateral_spread * 0.5, c_lat + 0.10 + penetration),
+            # Inland maximum inundation line
+            (c_lon + lateral_spread * 0.2, c_lat + 0.15 + penetration),
+            (c_lon, c_lat + 0.18 + penetration),
+            (c_lon - lateral_spread * 0.2, c_lat + 0.15 + penetration * 0.9),
+            (c_lon - lateral_spread * 0.5, c_lat + 0.10 + penetration * 0.8),
+            (c_lon - lateral_spread * 0.8, c_lat + 0.05 + penetration * 0.6),
             # Close back to start
-            (c_lon - lateral_spread, 21.55)
+            (c_lon - lateral_spread, c_lat - 0.25)
         ]
         
         raw_poly = Polygon(poly_coords)
@@ -624,20 +625,19 @@ def plot_surge_rainfall_map(
         control_scale=True
     )
     
-    # 1. Google Satellite Hybrid Basemap
+    # 1. 100% Free Basemaps (No API Key Required)
     folium.TileLayer(
-        tiles="https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}",
-        attr="Google Maps Satellite Hybrid",
-        name="Google Satellite Hybrid",
+        tiles="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+        attr='&copy; <a href="https://carto.com/">CARTO</a> &copy; OpenStreetMap',
+        name="Carto Dark Matter (High Contrast)",
         overlay=False,
         control=True
     ).add_to(m)
 
-    # 2. CartoDB Dark Matter Basemap (High-contrast visualization)
     folium.TileLayer(
-        tiles="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-        attr='&copy; <a href="https://carto.com/">CARTO</a>',
-        name="Carto Dark Matter (High Contrast)",
+        tiles="https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+        attr='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        name="OpenStreetMap Standard",
         overlay=False,
         control=True
     ).add_to(m)

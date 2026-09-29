@@ -1,17 +1,1440 @@
 {
-"type": "FeatureCollection",
-"name": "coastal_districts",
-"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
-"features": [
-{ "type": "Feature", "properties": { "district_id": "WB_S24PGS", "district_name": "South 24 Parganas", "state_or_division": "West Bengal", "country": "India", "coastal_zone": "Sundarbans Estuary", "population": 8161961, "hq": "Alipore" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 88.0, 21.5 ], [ 88.35, 21.5 ], [ 88.55, 21.6 ], [ 88.9, 21.65 ], [ 89.1, 21.8 ], [ 89.15, 22.15 ], [ 88.95, 22.35 ], [ 88.75, 22.45 ], [ 88.45, 22.5 ], [ 88.3, 22.45 ], [ 88.15, 22.3 ], [ 88.1, 22.0 ], [ 88.02, 21.75 ], [ 88.0, 21.5 ] ] ] } },
-{ "type": "Feature", "properties": { "district_id": "WB_N24PGS", "district_name": "North 24 Parganas", "state_or_division": "West Bengal", "country": "India", "coastal_zone": "Ichamati - Sundarbans Delta", "population": 10009781, "hq": "Barasat" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 88.45, 22.5 ], [ 88.75, 22.45 ], [ 88.95, 22.35 ], [ 89.15, 22.5 ], [ 89.1, 22.85 ], [ 88.85, 23.1 ], [ 88.5, 23.0 ], [ 88.35, 22.8 ], [ 88.45, 22.5 ] ] ] } },
-{ "type": "Feature", "properties": { "district_id": "WB_PURBA_MED", "district_name": "Purba Medinipur", "state_or_division": "West Bengal", "country": "India", "coastal_zone": "Digha - Haldia Coastal Strip", "population": 5095875, "hq": "Tamluk" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 87.4, 21.55 ], [ 87.75, 21.6 ], [ 88.05, 21.75 ], [ 88.15, 22.05 ], [ 88.1, 22.25 ], [ 87.95, 22.45 ], [ 87.65, 22.35 ], [ 87.5, 22.05 ], [ 87.35, 21.75 ], [ 87.4, 21.55 ] ] ] } },
-{ "type": "Feature", "properties": { "district_id": "WB_KOLKATA", "district_name": "Kolkata", "state_or_division": "West Bengal", "country": "India", "coastal_zone": "Metropolitan Hinterland", "population": 4496694, "hq": "Kolkata" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 88.28, 22.48 ], [ 88.42, 22.48 ], [ 88.45, 22.63 ], [ 88.32, 22.63 ], [ 88.28, 22.48 ] ] ] } },
-{ "type": "Feature", "properties": { "district_id": "WB_HOWRAH", "district_name": "Howrah", "state_or_division": "West Bengal", "country": "India", "coastal_zone": "Hooghly Basin Lowland", "population": 4850029, "hq": "Howrah" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 87.85, 22.35 ], [ 88.15, 22.3 ], [ 88.3, 22.45 ], [ 88.32, 22.65 ], [ 88.2, 22.75 ], [ 87.95, 22.65 ], [ 87.85, 22.35 ] ] ] } },
-{ "type": "Feature", "properties": { "district_id": "BD_SATKHIRA", "district_name": "Satkhira", "state_or_division": "Khulna", "country": "Bangladesh", "coastal_zone": "West Sundarbans Coastal Belt", "population": 2079884, "hq": "Satkhira" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 89.0, 21.65 ], [ 89.3, 21.75 ], [ 89.4, 22.15 ], [ 89.35, 22.65 ], [ 89.15, 22.85 ], [ 88.95, 22.5 ], [ 88.9, 22.0 ], [ 89.0, 21.65 ] ] ] } },
-{ "type": "Feature", "properties": { "district_id": "BD_KHULNA", "district_name": "Khulna", "state_or_division": "Khulna", "country": "Bangladesh", "coastal_zone": "Central Sundarbans Tidal Zone", "population": 2318527, "hq": "Khulna" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 89.3, 21.75 ], [ 89.6, 21.8 ], [ 89.65, 22.35 ], [ 89.6, 22.85 ], [ 89.35, 22.75 ], [ 89.35, 22.25 ], [ 89.3, 21.75 ] ] ] } },
-{ "type": "Feature", "properties": { "district_id": "BD_BAGERHAT", "district_name": "Bagerhat", "state_or_division": "Khulna", "country": "Bangladesh", "coastal_zone": "Mongla Estuary & East Sundarbans", "population": 1476090, "hq": "Bagerhat" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 89.6, 21.8 ], [ 89.95, 21.85 ], [ 90.0, 22.35 ], [ 89.85, 22.75 ], [ 89.65, 22.7 ], [ 89.6, 22.25 ], [ 89.6, 21.8 ] ] ] } },
-{ "type": "Feature", "properties": { "district_id": "BD_PATUAKHALI", "district_name": "Patuakhali", "state_or_division": "Barisal", "country": "Bangladesh", "coastal_zone": "Khepupara Landfall Coast", "population": 1535854, "hq": "Patuakhali" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 89.95, 21.7 ], [ 90.5, 21.75 ], [ 90.6, 22.25 ], [ 90.4, 22.5 ], [ 90.15, 22.35 ], [ 89.95, 22.05 ], [ 89.95, 21.7 ] ] ] } },
-{ "type": "Feature", "properties": { "district_id": "BD_BARGUNA", "district_name": "Barguna", "state_or_division": "Barisal", "country": "Bangladesh", "coastal_zone": "Bishkhali - Baleshwar Estuary", "population": 892781, "hq": "Barguna" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 89.85, 21.85 ], [ 90.2, 21.85 ], [ 90.25, 22.25 ], [ 90.05, 22.35 ], [ 89.85, 22.15 ], [ 89.85, 21.85 ] ] ] } }
-]
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "district_id": "WB_S24PGS",
+        "district_name": "South 24 Parganas",
+        "state_or_division": "West Bengal",
+        "country": "India",
+        "coastal_zone": "Sundarbans Estuary",
+        "population": 8161961,
+        "hq": "Alipore",
+        "lat": 22.15,
+        "lon": 88.55
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              88.0,
+              21.5
+            ],
+            [
+              89.1,
+              21.5
+            ],
+            [
+              89.1,
+              22.6
+            ],
+            [
+              88.0,
+              22.6
+            ],
+            [
+              88.0,
+              21.5
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "district_id": "WB_N24PGS",
+        "district_name": "North 24 Parganas",
+        "state_or_division": "West Bengal",
+        "country": "India",
+        "coastal_zone": "Ichamati - Sundarbans Delta",
+        "population": 10009781,
+        "hq": "Barasat",
+        "lat": 22.72,
+        "lon": 88.48
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              88.3,
+              22.2
+            ],
+            [
+              89.1,
+              22.2
+            ],
+            [
+              89.1,
+              23.2
+            ],
+            [
+              88.3,
+              23.2
+            ],
+            [
+              88.3,
+              22.2
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "district_id": "WB_PURBA_MED",
+        "district_name": "Purba Medinipur",
+        "state_or_division": "West Bengal",
+        "country": "India",
+        "coastal_zone": "Digha - Haldia Coastal Strip",
+        "population": 5095875,
+        "hq": "Tamluk",
+        "lat": 21.95,
+        "lon": 87.78
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              87.4,
+              21.6
+            ],
+            [
+              88.1,
+              21.6
+            ],
+            [
+              88.1,
+              22.3
+            ],
+            [
+              87.4,
+              22.3
+            ],
+            [
+              87.4,
+              21.6
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "district_id": "WB_KOLKATA",
+        "district_name": "Kolkata",
+        "state_or_division": "West Bengal",
+        "country": "India",
+        "coastal_zone": "Metropolitan Hinterland",
+        "population": 4496694,
+        "hq": "Kolkata",
+        "lat": 22.57,
+        "lon": 88.36
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              88.25,
+              22.45
+            ],
+            [
+              88.45,
+              22.45
+            ],
+            [
+              88.45,
+              22.65
+            ],
+            [
+              88.25,
+              22.65
+            ],
+            [
+              88.25,
+              22.45
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "district_id": "WB_HOWRAH",
+        "district_name": "Howrah",
+        "state_or_division": "West Bengal",
+        "country": "India",
+        "coastal_zone": "Hooghly Basin Lowland",
+        "population": 4850029,
+        "hq": "Howrah",
+        "lat": 22.59,
+        "lon": 88.26
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              87.8,
+              22.2
+            ],
+            [
+              88.4,
+              22.2
+            ],
+            [
+              88.4,
+              22.8
+            ],
+            [
+              87.8,
+              22.8
+            ],
+            [
+              87.8,
+              22.2
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "district_id": "OD_PURI",
+        "district_name": "Puri",
+        "state_or_division": "Odisha",
+        "country": "India",
+        "coastal_zone": "Chilika - Puri Shoreline",
+        "population": 1698730,
+        "hq": "Puri",
+        "lat": 19.81,
+        "lon": 85.83
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              85.1,
+              19.6
+            ],
+            [
+              86.4,
+              19.6
+            ],
+            [
+              86.4,
+              20.2
+            ],
+            [
+              85.1,
+              20.2
+            ],
+            [
+              85.1,
+              19.6
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "district_id": "OD_JAGATSINGHPUR",
+        "district_name": "Jagatsinghpur",
+        "state_or_division": "Odisha",
+        "country": "India",
+        "coastal_zone": "Paradip Port Estuary",
+        "population": 1136971,
+        "hq": "Jagatsinghpur",
+        "lat": 20.26,
+        "lon": 86.17
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              85.9,
+              19.9
+            ],
+            [
+              86.7,
+              19.9
+            ],
+            [
+              86.7,
+              20.4
+            ],
+            [
+              85.9,
+              20.4
+            ],
+            [
+              85.9,
+              19.9
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "district_id": "OD_KENDRAPARA",
+        "district_name": "Kendrapara",
+        "state_or_division": "Odisha",
+        "country": "India",
+        "coastal_zone": "Bhitarkanika Mangrove Shore",
+        "population": 1440361,
+        "hq": "Kendrapara",
+        "lat": 20.5,
+        "lon": 86.42
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              86.2,
+              20.3
+            ],
+            [
+              87.0,
+              20.3
+            ],
+            [
+              87.0,
+              20.8
+            ],
+            [
+              86.2,
+              20.8
+            ],
+            [
+              86.2,
+              20.3
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "district_id": "OD_BHADRAK",
+        "district_name": "Bhadrak",
+        "state_or_division": "Odisha",
+        "country": "India",
+        "coastal_zone": "Dhamra Port Coastal Plain",
+        "population": 1506522,
+        "hq": "Bhadrak",
+        "lat": 20.91,
+        "lon": 86.52
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              86.3,
+              20.7
+            ],
+            [
+              87.1,
+              20.7
+            ],
+            [
+              87.1,
+              21.2
+            ],
+            [
+              86.3,
+              21.2
+            ],
+            [
+              86.3,
+              20.7
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "district_id": "OD_BALASORE",
+        "district_name": "Balasore",
+        "state_or_division": "Odisha",
+        "country": "India",
+        "coastal_zone": "Chandipur Coast",
+        "population": 2320529,
+        "hq": "Balasore",
+        "lat": 21.49,
+        "lon": 86.93
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              86.4,
+              21.2
+            ],
+            [
+              87.5,
+              21.2
+            ],
+            [
+              87.5,
+              21.9
+            ],
+            [
+              86.4,
+              21.9
+            ],
+            [
+              86.4,
+              21.2
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "district_id": "OD_GANJAM",
+        "district_name": "Ganjam",
+        "state_or_division": "Odisha",
+        "country": "India",
+        "coastal_zone": "Gopalpur Coastal Belt",
+        "population": 3529031,
+        "hq": "Chhatrapur",
+        "lat": 19.35,
+        "lon": 84.98
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              84.3,
+              19.1
+            ],
+            [
+              85.2,
+              19.1
+            ],
+            [
+              85.2,
+              20.0
+            ],
+            [
+              84.3,
+              20.0
+            ],
+            [
+              84.3,
+              19.1
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "district_id": "AP_VIZAG",
+        "district_name": "Visakhapatnam",
+        "state_or_division": "Andhra Pradesh",
+        "country": "India",
+        "coastal_zone": "North Circars Major Port Belt",
+        "population": 4290589,
+        "hq": "Visakhapatnam",
+        "lat": 17.68,
+        "lon": 83.21
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              82.8,
+              17.4
+            ],
+            [
+              83.6,
+              17.4
+            ],
+            [
+              83.6,
+              18.2
+            ],
+            [
+              82.8,
+              18.2
+            ],
+            [
+              82.8,
+              17.4
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "district_id": "AP_SRIKAKULAM",
+        "district_name": "Srikakulam",
+        "state_or_division": "Andhra Pradesh",
+        "country": "India",
+        "coastal_zone": "Kalingapatnam Shoreline",
+        "population": 2703114,
+        "hq": "Srikakulam",
+        "lat": 18.29,
+        "lon": 83.89
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              83.4,
+              18.1
+            ],
+            [
+              84.8,
+              18.1
+            ],
+            [
+              84.8,
+              19.2
+            ],
+            [
+              83.4,
+              19.2
+            ],
+            [
+              83.4,
+              18.1
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "district_id": "AP_VIZIANAGARAM",
+        "district_name": "Vizianagaram",
+        "state_or_division": "Andhra Pradesh",
+        "country": "India",
+        "coastal_zone": "Bhogapuram Coastal Strip",
+        "population": 2344474,
+        "hq": "Vizianagaram",
+        "lat": 18.11,
+        "lon": 83.41
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              83.2,
+              17.9
+            ],
+            [
+              83.8,
+              17.9
+            ],
+            [
+              83.8,
+              18.8
+            ],
+            [
+              83.2,
+              18.8
+            ],
+            [
+              83.2,
+              17.9
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "district_id": "AP_EAST_GODAVARI",
+        "district_name": "East Godavari",
+        "state_or_division": "Andhra Pradesh",
+        "country": "India",
+        "coastal_zone": "Kakinada - Godavari Delta",
+        "population": 5154296,
+        "hq": "Kakinada",
+        "lat": 16.98,
+        "lon": 82.24
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              81.8,
+              16.6
+            ],
+            [
+              82.5,
+              16.6
+            ],
+            [
+              82.5,
+              17.6
+            ],
+            [
+              81.8,
+              17.6
+            ],
+            [
+              81.8,
+              16.6
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "district_id": "AP_KRISHNA",
+        "district_name": "Krishna",
+        "state_or_division": "Andhra Pradesh",
+        "country": "India",
+        "coastal_zone": "Machilipatnam - Krishna Delta",
+        "population": 4517398,
+        "hq": "Machilipatnam",
+        "lat": 16.18,
+        "lon": 81.13
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              80.5,
+              15.8
+            ],
+            [
+              81.5,
+              15.8
+            ],
+            [
+              81.5,
+              16.8
+            ],
+            [
+              80.5,
+              16.8
+            ],
+            [
+              80.5,
+              15.8
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "district_id": "AP_BAPATLA",
+        "district_name": "Bapatla",
+        "state_or_division": "Andhra Pradesh",
+        "country": "India",
+        "coastal_zone": "Nizampatnam Coastal Plain",
+        "population": 1586918,
+        "hq": "Bapatla",
+        "lat": 15.9,
+        "lon": 80.46
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              80.1,
+              15.6
+            ],
+            [
+              80.8,
+              15.6
+            ],
+            [
+              80.8,
+              16.2
+            ],
+            [
+              80.1,
+              16.2
+            ],
+            [
+              80.1,
+              15.6
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "district_id": "AP_NELLORE",
+        "district_name": "SPSR Nellore",
+        "state_or_division": "Andhra Pradesh",
+        "country": "India",
+        "coastal_zone": "Pulicat - Krishnapatnam Shore",
+        "population": 2963557,
+        "hq": "Nellore",
+        "lat": 14.44,
+        "lon": 79.98
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              79.6,
+              13.8
+            ],
+            [
+              80.4,
+              13.8
+            ],
+            [
+              80.4,
+              15.2
+            ],
+            [
+              79.6,
+              15.2
+            ],
+            [
+              79.6,
+              13.8
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "district_id": "TN_CHENNAI",
+        "district_name": "Chennai",
+        "state_or_division": "Tamil Nadu",
+        "country": "India",
+        "coastal_zone": "Coromandel Metropolitan Coast",
+        "population": 7088403,
+        "hq": "Chennai",
+        "lat": 13.08,
+        "lon": 80.27
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              80.15,
+              12.95
+            ],
+            [
+              80.35,
+              12.95
+            ],
+            [
+              80.35,
+              13.25
+            ],
+            [
+              80.15,
+              13.25
+            ],
+            [
+              80.15,
+              12.95
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "district_id": "TN_CHENGALPATTU",
+        "district_name": "Chengalpattu",
+        "state_or_division": "Tamil Nadu",
+        "country": "India",
+        "coastal_zone": "Mahabalipuram Coastal Strip",
+        "population": 2556244,
+        "hq": "Chengalpattu",
+        "lat": 12.69,
+        "lon": 79.98
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              79.8,
+              12.4
+            ],
+            [
+              80.3,
+              12.4
+            ],
+            [
+              80.3,
+              12.9
+            ],
+            [
+              79.8,
+              12.9
+            ],
+            [
+              79.8,
+              12.4
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "district_id": "TN_CUDDALORE",
+        "district_name": "Cuddalore",
+        "state_or_division": "Tamil Nadu",
+        "country": "India",
+        "coastal_zone": "Gadilam - Pennaiyar Shore",
+        "population": 2605914,
+        "hq": "Cuddalore",
+        "lat": 11.75,
+        "lon": 79.76
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              79.3,
+              11.2
+            ],
+            [
+              79.9,
+              11.2
+            ],
+            [
+              79.9,
+              12.0
+            ],
+            [
+              79.3,
+              12.0
+            ],
+            [
+              79.3,
+              11.2
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "district_id": "TN_NAGAPATTINAM",
+        "district_name": "Nagapattinam",
+        "state_or_division": "Tamil Nadu",
+        "country": "India",
+        "coastal_zone": "Cauvery Delta Landfall Coast",
+        "population": 1616450,
+        "hq": "Nagapattinam",
+        "lat": 10.76,
+        "lon": 79.84
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              79.6,
+              10.2
+            ],
+            [
+              80.0,
+              10.2
+            ],
+            [
+              80.0,
+              11.3
+            ],
+            [
+              79.6,
+              11.3
+            ],
+            [
+              79.6,
+              10.2
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "district_id": "TN_THIRUVARUR",
+        "district_name": "Thiruvarur",
+        "state_or_division": "Tamil Nadu",
+        "country": "India",
+        "coastal_zone": "Muthupet Tidal Lagoon",
+        "population": 1264277,
+        "hq": "Thiruvarur",
+        "lat": 10.77,
+        "lon": 79.63
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              79.4,
+              10.3
+            ],
+            [
+              79.8,
+              10.3
+            ],
+            [
+              79.8,
+              11.0
+            ],
+            [
+              79.4,
+              11.0
+            ],
+            [
+              79.4,
+              10.3
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "district_id": "TN_RAMANATHAPURAM",
+        "district_name": "Ramanathapuram",
+        "state_or_division": "Tamil Nadu",
+        "country": "India",
+        "coastal_zone": "Pamban - Gulf of Mannar",
+        "population": 1353445,
+        "hq": "Ramanathapuram",
+        "lat": 9.36,
+        "lon": 78.83
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              78.2,
+              9.1
+            ],
+            [
+              79.4,
+              9.1
+            ],
+            [
+              79.4,
+              9.8
+            ],
+            [
+              78.2,
+              9.8
+            ],
+            [
+              78.2,
+              9.1
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "district_id": "GJ_KUTCH",
+        "district_name": "Kutch",
+        "state_or_division": "Gujarat",
+        "country": "India",
+        "coastal_zone": "Gulf of Kutch / Jakhau - Kandla",
+        "population": 2092371,
+        "hq": "Bhuj",
+        "lat": 23.24,
+        "lon": 69.66
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              68.1,
+              22.7
+            ],
+            [
+              71.0,
+              22.7
+            ],
+            [
+              71.0,
+              24.5
+            ],
+            [
+              68.1,
+              24.5
+            ],
+            [
+              68.1,
+              22.7
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "district_id": "GJ_DWARKA",
+        "district_name": "Devbhumi Dwarka",
+        "state_or_division": "Gujarat",
+        "country": "India",
+        "coastal_zone": "Okhamandal Coastal Promontory",
+        "population": 752484,
+        "hq": "Khambhalia",
+        "lat": 22.24,
+        "lon": 68.96
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              68.8,
+              21.8
+            ],
+            [
+              69.8,
+              21.8
+            ],
+            [
+              69.8,
+              22.6
+            ],
+            [
+              68.8,
+              22.6
+            ],
+            [
+              68.8,
+              21.8
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "district_id": "GJ_JAMNAGAR",
+        "district_name": "Jamnagar",
+        "state_or_division": "Gujarat",
+        "country": "India",
+        "coastal_zone": "South Gulf of Kutch",
+        "population": 2160119,
+        "hq": "Jamnagar",
+        "lat": 22.47,
+        "lon": 70.07
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              69.7,
+              22.1
+            ],
+            [
+              70.8,
+              22.1
+            ],
+            [
+              70.8,
+              22.8
+            ],
+            [
+              69.7,
+              22.8
+            ],
+            [
+              69.7,
+              22.1
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "district_id": "GJ_PORBANDAR",
+        "district_name": "Porbandar",
+        "state_or_division": "Gujarat",
+        "country": "India",
+        "coastal_zone": "Saurashtra Arabian Sea Shore",
+        "population": 585449,
+        "hq": "Porbandar",
+        "lat": 21.64,
+        "lon": 69.6
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              69.3,
+              21.2
+            ],
+            [
+              70.0,
+              21.2
+            ],
+            [
+              70.0,
+              22.0
+            ],
+            [
+              69.3,
+              22.0
+            ],
+            [
+              69.3,
+              21.2
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "district_id": "GJ_GIR_SOMNATH",
+        "district_name": "Gir Somnath",
+        "state_or_division": "Gujarat",
+        "country": "India",
+        "coastal_zone": "Somnath - Veraval Belt",
+        "population": 1217477,
+        "hq": "Veraval",
+        "lat": 20.9,
+        "lon": 70.36
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              70.1,
+              20.6
+            ],
+            [
+              71.1,
+              20.6
+            ],
+            [
+              71.1,
+              21.2
+            ],
+            [
+              70.1,
+              21.2
+            ],
+            [
+              70.1,
+              20.6
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "district_id": "GJ_BHAVNAGAR",
+        "district_name": "Bhavnagar",
+        "state_or_division": "Gujarat",
+        "country": "India",
+        "coastal_zone": "Gulf of Khambhat Estuary",
+        "population": 2880365,
+        "hq": "Bhavnagar",
+        "lat": 21.76,
+        "lon": 72.15
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              71.6,
+              21.2
+            ],
+            [
+              72.4,
+              21.2
+            ],
+            [
+              72.4,
+              22.3
+            ],
+            [
+              71.6,
+              22.3
+            ],
+            [
+              71.6,
+              21.2
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "district_id": "BD_SATKHIRA",
+        "district_name": "Satkhira",
+        "state_or_division": "Khulna",
+        "country": "Bangladesh",
+        "coastal_zone": "West Sundarbans Coastal Belt",
+        "population": 2079884,
+        "hq": "Satkhira",
+        "lat": 22.35,
+        "lon": 89.08
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              88.9,
+              21.6
+            ],
+            [
+              89.4,
+              21.6
+            ],
+            [
+              89.4,
+              22.8
+            ],
+            [
+              88.9,
+              22.8
+            ],
+            [
+              88.9,
+              21.6
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "district_id": "BD_KHULNA",
+        "district_name": "Khulna",
+        "state_or_division": "Khulna",
+        "country": "Bangladesh",
+        "coastal_zone": "Central Sundarbans Tidal Zone",
+        "population": 2318527,
+        "hq": "Khulna",
+        "lat": 22.49,
+        "lon": 89.34
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              89.1,
+              21.8
+            ],
+            [
+              89.6,
+              21.8
+            ],
+            [
+              89.6,
+              23.0
+            ],
+            [
+              89.1,
+              23.0
+            ],
+            [
+              89.1,
+              21.8
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "district_id": "BD_BAGERHAT",
+        "district_name": "Bagerhat",
+        "state_or_division": "Khulna",
+        "country": "Bangladesh",
+        "coastal_zone": "Mongla Estuary & East Sundarbans",
+        "population": 1476090,
+        "hq": "Bagerhat",
+        "lat": 22.4,
+        "lon": 89.79
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              89.5,
+              21.7
+            ],
+            [
+              90.0,
+              21.7
+            ],
+            [
+              90.0,
+              22.8
+            ],
+            [
+              89.5,
+              22.8
+            ],
+            [
+              89.5,
+              21.7
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "district_id": "BD_PATUAKHALI",
+        "district_name": "Patuakhali",
+        "state_or_division": "Barisal",
+        "country": "Bangladesh",
+        "coastal_zone": "Khepupara Landfall Coast",
+        "population": 1535854,
+        "hq": "Patuakhali",
+        "lat": 22.15,
+        "lon": 90.33
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              90.0,
+              21.8
+            ],
+            [
+              90.7,
+              21.8
+            ],
+            [
+              90.7,
+              22.6
+            ],
+            [
+              90.0,
+              22.6
+            ],
+            [
+              90.0,
+              21.8
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "district_id": "BD_BARGUNA",
+        "district_name": "Barguna",
+        "state_or_division": "Barisal",
+        "country": "Bangladesh",
+        "coastal_zone": "Bishkhali - Baleshwar Estuary",
+        "population": 892781,
+        "hq": "Barguna",
+        "lat": 22.16,
+        "lon": 90.13
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              89.8,
+              21.8
+            ],
+            [
+              90.4,
+              21.8
+            ],
+            [
+              90.4,
+              22.5
+            ],
+            [
+              89.8,
+              22.5
+            ],
+            [
+              89.8,
+              21.8
+            ]
+          ]
+        ]
+      }
+    }
+  ]
 }

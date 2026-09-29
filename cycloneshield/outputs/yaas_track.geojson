@@ -1,0 +1,708 @@
+{
+  "type": "FeatureCollection",
+  "name": "cycloneshield_yaas_track",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          90.0,
+          15.5
+        ]
+      },
+      "properties": {
+        "time": "2021-05-23 00:00:00",
+        "wind_kts": 20.0,
+        "wind_kmh": 37.0,
+        "pressure_mb": 1000.0,
+        "category": "Depression (<28 kts)",
+        "speed_kmh": 5.6
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          89.9,
+          15.4
+        ]
+      },
+      "properties": {
+        "time": "2021-05-23 03:00:00",
+        "wind_kts": 23.0,
+        "wind_kmh": 42.6,
+        "pressure_mb": 999.0,
+        "category": "Depression (<28 kts)",
+        "speed_kmh": 3.7
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          89.8,
+          15.6
+        ]
+      },
+      "properties": {
+        "time": "2021-05-23 06:00:00",
+        "wind_kts": 25.0,
+        "wind_kmh": 46.3,
+        "pressure_mb": 996.0,
+        "category": "Depression (<28 kts)",
+        "speed_kmh": 3.7
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          89.7,
+          15.6
+        ]
+      },
+      "properties": {
+        "time": "2021-05-23 09:00:00",
+        "wind_kts": 28.0,
+        "wind_kmh": 51.9,
+        "pressure_mb": 997.0,
+        "category": "Deep Depression (28-33 kts)",
+        "speed_kmh": 5.6
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          89.6,
+          15.7
+        ]
+      },
+      "properties": {
+        "time": "2021-05-23 12:00:00",
+        "wind_kts": 30.0,
+        "wind_kmh": 55.6,
+        "pressure_mb": 994.0,
+        "category": "Deep Depression (28-33 kts)",
+        "speed_kmh": 5.6
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          89.5,
+          15.8
+        ]
+      },
+      "properties": {
+        "time": "2021-05-23 15:00:00",
+        "wind_kts": 33.0,
+        "wind_kmh": 61.1,
+        "pressure_mb": 995.0,
+        "category": "Deep Depression (28-33 kts)",
+        "speed_kmh": 3.7
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          89.5,
+          15.8
+        ]
+      },
+      "properties": {
+        "time": "2021-05-23 18:00:00",
+        "wind_kts": 35.0,
+        "wind_kmh": 64.8,
+        "pressure_mb": 992.0,
+        "category": "Cyclonic Storm (34-47 kts)",
+        "speed_kmh": 3.7
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          89.6,
+          16.0
+        ]
+      },
+      "properties": {
+        "time": "2021-05-23 21:00:00",
+        "wind_kts": 35.0,
+        "wind_kmh": 64.8,
+        "pressure_mb": 993.0,
+        "category": "Cyclonic Storm (34-47 kts)",
+        "speed_kmh": 7.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          89.8,
+          16.1
+        ]
+      },
+      "properties": {
+        "time": "2021-05-24 00:00:00",
+        "wind_kts": 35.0,
+        "wind_kmh": 64.8,
+        "pressure_mb": 990.0,
+        "category": "Cyclonic Storm (34-47 kts)",
+        "speed_kmh": 9.3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          89.7,
+          16.5
+        ]
+      },
+      "properties": {
+        "time": "2021-05-24 03:00:00",
+        "wind_kts": 40.0,
+        "wind_kmh": 74.1,
+        "pressure_mb": 988.0,
+        "category": "Cyclonic Storm (34-47 kts)",
+        "speed_kmh": 9.3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          89.6,
+          16.6
+        ]
+      },
+      "properties": {
+        "time": "2021-05-24 06:00:00",
+        "wind_kts": 40.0,
+        "wind_kmh": 74.1,
+        "pressure_mb": 988.0,
+        "category": "Cyclonic Storm (34-47 kts)",
+        "speed_kmh": 9.3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          89.6,
+          16.9
+        ]
+      },
+      "properties": {
+        "time": "2021-05-24 09:00:00",
+        "wind_kts": 40.0,
+        "wind_kmh": 74.1,
+        "pressure_mb": 988.0,
+        "category": "Cyclonic Storm (34-47 kts)",
+        "speed_kmh": 11.1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          89.4,
+          17.2
+        ]
+      },
+      "properties": {
+        "time": "2021-05-24 12:00:00",
+        "wind_kts": 45.0,
+        "wind_kmh": 83.3,
+        "pressure_mb": 986.0,
+        "category": "Cyclonic Storm (34-47 kts)",
+        "speed_kmh": 11.1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          89.2,
+          17.4
+        ]
+      },
+      "properties": {
+        "time": "2021-05-24 15:00:00",
+        "wind_kts": 45.0,
+        "wind_kmh": 83.3,
+        "pressure_mb": 986.0,
+        "category": "Cyclonic Storm (34-47 kts)",
+        "speed_kmh": 11.1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          89.0,
+          17.6
+        ]
+      },
+      "properties": {
+        "time": "2021-05-24 18:00:00",
+        "wind_kts": 50.0,
+        "wind_kmh": 92.6,
+        "pressure_mb": 983.0,
+        "category": "Severe Cyclonic Storm (48-63 kts)",
+        "speed_kmh": 11.1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          88.9,
+          17.8
+        ]
+      },
+      "properties": {
+        "time": "2021-05-24 21:00:00",
+        "wind_kts": 55.0,
+        "wind_kmh": 101.9,
+        "pressure_mb": 982.0,
+        "category": "Severe Cyclonic Storm (48-63 kts)",
+        "speed_kmh": 11.1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          88.6,
+          18.1
+        ]
+      },
+      "properties": {
+        "time": "2021-05-25 00:00:00",
+        "wind_kts": 55.0,
+        "wind_kmh": 101.9,
+        "pressure_mb": 980.0,
+        "category": "Severe Cyclonic Storm (48-63 kts)",
+        "speed_kmh": 13.0
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          88.4,
+          18.4
+        ]
+      },
+      "properties": {
+        "time": "2021-05-25 03:00:00",
+        "wind_kts": 55.0,
+        "wind_kmh": 101.9,
+        "pressure_mb": 980.0,
+        "category": "Severe Cyclonic Storm (48-63 kts)",
+        "speed_kmh": 14.8
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          88.2,
+          18.8
+        ]
+      },
+      "properties": {
+        "time": "2021-05-25 06:00:00",
+        "wind_kts": 60.0,
+        "wind_kmh": 111.1,
+        "pressure_mb": 978.0,
+        "category": "Severe Cyclonic Storm (48-63 kts)",
+        "speed_kmh": 13.0
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          88.2,
+          19.1
+        ]
+      },
+      "properties": {
+        "time": "2021-05-25 09:00:00",
+        "wind_kts": 60.0,
+        "wind_kmh": 111.1,
+        "pressure_mb": 978.0,
+        "category": "Severe Cyclonic Storm (48-63 kts)",
+        "speed_kmh": 13.0
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          88.2,
+          19.5
+        ]
+      },
+      "properties": {
+        "time": "2021-05-25 12:00:00",
+        "wind_kts": 65.0,
+        "wind_kmh": 120.4,
+        "pressure_mb": 975.0,
+        "category": "Very Severe Cyclonic Storm (64-89 kts)",
+        "speed_kmh": 14.8
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          88.0,
+          19.9
+        ]
+      },
+      "properties": {
+        "time": "2021-05-25 15:00:00",
+        "wind_kts": 65.0,
+        "wind_kmh": 120.4,
+        "pressure_mb": 975.0,
+        "category": "Very Severe Cyclonic Storm (64-89 kts)",
+        "speed_kmh": 14.8
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          87.8,
+          20.3
+        ]
+      },
+      "properties": {
+        "time": "2021-05-25 18:00:00",
+        "wind_kts": 70.0,
+        "wind_kmh": 129.6,
+        "pressure_mb": 974.0,
+        "category": "Very Severe Cyclonic Storm (64-89 kts)",
+        "speed_kmh": 9.3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          87.7,
+          20.4
+        ]
+      },
+      "properties": {
+        "time": "2021-05-25 21:00:00",
+        "wind_kts": 75.0,
+        "wind_kmh": 138.9,
+        "pressure_mb": 970.0,
+        "category": "Very Severe Cyclonic Storm (64-89 kts)",
+        "speed_kmh": 7.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          87.6,
+          20.6
+        ]
+      },
+      "properties": {
+        "time": "2021-05-26 00:00:00",
+        "wind_kts": 75.0,
+        "wind_kmh": 138.9,
+        "pressure_mb": 970.0,
+        "category": "Very Severe Cyclonic Storm (64-89 kts)",
+        "speed_kmh": 14.8
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          87.2,
+          21.1
+        ]
+      },
+      "properties": {
+        "time": "2021-05-26 03:00:00",
+        "wind_kts": 75.0,
+        "wind_kmh": 138.9,
+        "pressure_mb": 970.0,
+        "category": "Very Severe Cyclonic Storm (64-89 kts)",
+        "speed_kmh": 20.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          86.9,
+          21.5
+        ]
+      },
+      "properties": {
+        "time": "2021-05-26 06:00:00",
+        "wind_kts": 75.0,
+        "wind_kmh": 138.9,
+        "pressure_mb": 970.0,
+        "category": "Very Severe Cyclonic Storm (64-89 kts)",
+        "speed_kmh": 16.7
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          86.6,
+          21.7
+        ]
+      },
+      "properties": {
+        "time": "2021-05-26 09:00:00",
+        "wind_kts": 55.0,
+        "wind_kmh": 101.9,
+        "pressure_mb": 978.0,
+        "category": "Severe Cyclonic Storm (48-63 kts)",
+        "speed_kmh": 11.1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          86.5,
+          21.9
+        ]
+      },
+      "properties": {
+        "time": "2021-05-26 12:00:00",
+        "wind_kts": 45.0,
+        "wind_kmh": 83.3,
+        "pressure_mb": 984.0,
+        "category": "Cyclonic Storm (34-47 kts)",
+        "speed_kmh": 13.0
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          86.1,
+          22.2
+        ]
+      },
+      "properties": {
+        "time": "2021-05-26 15:00:00",
+        "wind_kts": 40.0,
+        "wind_kmh": 74.1,
+        "pressure_mb": 986.0,
+        "category": "Cyclonic Storm (34-47 kts)",
+        "speed_kmh": 16.7
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          85.8,
+          22.5
+        ]
+      },
+      "properties": {
+        "time": "2021-05-26 18:00:00",
+        "wind_kts": 35.0,
+        "wind_kmh": 64.8,
+        "pressure_mb": 988.0,
+        "category": "Cyclonic Storm (34-47 kts)",
+        "speed_kmh": 13.0
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          85.7,
+          22.8
+        ]
+      },
+      "properties": {
+        "time": "2021-05-26 21:00:00",
+        "wind_kts": 30.0,
+        "wind_kmh": 55.6,
+        "pressure_mb": 992.0,
+        "category": "Deep Depression (28-33 kts)",
+        "speed_kmh": 11.1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          85.7,
+          23.1
+        ]
+      },
+      "properties": {
+        "time": "2021-05-27 00:00:00",
+        "wind_kts": 30.0,
+        "wind_kmh": 55.6,
+        "pressure_mb": 988.0,
+        "category": "Deep Depression (28-33 kts)",
+        "speed_kmh": 9.3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          85.7,
+          23.3
+        ]
+      },
+      "properties": {
+        "time": "2021-05-27 03:00:00",
+        "wind_kts": 30.0,
+        "wind_kmh": 55.6,
+        "pressure_mb": 990.0,
+        "category": "Deep Depression (28-33 kts)",
+        "speed_kmh": 9.3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          85.6,
+          23.6
+        ]
+      },
+      "properties": {
+        "time": "2021-05-27 06:00:00",
+        "wind_kts": 25.0,
+        "wind_kmh": 46.3,
+        "pressure_mb": 991.0,
+        "category": "Depression (<28 kts)",
+        "speed_kmh": 13.0
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          85.5,
+          23.9
+        ]
+      },
+      "properties": {
+        "time": "2021-05-27 09:00:00",
+        "wind_kts": 25.0,
+        "wind_kmh": 46.3,
+        "pressure_mb": 991.5,
+        "category": "Depression (<28 kts)",
+        "speed_kmh": 14.8
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          85.3,
+          24.3
+        ]
+      },
+      "properties": {
+        "time": "2021-05-27 12:00:00",
+        "wind_kts": 25.0,
+        "wind_kmh": 46.3,
+        "pressure_mb": 992.0,
+        "category": "Depression (<28 kts)",
+        "speed_kmh": 13.0
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          85.1,
+          24.5
+        ]
+      },
+      "properties": {
+        "time": "2021-05-27 15:00:00",
+        "wind_kts": 25.0,
+        "wind_kmh": 46.3,
+        "pressure_mb": 992.0,
+        "category": "Depression (<28 kts)",
+        "speed_kmh": 11.1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          84.8,
+          24.7
+        ]
+      },
+      "properties": {
+        "time": "2021-05-27 18:00:00",
+        "wind_kts": 25.0,
+        "wind_kmh": 46.3,
+        "pressure_mb": 992.0,
+        "category": "Depression (<28 kts)",
+        "speed_kmh": 11.1
+      }
+    }
+  ]
+}
