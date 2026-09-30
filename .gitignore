@@ -47,3 +47,9 @@ desktop.ini
 .gemini/
 scratch/
 cycloneshield/outputs/video_recordings/
+cycloneshield/outputs/recordings/
+cycloneshield/outputs/voiceover_parts/
+cycloneshield/outputs/*.mp4
+test_dyn_map.html
+test_dyn_map.py
+

@@ -38,3 +38,12 @@ data/ibtracs_ni.csv
 scratch/
 tmp/
 *.log
+
+# Demo recordings, voiceovers, and presentations (not needed inside container)
+*.mp4
+*.webm
+*.mp3
+*.pptx
+test_dyn_map.html
+test_dyn_map.py
+

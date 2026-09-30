@@ -18,7 +18,11 @@ Write-Host "==================================================================" 
 Write-Host "🛡️  CycloneShield — 1-Click Google Cloud Run Deployment (PowerShell)" -ForegroundColor Cyan
 Write-Host "==================================================================" -ForegroundColor Cyan
 
-# 1. Check gcloud CLI
+# 1. Check gcloud CLI (auto-add default Windows SDK path if needed)
+$defaultSdkBin = "$env:LOCALAPPDATA\Google\Cloud SDK\google-cloud-sdk\bin"
+if (-not (Get-Command "gcloud" -ErrorAction SilentlyContinue) -and (Test-Path "$defaultSdkBin\gcloud.cmd")) {
+    $env:Path = "$defaultSdkBin;$env:Path"
+}
 $gcloudCmd = Get-Command "gcloud" -ErrorAction SilentlyContinue
 if (-not $gcloudCmd) {
     Write-Host "❌ Error: Google Cloud SDK ('gcloud') is not found in PATH." -ForegroundColor Red

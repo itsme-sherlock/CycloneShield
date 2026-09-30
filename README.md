@@ -9,7 +9,19 @@
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/itsme-sherlock/CycloneShield/blob/main/CycloneShield_Colab.ipynb)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-green.svg)](https://opensource.org/licenses/Apache-2.0)
 
-**[🌐 Live Streamlit App](https://cycloneshield-vawrqbhtbgu8i6cafhbf3q.streamlit.app/) • [🚀 1-Click Google Colab](https://colab.research.google.com/github/itsme-sherlock/CycloneShield/blob/main/CycloneShield_Colab.ipynb) • [📊 Executive Pitch Deck](PITCH_DECK.md) • [🎬 Video Demo Script](DEMO_SCRIPT.md) • [📝 Audit Report](AUDIT_REPORT.md)**
+**[🌐 Live Streamlit App](https://cycloneshield-vawrqbhtbgu8i6cafhbf3q.streamlit.app/) • [🎥 Master Demo Video (MP4)](./CycloneShield_Demo_Walkthrough.mp4) • [🎥 WebM Video](./cycloneshield_demo_walkthrough.webm) • [🎙️ Audio Voiceover](./cycloneshield_demo_voiceover.mp3) • [🚀 1-Click Google Colab](https://colab.research.google.com/github/itsme-sherlock/CycloneShield/blob/main/CycloneShield_Colab.ipynb) • [📊 Executive Pitch Deck](./PITCH_DECK.md) • [🎬 Video Demo Script](./DEMO_SCRIPT.md) • [📝 Audit Report](./AUDIT_REPORT.md)**
+
+---
+
+## 📦 Hackathon Submission Package (Judge Quick-Links)
+
+| Submission Deliverable | Direct Repository Link / URL | Description |
+| :--- | :--- | :--- |
+| **1. Deployed Working Prototype** | **[🌐 Launch Live Streamlit App](https://cycloneshield-vawrqbhtbgu8i6cafhbf3q.streamlit.app/)** | Hosted interactive command center (works out-of-the-box with zero API keys required). |
+| **2. Demo Video (3–5 Minutes)** | **[🎥 `CycloneShield_Demo_Walkthrough.mp4`](./CycloneShield_Demo_Walkthrough.mp4)** *(H.264/AAC)*<br>**[🎥 `cycloneshield_demo_walkthrough.webm`](./cycloneshield_demo_walkthrough.webm)** | 3m 28s end-to-end working walkthrough with studio narration ([`cycloneshield_demo_voiceover.mp3`](./cycloneshield_demo_voiceover.mp3)) and live Bengali radio broadcast. |
+| **3. Pitch Deck (PPTX & Markdown)** | **[📊 `CycloneShield_Pitch_Deck.pptx`](./cycloneshield/CycloneShield_Pitch_Deck.pptx)**<br>**[📄 `PITCH_DECK.md`](./PITCH_DECK.md)** | 12-slide executive presentation covering problem, Google AI architecture, validation, and 4-week state rollout. |
+| **4. Source Code & 1-Click Colab** | **[💻 `cycloneshield/app.py`](./cycloneshield/app.py)**<br>**[🚀 `CycloneShield_Colab.ipynb`](./CycloneShield_Colab.ipynb)** | Modular Python codebase, trained ML artifacts, Dockerfile, and reproducible Google Colab notebook. |
+| **5. Demo Script & Recording Guide** | **[🎬 `DEMO_SCRIPT.md`](./DEMO_SCRIPT.md)**<br>**[🧭 `DEMO_VIDEO_RECORDING_GUIDE.md`](./DEMO_VIDEO_RECORDING_GUIDE.md)** | Second-by-second storyboard mapped directly to the live Home Page and 6 operational tabs. |
 
 ---
 
@@ -67,19 +79,46 @@ graph TD
 
 ---
 
+## 📂 Repository Structure & Codebase Guide
+
+```text
+CycloneShield/
+├── app.py                              # Root Streamlit Cloud entry point (delegates to cycloneshield/app.py)
+├── requirements.txt                    #Pinned Python dependencies for Streamlit Cloud & local setup
+├── runtime.txt                         # Python 3.11 runtime specification for cloud deployment
+├── Dockerfile                          # Production Google Cloud Run container recipe (non-root, port 8080)
+├── CycloneShield_Colab.ipynb           # 1-Click interactive Google Colab notebook
+├── CycloneShield_Demo_Walkthrough.mp4  # Master 1080p H.264 + AAC Hackathon Demo Video
+├── PITCH_DECK.md                       # 12-Slide Executive Pitch Deck (Markdown)
+├── DEMO_SCRIPT.md                      # Second-by-second narration script & evaluation mapping
+├── DEMO_VIDEO_RECORDING_GUIDE.md       # Step-by-step UI walkthrough guide matching app.py
+└── cycloneshield/                      # Core Application Package
+    ├── app.py                          # Main 6-Tab Streamlit Command Center UI & Geospatial Engine
+    ├── gemini_advisory.py              # Google Gemini 2.5 Flash advisory, 7-language translation & OASIS CAP v1.2 XML
+    ├── vision_triage.py                # Google Gemini Multimodal Vision post-landfall drone/photo damage triage
+    ├── voice_engine.py                 # Google Cloud TTS / gTTS multilingual emergency radio voice synthesizer
+    ├── predictive_model.py             # Calibrated Scikit-Learn HistGradientBoosting ML model (ROC-AUC 0.941)
+    ├── bigquery_pipeline.py            # Google BigQuery NOAA IBTrACS SQL pipeline with 1 GB dry-run cost guard
+    ├── CycloneShield_Pitch_Deck.pptx   # PowerPoint presentation deck
+    ├── data/                           # Real GeoJSON districts, NOAA storm tracks, and benchmark field photos
+    └── outputs/                        # Pre-computed ML artifacts, Vertex AI manifest, and regional MP3 alerts
+```
+
+---
+
 ## 🇮🇳 Built for India: Multi-State & Multilingual Reach
 
 CycloneShield is built to protect all 7,516 km of India's coastline, with active support parameterized across 5 major coastal states and 7 regional languages:
 
 | State | Coastal Basin | Historical Cyclone Benchmarks | Regional Voice & Text | District Coverage |
 | :--- | :--- | :--- | :--- | :--- |
-| **West Bengal** | Bay of Bengal | Remal (2024), Amphan (2020), Yaas (2021) | Bengali (`bn-IN`), Hindi, English | South 24 Parganas, Purba Medinipur, North 24 Parganas, Howrah, Kolkata |
-| **Odisha** | Bay of Bengal | Fani (2019), Dana (2024), Phailin (2013) | Odia (`or-IN`), Hindi, English | Puri, Jagatsinghpur, Kendrapara, Bhadrak, Baleswar, Ganjam |
-| **Andhra Pradesh** | Bay of Bengal | Hudhud (2014), Michaung (2023) | Telugu (`te-IN`), Hindi, English | Visakhapatnam, Krishna, East Godavari, West Godavari, Srikakulam, Nellore |
-| **Tamil Nadu** | Bay of Bengal | Vardah (2016), Gaja (2018), Michaung (2023) | Tamil (`ta-IN`), English | Chennai, Thiruvallur, Kancheepuram, Cuddalore, Nagapattinam |
-| **Gujarat** | Arabian Sea | Biparjoy (2023), Tauktae (2021) | Gujarati (`gu-IN`), Hindi, English | Kachchh, Jamnagar, Porbandar, Junagadh, Bhavnagar, Devbhumi Dwarka |
+| **West Bengal** | Bay of Bengal | Remal (2024), Amphan (2020) | Bengali (`bn-IN`), Hindi, English | South 24 Parganas, North 24 Parganas, Purba Medinipur, Kolkata, Howrah |
+| **Odisha** | Bay of Bengal | Fani (2019), Yaas (2021), Dana (2024) | Odia (`or-IN`), Hindi, English | Puri, Jagatsinghpur, Kendrapara, Bhadrak, Balasore, Ganjam |
+| **Andhra Pradesh** | Bay of Bengal | Hudhud (2014), Michaung (2023) | Telugu (`te-IN`), Hindi, English | Visakhapatnam, Srikakulam, Vizianagaram, East Godavari, Krishna, Bapatla, Nellore |
+| **Tamil Nadu** | Bay of Bengal | Vardah (2016), Gaja (2018), Michaung (2023) | Tamil (`ta-IN`), Hindi, English | Chennai, Chengalpattu, Cuddalore, Nagapattinam, Thiruvarur, Ramanathapuram |
+| **Gujarat** | Arabian Sea | Biparjoy (2023), Tauktae (2021) | Gujarati (`gu-IN`), Hindi, English | Kutch, Devbhumi Dwarka, Jamnagar, Porbandar, Gir Somnath, Bhavnagar |
 
-Disaster commanders can also upload custom **IMD Synoptic Bulletins** (CSV track) to forecast any emerging cyclonic storm in real time.
+Disaster commanders can also upload custom **IMD Synoptic Bulletins** (CSV track) via the `🌀 Select Cyclone Event` dropdown to forecast any emerging cyclonic storm in real time.
 
 ---
 
@@ -143,8 +182,8 @@ cycloneshield\.venv\Scripts\activate
 # Linux/macOS:
 source cycloneshield/.venv/bin/activate
 
-# 3. Install dependencies
-pip install -r cycloneshield/requirements.txt
+# 3. Install dependencies from root requirements.txt
+pip install -r requirements.txt
 
 # 4. (Optional) Provide Gemini API Key (App works with calibrated fallbacks without key)
 # Windows PowerShell:

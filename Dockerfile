@@ -39,7 +39,7 @@ RUN useradd -m -u 10001 -s /bin/bash appuser
 WORKDIR /app
 
 # Cache dependency installation layer
-COPY cycloneshield/requirements.txt /app/requirements.txt
+COPY requirements.txt /app/requirements.txt
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r /app/requirements.txt
 
