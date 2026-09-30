@@ -155,12 +155,16 @@ def plot_track(gdf: gpd.GeoDataFrame, storm_name: str, output_html: str = None, 
     m = folium.Map(
         location=[center_lat, center_lon],
         zoom_start=6,
-        tiles="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-        attr='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+        tiles="OpenStreetMap",
+        name="OpenStreetMap Standard"
     )
 
-    # Add alternate tile layer
-    folium.TileLayer("OpenStreetMap", name="OpenStreetMap").add_to(m)
+    # Add alternate satellite tile layer
+    folium.TileLayer(
+        tiles="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        attr="Esri World Imagery",
+        name="Satellite Hybrid"
+    ).add_to(m)
 
     # Draw track polyline with color gradient
     coordinates = list(zip(gdf["lat"], gdf["lon"]))

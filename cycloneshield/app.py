@@ -979,16 +979,13 @@ with tab_geo:
                     landfall_pt = [float(use_t.loc[min_idx, "lat"]), float(use_t.loc[min_idx, "lon"])]
                     track_pts = [[float(r["lat"]), float(r["lon"])] for _, r in use_t.iterrows()]
 
-            # 3. Initialize Folium Map with Verified Working Tiles (NO {r} parameter)
+            # 3. Initialize Folium Map with Verified Working Tiles
             m = folium.Map(
                 location=[c_lat, c_lon],
                 zoom_start=zoom_lvl,
-                tiles="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
-                attr="&copy; OpenStreetMap contributors &copy; CARTO",
-                subdomains="abcd",
-                name="Disaster Ops Dark"
+                tiles="OpenStreetMap",
+                name="OpenStreetMap Standard"
             )
-            folium.TileLayer("OpenStreetMap", name="OpenStreetMap Standard").add_to(m)
             folium.TileLayer(
                 tiles="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
                 attr="Esri World Imagery",
