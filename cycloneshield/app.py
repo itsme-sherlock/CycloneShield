@@ -5,17 +5,14 @@ Streamlit-based Emergency Management Command Center for Tropical Cyclones across
 Designed for District Magistrates (DMs), SDMA duty officers, and NDRF commanders.
 
 Key Capabilities:
-  - Multi-State & Multi-Cyclone Coverage: West Bengal, Odisha, Andhra Pradesh, Tamil Nadu, Gujarat
-  - Live Custom Track Ingestion: Upload/enter live IMD cyclone bulletins (CSV / manual entry)
-  - Synoptic Intensity & Dynamic Wind Swaths (NOAA IBTrACS)
-  - Coastal Bathtub Storm Surge Inundation (SRTM 30m DEM Screening Model)
-  - Multi-Hazard Critical Infrastructure Exposure (OpenStreetMap: Hospitals, Shelters, Roads, Power)
-  - Google Gemini 2.5 / 1.5 Flash Multilingual Emergency Broadcast Advisories
-  - Google Gemini Multimodal Ground Damage Photo Triage
-  - Voice-First Multi-Tier Audio Engine (Cloud TTS BCP-47 & gTTS for EN, HI, BN, OR, TE, TA, GU)
-  - Common Alerting Protocol (CAP 1.2 XML / JSON) Export & Multi-Channel Alert Delivery (SMS, WhatsApp, Radio)
-  - Calibrated Predictive Lifeline Failure Model (Vertex AI-Ready HistGradientBoosting)
-  - Google BigQuery NOAA Hurricane Data Pipeline & Serverless Cloud Run Architecture
+  - Configured state and historical storm scenarios for decision-support demonstrations
+  - User-supplied track files and optional connected bulletin/data-service integrations
+  - Screening estimates for storm surge and district lifeline risks
+  - Configured geospatial baselines and optional Earth Engine processing
+  - Explicit, optional Gemini Vision image analysis with an offline benchmark fallback
+  - Draft multilingual messages and CAP export for human review (not alert delivery)
+  - Local scenario model trained on synthetic physics-inspired data
+  - Optional BigQuery historical-track query and Cloud Run deployment blueprint
 """
 
 import os
@@ -24,6 +21,7 @@ import json
 import base64
 import math
 import datetime
+import html as html_lib
 from typing import Dict, Any, List, Optional, Tuple
 from PIL import Image
 import textwrap
@@ -87,7 +85,11 @@ try:
         translate_advisory_text,
         export_cap_alert,
         get_resolved_api_key,
-        get_localized_broadcast
+        get_localized_broadcast,
+        parse_imd_bulletin_gemini,
+        generate_whatif_tactical_playbook,
+        generate_parametric_liquidity_audit,
+        generate_compound_hazard_briefing
     )
 except ImportError:
     call_gemini_api = None
@@ -96,6 +98,10 @@ except ImportError:
     export_cap_alert = None
     get_resolved_api_key = lambda: active_gemini_key
     get_localized_broadcast = None
+    parse_imd_bulletin_gemini = None
+    generate_whatif_tactical_playbook = None
+    generate_parametric_liquidity_audit = None
+    generate_compound_hazard_briefing = None
 
 try:
     from multimodal_damage import (
@@ -186,6 +192,7 @@ except ImportError:
 try:
     from imd_live_ingestion import (
         check_live_imd_rsmc_status,
+        fetch_latest_imd_bulletin,
         parse_imd_bulletin_text,
         load_emerging_scenario,
         build_custom_approach_track,
@@ -194,6 +201,7 @@ try:
     )
 except ImportError:
     check_live_imd_rsmc_status = None
+    fetch_latest_imd_bulletin = None
     parse_imd_bulletin_text = None
     load_emerging_scenario = None
     build_custom_approach_track = None
@@ -387,6 +395,13 @@ html, body, [class*="css"] {
     display: inline-flex;
     align-items: center;
     gap: 4px;
+    cursor: help;
+    transition: all 0.15s ease;
+}
+.source-badge-real:hover {
+    background: rgba(16, 185, 129, 0.25);
+    border-color: #10b981;
+    transform: translateY(-1px);
 }
 .source-badge-est {
     background: rgba(56, 189, 248, 0.15);
@@ -399,6 +414,13 @@ html, body, [class*="css"] {
     display: inline-flex;
     align-items: center;
     gap: 4px;
+    cursor: help;
+    transition: all 0.15s ease;
+}
+.source-badge-est:hover {
+    background: rgba(56, 189, 248, 0.25);
+    border-color: #38bdf8;
+    transform: translateY(-1px);
 }
 .source-badge-sim {
     background: rgba(245, 158, 11, 0.15);
@@ -411,10 +433,379 @@ html, body, [class*="css"] {
     display: inline-flex;
     align-items: center;
     gap: 4px;
+    cursor: help;
+    transition: all 0.15s ease;
+}
+.source-badge-sim:hover {
+    background: rgba(245, 158, 11, 0.25);
+    border-color: #f59e0b;
+    transform: translateY(-1px);
+}
+
+/* Google Product Highlighting System */
+.badge-google {
+    background: linear-gradient(135deg, rgba(66, 133, 244, 0.20), rgba(219, 68, 85, 0.15), rgba(244, 180, 0, 0.15), rgba(15, 157, 88, 0.15));
+    color: #f8fafc;
+    border: 1px solid rgba(66, 133, 244, 0.45);
+    border-bottom: 2px solid rgba(66, 133, 244, 0.7);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11.5px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    letter-spacing: 0.2px;
+    cursor: help;
+    transition: all 0.15s ease;
+}
+.badge-google:hover, .badge-google-live:hover, .badge-google-fallback:hover {
+    filter: brightness(1.2);
+    transform: translateY(-1.5px);
+    box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3);
+}
+.badge-google-live {
+    background: rgba(66, 133, 244, 0.25);
+    color: #93c5fd;
+    border: 1px solid #3b82f6;
+    border-bottom: 2px solid #60a5fa;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    cursor: help;
+    transition: all 0.15s ease;
+}
+.badge-google-fallback {
+    background: rgba(245, 158, 11, 0.18);
+    color: #fde68a;
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    border-bottom: 2px solid rgba(245, 158, 11, 0.7);
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    cursor: help;
+    transition: all 0.15s ease;
+}
+.google-card {
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(66, 133, 244, 0.3);
+    border-top: 3px solid #4285f4;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-top: 12px;
+    margin-bottom: 12px;
 }
 </style>
 """
 st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
+
+# Additional typography and layout helpers for explanation sections
+EXPLANATION_CSS = """
+<style>
+/* Explanation Section Typography Scale */
+.exp-section {
+    margin-bottom: 14px;
+    padding: 12px 16px;
+    background: rgba(30, 41, 59, 0.6);
+    border: 1px solid rgba(148, 163, 184, 0.15);
+    border-radius: 8px;
+    border-left: 3px solid #38bdf8;
+}
+.exp-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #38bdf8;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+.exp-question {
+    font-size: 14px;
+    font-weight: 600;
+    color: #f1f5f9;
+    margin: 10px 0 4px 0;
+    line-height: 1.3;
+}
+.exp-answer {
+    font-size: 14px;
+    font-weight: 400;
+    color: #cbd5e1;
+    line-height: 1.6;
+    margin: 0 0 6px 0;
+}
+.exp-answer strong {
+    color: #f8fafc;
+    font-weight: 600;
+}
+.exp-bullet {
+    font-size: 13.5px;
+    color: #cbd5e1;
+    line-height: 1.55;
+    margin: 3px 0 3px 18px;
+}
+.exp-bullet::before {
+    content: "▸ ";
+    color: #38bdf8;
+    font-weight: 600;
+}
+.exp-numbered {
+    font-size: 13.5px;
+    color: #cbd5e1;
+    line-height: 1.55;
+    margin: 4px 0 4px 22px;
+}
+.exp-numbered::before {
+    content: counter(exp-counter) ". ";
+    color: #38bdf8;
+    font-weight: 700;
+    counter-increment: exp-counter;
+}
+.exp-numbered-list {
+    counter-reset: exp-counter;
+}
+.exp-tech-list {
+    font-size: 13px;
+    color: #cbd5e1;
+    line-height: 1.5;
+    margin: 4px 0 4px 18px;
+}
+.exp-tech-list::before {
+    content: "• ";
+    color: #38bdf8;
+    font-weight: 600;
+}
+.exp-note {
+    font-size: 12.5px;
+    color: #94a3b8;
+    font-style: italic;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(148, 163, 184, 0.15);
+    line-height: 1.45;
+}
+/* Override Streamlit expander header size */
+.streamlit-expanderHeader {
+    font-size: 14.5px !important;
+    font-weight: 600 !important;
+}
+.streamlit-expanderHeader p {
+    font-size: 14.5px !important;
+    font-weight: 600 !important;
+    margin: 0 !important;
+}
+</style>
+"""
+st.markdown(EXPLANATION_CSS, unsafe_allow_html=True)
+
+# Helper function for rendering consistent explanation sections
+def render_explanation(title: str, sections: dict, icon: str = "ℹ️", expanded: bool = False):
+    """Render a consistent explanation expander with the standard structure.
+    
+    sections: dict with keys like 'what', 'how', 'benefit', 'tech', 'limitations', 'note'
+    Values can be strings, lists (for bullets/numbered), or None to skip.
+    """
+    lines = []
+    for key, value in sections.items():
+        if value is None:
+            continue
+        if key == 'what':
+            lines.append(f'<div class="exp-section"><div class="exp-title">{icon} What it does</div><div class="exp-answer">{value}</div></div>')
+        elif key == 'how':
+            if isinstance(value, list):
+                html = '<div class="exp-section"><div class="exp-title">{icon} How it works</div><div class="exp-numbered-list">'.format(icon=icon)
+                for item in value:
+                    html += f'<div class="exp-numbered">{item}</div>'
+                html += '</div></div>'
+                lines.append(html)
+            else:
+                lines.append(f'<div class="exp-section"><div class="exp-title">{icon} How it works</div><div class="exp-answer">{value}</div></div>')
+        elif key == 'benefit':
+            lines.append(f'<div class="exp-section"><div class="exp-title">{icon} Real-world benefit</div><div class="exp-answer">{value}</div></div>')
+        elif key == 'tech':
+            if isinstance(value, list):
+                html = '<div class="exp-section"><div class="exp-title">{icon} Technology</div>'.format(icon=icon)
+                for item in value:
+                    html += f'<div class="exp-tech-list">{item}</div>'
+                html += '</div>'
+                lines.append(html)
+            else:
+                lines.append(f'<div class="exp-section"><div class="exp-title">{icon} Technology</div><div class="exp-answer">{value}</div></div>')
+        elif key == 'limitations':
+            lines.append(f'<div class="exp-section"><div class="exp-title">📋 Data status & limitations</div><div class="exp-answer">{value}</div></div>')
+        elif key == 'note':
+            lines.append(f'<div class="exp-note">{value}</div>')
+    with st.expander(f"{icon} {title}", expanded=expanded):
+        render_html("".join(lines))
+
+# Google Ecosystem Masthead Showcase Banner
+render_html("""
+<div style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.90)); border: 1px solid rgba(66, 133, 244, 0.35); border-radius: 12px; padding: 14px 20px; margin-bottom: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div style="display:flex; align-items:center; gap:12px;">
+            <div style="font-size:30px;">🌀</div>
+            <div>
+                <div style="font-size:22px; font-weight:800; color:#f8fafc; letter-spacing:-0.5px;">
+                    CycloneShield <span style="font-size:13px; font-weight:700; color:#38bdf8; background:rgba(56,189,248,0.15); border:1px solid rgba(56,189,248,0.3); padding:2px 8px; border-radius:4px; margin-left:6px;">Google Ecosystem Powered</span>
+                </div>
+                <div style="font-size:12.5px; color:#cbd5e1; margin-top:2px;">
+                    Multi-Hazard Cyclone Impact & Lifeline Infrastructure Vulnerability Command Center for Indian Coastal States
+                </div>
+            </div>
+        </div>
+        <div style="display:flex; flex-wrap:wrap; gap:6px; align-items:center;">
+            <span class="badge-google" title="Optional Gemini features support specific user-requested tasks when connected. They do not issue directives, send alerts, or release funds.">✨ Google Gemini integrations</span>
+            <span class="badge-google" title="Earth Engine can provide or process geospatial layers when authenticated; it does not generate live cyclone forecasts.">🌍 Earth Engine (GEE)</span>
+            <span class="badge-google" title="Google BigQuery: Searches historical storm records in seconds to compare the current cyclone with past major Indian storms.">🛰️ BigQuery NOAA</span>
+            <span class="badge-google" title="Cloud Run deployment blueprint; this does not describe the current hosted runtime or guarantee capacity/cost.">☁️ Cloud Run blueprint</span>
+            <span class="badge-google" title="Google Colab: Run the entire project in 1 click in Google Colab without needing to install anything on your computer.">🧪 Colab 1-Click</span>
+        </div>
+    </div>
+</div>
+""")
+
+# Interactive Architecture Guide Accordion
+with st.expander("ℹ️ CycloneShield Architecture Guide: Turning Cyclone Warnings into Life-Saving Actions", expanded=False):
+    st.markdown("""
+    ### 🌀 CycloneShield: Decision Support for Cyclone Preparedness
+    **A prototype designed to help authorized teams turn complex information into clearer priorities and faster decisions.**
+
+    CycloneShield presents configured storm scenarios, screening estimates, and possible preparedness actions for human review. It does not replace weather agencies or rescue officers.
+
+    Instead of looking at multiple reports and maps separately, officers can use one dashboard to understand the danger and plan their response.
+
+    #### Our Technology:
+    - ✨ **Google Gemini:** Optional, user-requested AI features run only when configured and a successful response is confirmed.
+    - 🌍 **Google Earth Engine:** Can provide or process geospatial data when authenticated; it does not predict cyclones.
+    - 🛰️ **Google BigQuery:** Optional path for querying historical cyclone information.
+    - ☁️ **Google Cloud Run:** A deployment option; it is not necessarily the current host.
+    - 🧪 **Google Colab:** Helps developers test the system and demonstrate its calculations.
+
+    *Historical and prepared examples are distinct from live responses. Forecasts require a connected weather source; check source/status labels before calling data live.*
+
+    ---
+
+    #### How Google Technology Helps CycloneShield:
+    1. **Google Gemini:** Can support configured, user-requested analysis; outputs are recommendations for human review, not operational decisions.
+    2. **Gemini Vision:** Can analyze an explicitly submitted photo when a live response is confirmed; offline benchmark results are prepared demonstrations, not model output.
+    3. **Google Earth Engine:** Can support geospatial/elevation data access and processing; it does not generate live cyclone predictions.
+    4. **Google BigQuery — Helps Learn from Past Cyclones:** Stores and searches historical cyclone records to compare current storms with past disasters.
+    5. **Google Cloud Run:** Deployment blueprint; actual hosting, scaling, and costs depend on a configured deployment.
+    6. **Google Colab — Helps Test the System:** An online 1-click test notebook for evaluators and developers without local setup.
+    """, unsafe_allow_html=True)
+
+    g_col1, g_col2, g_col3 = st.columns(3, gap="medium")
+    with g_col1:
+        render_html("""
+        <div style="background:rgba(15,23,42,0.7); border:1px solid rgba(66,133,244,0.35); border-top:3px solid #4285f4; border-radius:8px; padding:12px 14px; height:100%;">
+            <div style="font-size:12.5px; font-weight:800; color:#38bdf8; display:flex; align-items:center; gap:6px;">
+                <span>✨</span> GOOGLE GEMINI AI
+            </div>
+            <div style="font-size:11.5px; color:#94a3b8; margin-top:2px;"><b>Role</b>: Decision support for human review</div>
+            <div style="font-size:12px; color:#cbd5e1; margin-top:8px; line-height:1.5;">
+                • <b>Possible Actions</b>: Scenario outputs can help officers review resource priorities; they do not deploy rescue units.<br>
+                • <b>Insurance Demo</b>: Calculates illustrative trigger tiers and payout scenarios; it does not release funds.<br>
+                • <b>Weather Reports</b>: Forecasts require a connected meteorological source and confirmed live response.<br>
+                • <b>Messages</b>: Prepared multilingual templates and CAP exports are drafts for authorized review, not public alerts.<br>
+                • <b>Offline Mode</b>: Prepared fallbacks demonstrate workflows and are labeled as estimates or simulations.
+            </div>
+        </div>
+        """)
+    with g_col2:
+        render_html("""
+        <div style="background:rgba(15,23,42,0.7); border:1px solid rgba(16,185,129,0.35); border-top:3px solid #10b981; border-radius:8px; padding:12px 14px; height:100%;">
+            <div style="font-size:12.5px; font-weight:800; color:#6ee7b7; display:flex; align-items:center; gap:6px;">
+                <span>📸</span> GEMINI VISION & EARTH ENGINE
+            </div>
+            <div style="font-size:11.5px; color:#94a3b8; margin-top:2px;"><b>Role</b>: Photo inspection & flood ground maps</div>
+            <div style="font-size:12px; color:#cbd5e1; margin-top:8px; line-height:1.5;">
+                • <b>Disaster Photos (Tab 3)</b>: Gemini Vision is called only on request; offline benchmark output is not model analysis.<br>
+                • <b>Flood Check (Tab 1)</b>: Elevation layers inform screening estimates; Earth Engine does not predict cyclones.<br>
+                • <b>Map (Tab 1)</b>: Displays the selected scenario and configured geospatial layers, not a live satellite feed.
+            </div>
+        </div>
+        """)
+    with g_col3:
+        render_html("""
+        <div style="background:rgba(15,23,42,0.7); border:1px solid rgba(245,158,11,0.35); border-top:3px solid #f59e0b; border-radius:8px; padding:12px 14px; height:100%;">
+            <div style="font-size:12.5px; font-weight:800; color:#fde68a; display:flex; align-items:center; gap:6px;">
+                <span>🛰️</span> BIGQUERY, CLOUD RUN & COLAB
+            </div>
+            <div style="font-size:11.5px; color:#94a3b8; margin-top:2px;"><b>Role</b>: Cloud database, scale & easy test notebook</div>
+            <div style="font-size:12px; color:#cbd5e1; margin-top:8px; line-height:1.5;">
+                • <b>Past Storms (Tab 8)</b>: Historical records may come from a bundled cache or an optional confirmed BigQuery query.<br>
+                • <b>Cloud Hosting</b>: Cloud Run is a deployment option, not the current hosted runtime.<br>
+                • <b>Easy Testing</b>: 1-click test notebook on Google Cloud with zero setup.<br>
+                • <b>Plain Explanations (Tab 4)</b>: Explains in simple terms why each district is at risk (wind, seawater surge, or low ground).
+            </div>
+        </div>
+        """)
+
+    render_html("""
+    <div style="margin-top:14px; background:rgba(30,41,59,0.5); border:1px solid rgba(148,163,184,0.25); border-radius:8px; padding:12px 16px;">
+        <div style="font-size:12.5px; font-weight:700; color:#38bdf8; margin-bottom:8px;">
+            🔍 What Each Google Tool Does in Plain Words:
+        </div>
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:10px; font-size:11.5px; color:#cbd5e1; line-height:1.45;">
+            <div>
+                <span class="badge-google" title="Parses bulletin text supplied by the user; Gemini is optional and the local regex parser is the fallback.">Sidebar: Weather Bulletin Text Parser</span><br>
+                <b>What it does</b>: Extracts track details from a supplied bulletin; it does not generate or predict a forecast.<br>
+                <i>Fallback</i>: Local regex parser.
+            </div>
+            <div>
+                <span class="badge-google" title="Displays configured scenario layers with geospatial/elevation inputs">Tab 1: Scenario & Hazard Map</span><br>
+                <b>What it does</b>: Uses elevation and scenario estimates to support screening; it is not a live satellite feed or cyclone forecast.<br>
+                <i>Offline example</i>: Configured geospatial baseline.
+            </div>
+            <div>
+                <span class="badge-google" title="Summarizes configured scenario indicators for human review">Tab 1: District Scenario Review</span><br>
+                <b>What it does</b>: Presents scenario-based lifeline indicators and possible actions for authorized review.<br>
+                <i>Note</i>: Not an official warning or observed impact report.
+            </div>
+            <div>
+                <span class="badge-google" title="Shows prepared message templates and optional voice previews">Tab 2: Draft Messages & Voice Preview</span><br>
+                <b>What it does</b>: Prepares multilingual draft text and optional audio for review.<br>
+                <i>Note</i>: Does not issue or transmit public alerts.
+            </div>
+            <div>
+                <span class="badge-google" title="Gemini Vision is used only for a confirmed live request; otherwise results are prepared benchmark examples">Tab 3: Photo-Triage Demonstration</span><br>
+                <b>What it does</b>: Demonstrates image triage; an offline benchmark is not Gemini analysis.<br>
+                <i>Live mode</i>: Requires configured access and a confirmed successful response.
+            </div>
+            <div>
+                <span class="badge-google" title="Explains configured scenario screening scores">Tab 4: Scenario Risk Matrix</span><br>
+                <b>What it does</b>: Compares configured district indicators using project-defined scoring rules.<br>
+                <i>Note</i>: Scores are screening outputs, not field-validated probabilities.
+            </div>
+            <div>
+                <span class="badge-google" title="Produces scenario-based action suggestions for officer review">Tab 5: Possible Actions</span><br>
+                <b>What it does</b>: Recommends possible resource and route considerations for human review.<br>
+                <i>Note</i>: Does not deploy rescue resources or issue evacuation decisions.
+            </div>
+            <div>
+                <span class="badge-google" title="Demonstrates configured insurance trigger and payout calculations">Tab 6: Insurance Trigger Demonstration</span><br>
+                <b>What it does</b>: Maps scenario inputs to illustrative payout tiers.<br>
+                <i>Note</i>: Not an active policy, verified trigger, or payment.
+            </div>
+            <div>
+                <span class="badge-google" title="Separate weather forecast feed; check status and source">Tab 7: Weather Forecast Feed</span><br>
+                <b>What it does</b>: Requests forecast data from a connected weather source when available.<br>
+                <i>Note</i>: Not an official IMD forecast; does not drive scenario risk scores.
+            </div>
+        </div>
+    </div>
+    """)
+
 
 
 # ==============================================================================
@@ -470,7 +861,7 @@ with ctrl_col1:
 with ctrl_col2:
     cyclone_options = [
         *[f"{c['name']} ({c['year']}) — {c['category']}" for c in STATE_CYCLONES[selected_state]],
-        "🔴 [LIVE] Ingest Active IMD Bulletin / 2026 Cyclone"
+        "🔴 [LIVE] Fetch Latest IMD Bulletin / Track"
     ]
     
     selected_cyclone_label = st.selectbox(
@@ -478,7 +869,7 @@ with ctrl_col2:
         options=cyclone_options,
         index=0,
         key=f"cyclone_event_for_{selected_state}",
-        help="Select historical cyclone benchmark or ingest live IMD track points to simulate real-time impact."
+        help="Select a historical benchmark or fetch the latest official RSMC bulletin. A track is loaded only if explicit waypoints can be parsed."
     )
     is_custom_track = any(k in selected_cyclone_label for k in ["[LIVE]", "Custom", "Ingest"])
     selected_storm_name = selected_cyclone_label.split()[0] if not is_custom_track else "CUSTOM"
@@ -609,60 +1000,90 @@ if not state_districts:
 
 
 # ==============================================================================
-# 3. Live IMD / RSMC Real-Time Cyclone Ingestion Command Center
+# 3. Live IMD / RSMC Bulletin Retrieval & Cyclone Track Ingestion
 # ==============================================================================
 custom_track_df = None
 if is_custom_track:
-    with st.expander("🛰️ IMD Live Basin Command & Real-Time Cyclone Ingestion Engine", expanded=True):
+    with st.expander("🛰️ IMD / RSMC Live Bulletin & Track Ingestion", expanded=True):
         st.markdown("""
         <div style="font-size:13px; color:#cbd5e1; margin-bottom:10px; line-height:1.5;">
-            Direct operational integration with the <b>India Meteorological Department (IMD)</b> & <b>RSMC New Delhi</b> (WMO North Indian Ocean Regional Centre).
-            When a new cyclone or depression forms, ingest live coordinates, raw text advisories, or active 2026 scenarios to instantly drive the entire 8-tab command center.
+            Fetch the latest published cyclone outlook/bulletin from <b>IMD / RSMC New Delhi</b>. The app changes the active track only when the official document contains at least two complete, explicit waypoints; demo scenarios and operator uploads are separate.
         </div>
         """, unsafe_allow_html=True)
 
-        # Live RSMC Basin Status Banner
+        # Live RSMC product status
         rsmc_info = None
-        if check_live_imd_rsmc_status:
-            if "live_rsmc_status" not in st.session_state or st.session_state.get("refresh_rsmc_requested", False):
+        if st.session_state.get("refresh_rsmc_requested", False) and fetch_latest_imd_bulletin:
+            with st.spinner("Fetching the latest official RSMC bulletin and checking for explicit track waypoints..."):
+                live_track_df, rsmc_info = fetch_latest_imd_bulletin()
+                st.session_state["live_rsmc_status"] = rsmc_info
+                if live_track_df is not None and not live_track_df.empty:
+                    st.session_state["custom_track_df"] = live_track_df
+                    st.session_state["custom_track_meta"] = rsmc_info
+                    st.session_state["imd_refresh_notice"] = {
+                        "level": "success",
+                        "message": f"Loaded {len(live_track_df)} explicit waypoints from {rsmc_info.get('latest_product_title', 'the latest IMD product')}."
+                    }
+                else:
+                    st.session_state["imd_refresh_notice"] = {
+                        "level": "warning",
+                        "message": rsmc_info.get("track_status", "No verified track was found; the active dashboard track was not changed.")
+                    }
+                st.session_state["refresh_rsmc_requested"] = False
+        elif check_live_imd_rsmc_status:
+            if "live_rsmc_status" not in st.session_state:
                 with st.spinner("Connecting to RSMC New Delhi live server..."):
                     st.session_state["live_rsmc_status"] = check_live_imd_rsmc_status()
-                    st.session_state["refresh_rsmc_requested"] = False
             rsmc_info = st.session_state.get("live_rsmc_status")
 
         stat_col1, stat_col2 = st.columns([2.2, 1.0])
         with stat_col1:
-            badge_txt = rsmc_info.get("status_badge", "🟢 BASIN VIGILANCE ACTIVE") if rsmc_info else "🟢 BASIN VIGILANCE ACTIVE"
-            summary_txt = rsmc_info.get("summary", "Connected to IMD / RSMC feeds.") if rsmc_info else "Connected to IMD / RSMC feeds."
+            badge_txt = html_lib.escape(rsmc_info.get("status_badge", "⚪ IMD CONNECTION UNAVAILABLE")) if rsmc_info else "⚪ IMD CONNECTION UNAVAILABLE"
+            summary_txt = html_lib.escape(rsmc_info.get("summary", "IMD / RSMC status is not available.")) if rsmc_info else "IMD / RSMC status is not available."
+            checked_at = html_lib.escape(rsmc_info.get("timestamp", "Not checked")) if rsmc_info else "Not checked"
             st.markdown(f"""
             <div style="background:rgba(15,23,42,0.85); border:1px solid rgba(56,189,248,0.25); border-radius:8px; padding:10px 14px; margin-bottom:12px;">
                 <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
                     <div>
                         <span style="font-size:12px; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.15); padding:3px 8px; border-radius:4px;">{badge_txt}</span>
-                        <span style="font-size:11px; color:#94a3b8; margin-left:8px;">Source: <a href="https://rsmcnewdelhi.imd.gov.in" target="_blank" style="color:#7dd3fc; text-decoration:none;">rsmcnewdelhi.imd.gov.in</a></span>
+                        <span style="font-size:11px; color:#94a3b8; margin-left:8px;">Source: <a href="https://rsmcnewdelhi.imd.gov.in" target="_blank" style="color:#7dd3fc; text-decoration:none;">RSMC New Delhi</a></span>
                     </div>
-                    <div style="font-size:11px; color:#94a3b8;">Checked: {rsmc_info.get('timestamp','Real-Time') if rsmc_info else 'Real-Time'}</div>
+                    <div style="font-size:11px; color:#94a3b8;">Checked: {checked_at}</div>
                 </div>
                 <div style="font-size:12px; color:#cbd5e1; margin-top:6px;">{summary_txt}</div>
             </div>
             """, unsafe_allow_html=True)
+            if rsmc_info and rsmc_info.get("latest_product_url"):
+                st.link_button(
+                    f"Open latest IMD product: {rsmc_info.get('latest_product_title', 'RSMC bulletin')}",
+                    rsmc_info["latest_product_url"],
+                    use_container_width=True
+                )
+            if rsmc_info and rsmc_info.get("issued_at"):
+                st.caption(f"Official issue date: {rsmc_info['issued_at']}")
+            notice = st.session_state.pop("imd_refresh_notice", None)
+            if notice:
+                if notice["level"] == "success":
+                    st.success(notice["message"])
+                else:
+                    st.warning(notice["message"])
         with stat_col2:
-            if st.button("🔄 Poll Live RSMC Server", use_container_width=True, help="Queries RSMC New Delhi for the latest active tropical cyclone bulletins."):
+            if st.button("🔄 Fetch Latest IMD Update", use_container_width=True, help="Downloads the latest dated RSMC outlook/bulletin and loads a track only if explicit waypoints are present."):
                 st.session_state["refresh_rsmc_requested"] = True
                 st.rerun()
 
         # Ingestion Modes
         ingest_t1, ingest_t2, ingest_t3, ingest_t4 = st.tabs([
-            "⚡ Active 2026 Emerging Scenarios",
+            "🧪 Synthetic Demo Scenarios",
             "📋 Paste Raw IMD Bulletin Text",
             "🎯 Coastal Landfall Builder",
             "📁 Upload IMD CSV Track"
         ])
 
         with ingest_t1:
-            st.markdown("<div style='font-size:12.5px; color:#cbd5e1; margin-bottom:8px;'><b>1-Click Emerging Cyclone Readiness</b>: Simulate realistic post-monsoon systems threatening India's coast.</div>", unsafe_allow_html=True)
+            st.markdown("<div style='font-size:12.5px; color:#cbd5e1; margin-bottom:8px;'><b>Demo-only scenarios</b>: Hard-coded synthetic tracks for testing; these are not current IMD alerts or observations.</div>", unsafe_allow_html=True)
             sc_keys = list(EMERGING_SCENARIOS.keys()) if EMERGING_SCENARIOS else []
-            sel_sc_key = st.selectbox("Select Active 2026 Alert Scenario:", options=sc_keys, index=0)
+            sel_sc_key = st.selectbox("Select a synthetic demo scenario:", options=sc_keys, index=0)
             
             sc_preview = EMERGING_SCENARIOS.get(sel_sc_key, {})
             p_c1, p_c2, p_c3, p_c4 = st.columns(4)
@@ -671,16 +1092,21 @@ if is_custom_track:
             p_c3.metric("Peak Wind", f"{sc_preview.get('peak_wind_kts', 0):.0f} kts")
             p_c4.metric("Min Pressure", f"{sc_preview.get('min_pressure_mb', 0):.0f} mb")
             
-            if st.button(f"⚡ Ingest & Launch '{sc_preview.get('storm_name','Alert')}' Scenario", type="primary", use_container_width=True):
+            if st.button(f"🧪 Load demo scenario '{sc_preview.get('storm_name','Demo')}'", type="primary", use_container_width=True):
                 if load_emerging_scenario:
                     s_df, s_meta = load_emerging_scenario(sel_sc_key)
                     st.session_state["custom_track_df"] = s_df
                     st.session_state["custom_track_meta"] = s_meta
-                    st.success(f"✅ Successfully ingested Cyclone {s_meta['name']} ({s_meta['category']})!")
+                    st.success(f"Loaded synthetic demo track {s_meta['name']} ({s_meta['category']}); this is not an IMD observation.")
                     st.rerun()
 
         with ingest_t2:
-            st.markdown("<div style='font-size:12.5px; color:#cbd5e1; margin-bottom:8px;'><b>Automated IMD Bulletin Parser</b>: Paste raw text from an official National Cyclone Warning Centre bulletin.</div>", unsafe_allow_html=True)
+            st.markdown("""
+            <div style='display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;'>
+                <div style='font-size:12.5px; color:#cbd5e1;'><b>IMD Bulletin Text Parser</b>: Extract track details from bulletin text you provide; this does not create a forecast.</div>
+                <span class='badge-google' title="Gemini can extract details from supplied bulletin text when configured and successfully connected; otherwise the local regex parser is used.">✨ Optional Google Gemini 2.5 Flash</span>
+            </div>
+            """, unsafe_allow_html=True)
             sample_imd_bulletin_text = (
                 "INDIA METEOROLOGICAL DEPARTMENT\n"
                 "BULLETIN NO. 14 (BOB/01/2026)\n"
@@ -698,7 +1124,7 @@ if is_custom_track:
             )
             col_b1, col_b2 = st.columns([1.0, 1.0])
             with col_b1:
-                if st.button("📋 Paste Sample Live IMD Bulletin (Cyclone SHAKTI)", use_container_width=True):
+                if st.button("📋 Paste Synthetic Sample Bulletin (SHAKTI)", use_container_width=True):
                     st.session_state["raw_bulletin_input"] = sample_imd_bulletin_text
                     st.rerun()
             with col_b2:
@@ -709,13 +1135,27 @@ if is_custom_track:
             bulletin_val = st.session_state.get("raw_bulletin_input", "")
             raw_input = st.text_area("Paste Raw IMD Text Bulletin:", value=bulletin_val, height=140, placeholder="Paste IMD bulletin text here...")
             
-            if st.button("🔄 Parse & Ingest IMD Bulletin", type="primary", use_container_width=True):
-                if parse_imd_bulletin_text and raw_input.strip():
-                    p_df, p_meta = parse_imd_bulletin_text(raw_input)
+            p_btn1, p_btn2 = st.columns([1.2, 1.0])
+            with p_btn1:
+                run_gemini_parse = st.button("✨ Parse with Gemini (Regex fallback)", type="primary", use_container_width=True)
+            with p_btn2:
+                run_regex_parse = st.button("🔄 Fast Regex Parse", use_container_width=True)
+
+            if (run_gemini_parse or run_regex_parse) and raw_input.strip():
+                with st.spinner("Parsing bulletin with Google Gemini / regex engine..."):
+                    p_df, p_meta = None, {}
+                    if run_gemini_parse and parse_imd_bulletin_gemini:
+                        p_df, p_meta = parse_imd_bulletin_gemini(raw_input, api_key=active_gemini_key)
+                    elif parse_imd_bulletin_text:
+                        p_df, p_meta = parse_imd_bulletin_text(raw_input)
+                        if p_meta:
+                            p_meta["engine"] = "🛡️ Calibrated Regex Parser"
+
                     if p_df is not None and not p_df.empty:
                         st.session_state["custom_track_df"] = p_df
                         st.session_state["custom_track_meta"] = p_meta
-                        st.success(f"✅ Ingested {len(p_df)} track waypoints for Cyclone {p_meta['name']} ({p_meta['category']})!")
+                        eng_badge = p_meta.get("engine", "Parser Engine")
+                        st.success(f"✅ Ingested {len(p_df)} track waypoints for Cyclone {p_meta.get('name','Alert')} ({p_meta.get('category','Storm')})! [{eng_badge}]")
                         st.dataframe(p_df, use_container_width=True, hide_index=True)
                         st.rerun()
                     else:
@@ -816,7 +1256,7 @@ if is_custom_track and custom_track_df is not None and not custom_track_df.empty
         "landfall_location": c_meta.get("landfall_location", f"{selected_state} Coastline"),
         "landfall_time": str(custom_track_df["time"].iloc[-1]),
         "total_observations": len(custom_track_df),
-        "data_source": c_meta.get("data_source", "Live IMD / RSMC Bulletin Ingestion")
+        "data_source": c_meta.get("data_source", "Configured scenario / historical track")
     }
     selected_storm_name = s_name
 else:
@@ -929,45 +1369,45 @@ else:
     overall_color = "#f59e0b"
 
 top_dist_name = state_vuln_df.iloc[0]["district_name"] if not state_vuln_df.empty else selected_state
-top_directive = state_vuln_df.iloc[0]["action_directive"] if not state_vuln_df.empty else "Evacuate low-lying areas."
+top_directive = state_vuln_df.iloc[0]["action_directive"] if not state_vuln_df.empty else "Review possible preparedness actions for low-lying areas."
 
 render_html(f"""
-<div class="situation-card" style="border-left-color: {overall_color};">
-<div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px;">
-<div>
-<div style="font-size:12px; font-weight:700; color:#38bdf8; text-transform:uppercase; letter-spacing:0.8px;">
-{'🛰️ LIVE IMD / RSMC ADVISORY INGESTED • EXECUTIVE ACTION DIRECTIVE' if is_custom_track else '🚨 SITUATION AT A GLANCE • EXECUTIVE ACTION DIRECTIVE'}
-</div>
-<h2 style="margin:4px 0 6px 0; font-size:24px; font-weight:800; color:#f8fafc;">
-Cyclone {selected_storm_name.upper()} • {selected_state.upper()}
-</h2>
-<div style="font-size:14px; color:#cbd5e1; line-height:1.5;">
-📍 <b>Expected Landfall</b>: <span style="color:#f8fafc; font-weight:700;">{landfall_loc}</span> ({landfall_time})<br>
-👥 <b>Citizens at Risk</b>: <span style="color:#38bdf8; font-weight:700;">{total_pop_at_risk/1000000:.1f} Million</span> across <b>{len(state_vuln_df)} Coastal Districts</b><br>
-<span style="font-size:12px; color:#94a3b8;">📡 Data Provenance: <b style="color:#38bdf8;">{active_meta.get('data_source', 'NOAA IBTrACS v4 Archive')}</b></span>
-</div>
-</div>
-<div style="text-align:right;">
-<span class="{overall_badge_class}" style="font-size:14px; padding:6px 14px;">
-● {overall_threat_level}
-</span>
-<div style="font-size:12.5px; color:#94a3b8; margin-top:6px;">
-Max Winds: <b style="color:#f8fafc;">{peak_wind:.0f} kts ({peak_wind*1.852:.0f} km/h)</b> • Surge: <b style="color:#38bdf8;">{calc_surge_m:.2f} m</b>
-</div>
-</div>
-</div>
-<div class="directive-box" style="margin-top:14px; margin-bottom:4px;">
-<div style="font-size:12px; font-weight:800; color:#ef4444; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:4px;">
-⚠️ TOP PRIORITY IMMEDIATE OPERATIONAL ACTIONS (NEXT 6 HOURS):
-</div>
-<div style="font-size:13.5px; color:#f1f5f9; line-height:1.5;">
-1. <b>Immediate Evacuation ({top_dist_name})</b>: {top_directive}<br>
-2. <b>Arterial Route Protection</b>: Pre-stage heavy tow winches & tree-clearing loaders along major coastal highways ({total_flooded_roads:.1f} km projected cut-off).<br>
-3. <b>Healthcare Contingency</b>: Deploy backup 125 kVA diesel generators to vulnerable coastal hospitals before tidal inundation commences.
-</div>
-</div>
-</div>
-""")
+    <div class="situation-card" style="border-left-color: {overall_color};">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px;">
+    <div>
+    <div style="font-size:12px; font-weight:700; color:#38bdf8; text-transform:uppercase; letter-spacing:0.8px;">
+        {'🧭 CUSTOM TRACK SCENARIO • SCREENING OUTPUTS' if is_custom_track else '🚨 SITUATION AT A GLANCE • SCENARIO SCREENING'}
+    </div>
+    <h2 style="margin:4px 0 6px 0; font-size:24px; font-weight:800; color:#f8fafc;">
+        Cyclone {selected_storm_name.upper()} • {selected_state.upper()}
+    </h2>
+    <div style="font-size:14px; color:#cbd5e1; line-height:1.5;">
+        📍 <b>Where the storm is expected to hit</b>: <span style="color:#f8fafc; font-weight:700;">{landfall_loc}</span> ({landfall_time})<br>
+        👥 <b>People living in the districts shown</b>: <span style="color:#38bdf8; font-weight:700;">{total_pop_at_risk/1000000:.1f} Million</span> across <b>{len(state_vuln_df)} Coastal Districts</b><br>
+        <span style="font-size:12px; color:#94a3b8;">📡 Data Provenance: <b style="color:#38bdf8;">{active_meta.get('data_source', 'NOAA IBTrACS v4 Archive')}</b></span>
+    </div>
+    </div>
+    <div style="text-align:right;">
+        <span class="{overall_badge_class}" style="font-size:14px; padding:6px 14px;">
+        ● {overall_threat_level}
+        </span>
+        <div style="font-size:12.5px; color:#94a3b8; margin-top:6px;">
+        Max Winds: <b style="color:#f8fafc;">{peak_wind:.0f} kts ({peak_wind*1.852:.0f} km/h)</b> • Surge: <b style="color:#38bdf8;">{calc_surge_m:.2f} m</b>
+        </div>
+    </div>
+    </div>
+    <div class="directive-box" style="margin-top:14px; margin-bottom:4px;">
+    <div style="font-size:12px; font-weight:800; color:#ef4444; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:4px;">
+        ⚠️ POSSIBLE PREPAREDNESS ACTIONS — FOR AUTHORIZED REVIEW:
+    </div>
+    <div style="font-size:13.5px; color:#f1f5f9; line-height:1.5;">
+        1. <b>Review evacuation needs ({top_dist_name})</b>: {top_directive}<br>
+        2. <b>Review route contingencies</b>: Consider access options along modeled coastal highway exposure ({total_flooded_roads:.1f} km screening estimate).<br>
+        3. <b>Review healthcare continuity</b>: Consider backup power and other facility-continuity plans using locally verified information.
+    </div>
+    </div>
+    </div>
+    """)
 
 
 # ==============================================================================
@@ -977,7 +1417,7 @@ kpi_cols = st.columns(6)
 
 with kpi_cols[0]:
     render_html(f"""
-    <div class="kpi-card" title="Maximum wind speed at the cyclone's core. Sustained winds above 64 knots (120 km/h) qualify as a Very Severe Cyclonic Storm on the Indian scale.">
+    <div class="kpi-card" title="The strongest steady wind the storm is producing. Sustained winds above 64 knots (120 km/h) qualify as a Very Severe Cyclonic Storm on the Indian scale.">
         <div class="kpi-label">Peak Sustained Wind</div>
         <div class="kpi-value" style="color:#ef4444;">{peak_wind:.0f} kts</div>
         <div class="kpi-sub">≈ {peak_wind*1.852:.0f} km/h · {active_meta.get('category', 'Severe Storm').split('(')[0].strip()}</div>
@@ -986,7 +1426,7 @@ with kpi_cols[0]:
 
 with kpi_cols[1]:
     render_html(f"""
-    <div class="kpi-card" title="Air pressure at the cyclone's centre (eye). Lower number = more powerful storm. Normal sea-level pressure is 1013 hPa — the bigger the gap, the more destructive the winds.">
+    <div class="kpi-card" title="Air pressure at the centre of the storm eye. A lower number means a more powerful storm. Normal sea-level pressure is 1013 hPa — the bigger the gap, the more destructive the winds.">
         <div class="kpi-label">Storm Eye Pressure</div>
         <div class="kpi-value">{min_pres:.0f} hPa</div>
         <div class="kpi-sub">↓ {1013.0-min_pres:.0f} hPa below normal sea-level pressure</div>
@@ -995,7 +1435,7 @@ with kpi_cols[1]:
 
 with kpi_cols[2]:
     render_html(f"""
-    <div class="kpi-card" title="How high the sea will rise above its normal level due to the storm's winds pushing water ashore. Even 1 metre of surge can submerge entire coastal villages.">
+    <div class="kpi-card" title="How high the sea will rise above its normal level because the storm's winds push water ashore. Even 1 metre of surge can submerge entire coastal villages.">
         <div class="kpi-label">Peak Coastal Surge</div>
         <div class="kpi-value" style="color:#38bdf8;">{calc_surge_m:.2f} m</div>
         <div class="kpi-sub">Seawater rise above normal tide <span class="source-badge-est" title="Calculated from the barometric pressure difference — a fast estimate. A full physics simulation (SLOSH model) is on the roadmap.">Estimated</span></div>
@@ -1029,10 +1469,10 @@ with kpi_cols[5]:
         _ins_color = _ins_result.color
         _ins_payout = f"₹ {_ins_result.payout_amount_cr:.0f} Cr"
     render_html(f"""
-    <div class="kpi-card" title="Parametric insurance trigger tier. Payouts are automatic when wind/surge crosses thresholds — no claims needed. Funds release pre-landfall for evacuation, generator fuel and shelter supplies.">
+    <div class="kpi-card" title="Illustrative parametric insurance trigger calculation using configured scenario values. This is not an active policy or payment.">
         <div class="kpi-label">Parametric Insurance Trigger</div>
         <div class="kpi-value" style="color:{_ins_color}; font-size:17px;">{_ins_label}</div>
-        <div class="kpi-sub">Auto-payout: <b style="color:#f8fafc;">{_ins_payout}</b> · Activated now</div>
+        <div class="kpi-sub">Example payout calculation: <b style="color:#f8fafc;">{_ins_payout}</b> · No funds released</div>
     </div>
     """)
 
@@ -1049,15 +1489,15 @@ tab_geo, tab_voice, tab_vision, tab_matrix, tab_sim, tab_insurance, tab_met, tab
     "📢 2. Voice Alerts & Broadcast Hub",
     "📸 3. Ground Damage Photo Triage",
     "📊 4. Multi-District Risk Matrix",
-    "🌪️ 5. What-If Landfall Simulator",
-    "💰 6. Parametric Insurance Triggers",
+    "🌪️ 5. What-If Landfall Scenario Modeler",
+    "💰 6. Emergency Relief Funds Dashboard",
     "🌤️ 7. Real-Time Met Feed",
     "🛰️ 8. Technical Architecture & Evaluator Audit"
 ])
 
 
 # ==============================================================================
-# TAB 1: Situation & Hazard Maps + District AI Inspector
+# TAB 1: Scenario Map & District Review
 # ==============================================================================
 with tab_geo:
     district_list = state_vuln_df["district_name"].tolist() if not state_vuln_df.empty else ["Coastal Sector"]
@@ -1074,24 +1514,27 @@ with tab_geo:
             <div style="font-size:16px; font-weight:700; color:#38bdf8; display:flex; align-items:center; gap:8px;">
                 <span>🗺️</span> Interactive Multi-Hazard Geospatial Intelligence Viewport
             </div>
-            <div style="font-size:12px; color:#94a3b8;">Google Satellite & Carto Hybrid Basemaps</div>
+            <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+                <span class="badge-google" title="Google Earth Engine: Uses satellite ground height maps to check which coastal areas, villages, and hospitals are too low and likely to get flooded by rising sea water.">🌍 Google Earth Engine (GEE)</span>
+                <span class="badge-google" title="Google Satellite Maps: Clear aerial satellite view of the coastline, villages, and main evacuation roads.">🗺️ Google Satellite Cartography</span>
+            </div>
         </div>
         """, unsafe_allow_html=True)
 
         # Map Selector
         map_layer_options = [
             "🏥 District Risk & Critical Lifelines (Recommended)",
-            "🛣️ Severed Highways & Evacuation Corridors",
-            "🌊 Coastal Surge Inundation & Sea Water Ingress",
-            "🌪️ Damaging Wind Swaths (Core / Gale / Squall)",
-            "🛰️ Cyclone Track & Landfall Eye Timeline"
+            "🚧 Road Access Screening & Evacuation Corridors",
+            "🌊 Areas at Risk of Sea Water Flooding",
+            "🌪️ Areas Hit by Damaging Winds",
+            "🗺️ Cyclone Track & Landfall Eye Timeline"
         ]
         chosen_layer = st.selectbox(
             "Select Map Layer:",
             options=map_layer_options,
             index=0,
             label_visibility="collapsed",
-            help="Choose what hazard to display on the map. Start with '🏥 District Risk & Critical Lifelines' for a full overview, then switch to specific layers: 🌊 Coastal Surge shows which areas will flood, 🌪️ Wind Swaths shows the damage radius, 🛰️ Cyclone Track traces the storm's path."
+            help="Choose a scenario layer to review. Flood and wind layers show screening estimates, not verified impacts; the cyclone track reflects the selected scenario input."
         )
 
         # Dynamic Folium Map Builder
@@ -1153,7 +1596,7 @@ with tab_geo:
             ).add_to(m)
 
             # 4. Layer-Specific Features
-            if "Severed Highways" in layer_type:
+            if "Road Access Screening" in layer_type:
                 coords_list = []
                 for _, d in districts_df.iterrows():
                     if pd.notna(d.get("lat")) and pd.notna(d.get("lon")):
@@ -1165,26 +1608,26 @@ with tab_geo:
                     cut_km = max(p1[3], p2[3])
                     tier = "CRITICAL" if (p1[4] == "CRITICAL" or p2[4] == "CRITICAL") else ("HIGH" if (p1[4] == "HIGH" or p2[4] == "HIGH") else "MODERATE")
                     if cut_km >= 10.0 or tier == "CRITICAL":
-                        r_col, r_stat, r_wt, r_dash = "#ef4444", f"CUT-OFF / SUBMERGED ({cut_km:.1f} km underwater)", 5, None
+                        r_col, r_stat, r_wt, r_dash = "#ef4444", f"SCENARIO SCREENING: elevated access risk ({cut_km:.1f} km estimated)", 5, None
                     elif cut_km > 0.0 or tier == "HIGH":
-                        r_col, r_stat, r_wt, r_dash = "#f97316", f"HIGH RISK / PARTIAL BLOCKAGE ({cut_km:.1f} km impacted)", 4, "6, 6"
+                        r_col, r_stat, r_wt, r_dash = "#f97316", f"SCENARIO SCREENING: possible access disruption ({cut_km:.1f} km estimated)", 4, "6, 6"
                     else:
-                        r_col, r_stat, r_wt, r_dash = "#10b981", "PASSABLE / ACTIVE EVACUATION CORRIDOR", 4, None
+                        r_col, r_stat, r_wt, r_dash = "#10b981", "SCENARIO SCREENING: lower modeled risk; passability not verified", 4, None
 
                     folium.PolyLine(
                         [[p1[0], p1[1]], [p2[0], p2[1]]],
                         color=r_col, weight=r_wt, dash_array=r_dash, opacity=0.9,
-                        tooltip=f"<b>Coastal Highway: {p1[2]} ↔ {p2[2]}</b><br>Status: <b>{r_stat}</b>"
+                        tooltip=f"<b>Illustrative route between {p1[2]} ↔ {p2[2]}</b><br>{r_stat}<br>Not a verified road condition."
                     ).add_to(m)
 
                 for _, d in districts_df.iterrows():
                     d_lat, d_lon = float(d.get("lat", c_lat)), float(d.get("lon", c_lon))
                     folium.CircleMarker(
                         [d_lat, d_lon], radius=7, color="#38bdf8", fill=True, fill_color="#0f172a", fill_opacity=0.9,
-                        tooltip=f"<b>{d['district_name']} Highway Checkpoint</b><br>Severed: {d.get('submerged_road_km',0):.1f} km"
+                        tooltip=f"<b>{d['district_name']} Road Access Screening</b><br>Estimated affected road length: {d.get('submerged_road_km',0):.1f} km; not field-verified."
                     ).add_to(m)
 
-            elif "Coastal Surge" in layer_type:
+            elif "Areas at Risk of Sea Water Flooding" in layer_type:
                 for _, d in districts_df.iterrows():
                     d_lat, d_lon = float(d.get("lat", c_lat)), float(d.get("lon", c_lon))
                     d_tier = d.get("threat_tier", "MODERATE")
@@ -1192,7 +1635,7 @@ with tab_geo:
                     folium.Circle(
                         location=[d_lat, d_lon], radius=surge_r, color="#0284c7",
                         fill=True, fill_color="#38bdf8", fill_opacity=0.45, weight=2,
-                        tooltip=f"<b>{d['district_name']} Inundation Zone</b><br>Surge: <b>+{calc_surge_m:.2f} m</b>"
+                        tooltip=f"<b>{d['district_name']} Scenario Screening Area</b><br>Surge estimate: <b>+{calc_surge_m:.2f} m</b>; not an observed inundation boundary."
                     ).add_to(m)
                     folium.CircleMarker(
                         [d_lat, d_lon], radius=6, color="#0369a1", fill=True, fill_color="#38bdf8", fill_opacity=0.9,
@@ -1200,11 +1643,11 @@ with tab_geo:
                     ).add_to(m)
 
                 folium.Marker(
-                    landfall_pt, tooltip=f"🌊 Storm Surge Epicenter: +{calc_surge_m:.2f}m Sea Ingress",
+                    landfall_pt, tooltip=f"🌊 Scenario surge estimate: +{calc_surge_m:.2f}m; not an observed boundary",
                     icon=folium.Icon(color="blue", icon="tint", prefix="fa")
                 ).add_to(m)
 
-            elif "Wind Swaths" in layer_type:
+            elif "Areas Hit by Damaging Winds" in layer_type:
                 folium.Circle(
                     landfall_pt, radius=220000, color="#eab308", weight=1.5,
                     fill=True, fill_color="#eab308", fill_opacity=0.14,
@@ -1318,10 +1761,10 @@ with tab_geo:
         # Quick Plain-Language Cartographic Bar with honest GEE badge
         st.markdown("""
         <div style="display:flex; justify-content:space-between; font-size:12px; color:#cbd5e1; background:rgba(30,41,59,0.7); padding:8px 14px; border-radius:8px; margin-top:6px;">
-            <div title="Elevation: USGS/NASA SRTM 30m queried via OpenTopodata free API. Google Earth Engine is used when credentials are present; OpenTopodata is the authenticated-free fallback.">🗺️ <b>Elevation</b>: SRTM 30m via OpenTopodata <span style='background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b;border-radius:4px;padding:1px 6px;font-size:10px;'>Screening Model</span></div>
-            <div title="NOAA IBTrACS v4: International Best Track Archive for Climate Stewardship — official global historical cyclone database.">🌪️ <b>Storm Tracks</b>: NOAA IBTrACS v4 <span style='background:#10b98122;color:#10b981;border:1px solid #10b981;border-radius:4px;padding:1px 6px;font-size:10px;'>Real Data</span></div>
-            <div title="OpenStreetMap: Community-mapped hospitals, cyclone shelters, power substations, and roads. Live Overpass API with offline baseline fallback.">🏥 <b>Infrastructure</b>: OpenStreetMap (OSM Overpass) <span style='background:#10b98122;color:#10b981;border:1px solid #10b981;border-radius:4px;padding:1px 6px;font-size:10px;'>Real Data</span></div>
-            <div title="Open-Meteo ECMWF IFS: Free real-time weather forecast, updated every 15 minutes. No API key required.">🌤️ <b>Weather</b>: Open-Meteo ECMWF IFS <span style='background:#10b98122;color:#10b981;border:1px solid #10b981;border-radius:4px;padding:1px 6px;font-size:10px;'>Live Feed</span></div>
+            <div title="SRTM elevation via the configured geospatial path supports screening estimates. Earth Engine is optional geospatial processing, not a cyclone prediction service.">🗺️ <b>Elevation</b>: SRTM 30m <span style='background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b;border-radius:4px;padding:1px 6px;font-size:10px;'>Screening input</span></div>
+            <div title="NOAA IBTrACS is a historical cyclone archive; the selected track source is shown in the scenario metadata.">🌪️ <b>Storm Tracks</b>: Historical / selected input <span style='background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b;border-radius:4px;padding:1px 6px;font-size:10px;'>Check source</span></div>
+            <div title="OpenStreetMap-derived baseline or configured infrastructure data; this map does not imply a fresh live Overpass query.">🏥 <b>Infrastructure</b>: Configured OSM-derived data <span style='background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b;border-radius:4px;padding:1px 6px;font-size:10px;'>Baseline</span></div>
+            <div title="Weather is requested separately. Check the status and retrieval time in the weather tab; this feed does not drive the displayed risk score.">🌤️ <b>Weather</b>: Separate forecast feed <span style='background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b;border-radius:4px;padding:1px 6px;font-size:10px;'>Check status</span></div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -1332,9 +1775,9 @@ with tab_geo:
         st.markdown("""
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
             <div style="font-size:16px; font-weight:700; color:#38bdf8; display:flex; align-items:center; gap:8px;">
-                <span>🤖</span> District AI Inspector & Directives
+                <span>🧭</span> District Scenario Review & Possible Actions
             </div>
-            <div style="font-size:12px; color:#94a3b8;">Google Gemini 2.5 Flash</div>
+            <span class="source-badge-est" title="Configured district profile and scenario-based screening output; not live Gemini analysis or an official warning.">Scenario estimate</span>
         </div>
         """, unsafe_allow_html=True)
 
@@ -1351,7 +1794,7 @@ with tab_geo:
         d_tier = dist_row.get("threat_tier", "HIGH")
         d_prio = int(dist_row.get("evacuation_priority", 2))
         d_driver = dist_row.get("primary_risk_driver", "High Cyclone Exposure")
-        d_action = dist_row.get("action_directive", "Evacuate low-lying areas.")
+        d_action = dist_row.get("action_directive", "Review preparedness needs for low-lying areas.")
         d_pop = int(dist_row.get("population", 1500000))
 
         d_badge = "badge-critical" if d_tier == "CRITICAL" else ("badge-high" if d_tier == "HIGH" else "badge-moderate")
@@ -1366,15 +1809,15 @@ with tab_geo:
                     <div style="font-size:13px; color:#94a3b8;">{selected_state}, India • Pop: <b>{d_pop/100000:.1f} Lakh</b> ({d_pop:,})</div>
                 </div>
                 <div style="text-align:right;">
-                    <span class="{d_badge}">● {d_tier}</span>
+                    <span class="{d_badge}" title="Scenario tier based on configured wind/surge scoring rules; not an official warning or observed impact.">● Scenario: {d_tier}</span>
                     <div style="font-size:20px; font-weight:800; color:#f8fafc; margin-top:4px;">
-                        {d_score:.1f} <span style="font-size:12px; color:#94a3b8;">/ 100</span>
+                        {d_score:.1f} <span style="font-size:12px; color:#94a3b8;">/ 100 scenario score</span>
                     </div>
                 </div>
             </div>
             <div style="font-size:13px; color:#cbd5e1; margin-top:10px; border-top:1px solid rgba(148,163,184,0.2); padding-top:8px; line-height:1.4;">
-                ⚠️ <b>Primary Risk Factor</b>: {d_driver}<br>
-                🚨 <b>Evacuation Directive</b>: Priority {d_prio} ({d_action})
+                ⚠️ <b>What is dangerous here</b>: {d_driver}<br>
+                🚨 <b>What officials should consider doing</b>: {d_action}
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -1390,34 +1833,34 @@ with tab_geo:
 
         with l1:
             st.markdown(f"""
-            <div style="background:rgba(15,23,42,0.7); padding:8px 10px; border-radius:8px; text-align:center; cursor:help;" title="Flooded vs. total hospitals in this district. Flooded hospitals cannot admit patients — generators and backup facilities must be activated before landfall.">
-                <div style="font-size:11px; color:#94a3b8;">HOSPITALS</div>
+            <div style="background:rgba(15,23,42,0.7); padding:8px 10px; border-radius:8px; text-align:center; cursor:help;" title="Hospitals and shelters flagged by scenario rules; this is not a verified live flood assessment or operational status.">
+                <div style="font-size:11px; color:#94a3b8;">HOSPITALS & SHELTERS FLAGGED</div>
                 <div style="font-size:16px; font-weight:800; color:{'#ef4444' if fh_val>0 else '#10b981'};">{fh_val}/{th_val}</div>
-                <div style="font-size:10.5px; color:#94a3b8;">{'At Flood Risk' if fh_val>0 else 'Safe & Operational'}</div>
+                <div style="font-size:10.5px; color:#94a3b8;">{'Scenario flag' if fh_val>0 else 'No scenario flag'}</div>
             </div>
             """, unsafe_allow_html=True)
         with l2:
             st.markdown(f"""
-            <div style="background:rgba(15,23,42,0.7); padding:8px 10px; border-radius:8px; text-align:center; cursor:help;" title="Flooded vs. total designated government cyclone shelters. These are the buildings civilians are officially evacuated to — a flooded shelter cannot provide refuge.">
-                <div style="font-size:11px; color:#94a3b8;">SHELTERS</div>
+            <div style="background:rgba(15,23,42,0.7); padding:8px 10px; border-radius:8px; text-align:center; cursor:help;" title="Shelters flagged by scenario rules; this does not establish current safety or operational status.">
+                <div style="font-size:11px; color:#94a3b8;">SHELTERS FLAGGED</div>
                 <div style="font-size:16px; font-weight:800; color:{'#ef4444' if fs_val>0 else '#10b981'};">{fs_val}/{ts_val}</div>
-                <div style="font-size:10.5px; color:#94a3b8;">{'At Flood Risk' if fs_val>0 else 'Operational'}</div>
+                <div style="font-size:10.5px; color:#94a3b8;">{'Scenario flag' if fs_val>0 else 'No scenario flag'}</div>
             </div>
             """, unsafe_allow_html=True)
         with l3:
             st.markdown(f"""
-            <div style="background:rgba(15,23,42,0.7); padding:8px 10px; border-radius:8px; text-align:center; cursor:help;" title="Length of main roads (state highways) expected to be submerged and impassable, preventing ambulances and NDRF rescue convoys from reaching coastal villages.">
-                <div style="font-size:11px; color:#94a3b8;">ROADS CUT OFF</div>
+            <div style="background:rgba(15,23,42,0.7); padding:8px 10px; border-radius:8px; text-align:center; cursor:help;" title="Road exposure estimate for this scenario; verify access conditions with current local information.">
+                <div style="font-size:11px; color:#94a3b8;">ROAD EXPOSURE ESTIMATE</div>
                 <div style="font-size:16px; font-weight:800; color:{'#ef4444' if sr_val>0 else '#10b981'};">{sr_val:.1f} km</div>
-                <div style="font-size:10.5px; color:#94a3b8;">{'Flooded & Impassable' if sr_val>0 else 'Passable'}</div>
+                <div style="font-size:10.5px; color:#94a3b8;">Scenario estimate; verify locally</div>
             </div>
             """, unsafe_allow_html=True)
         with l4:
             st.markdown(f"""
-            <div style="background:rgba(15,23,42,0.7); padding:8px 10px; border-radius:8px; text-align:center; cursor:help;" title="Number of electrical power substations at flood risk. A substation failure cuts power to hospitals, shelters, and entire towns — pre-positioning diesel generators is critical.">
-                <div style="font-size:11px; color:#94a3b8;">POWER GRID</div>
+            <div style="background:rgba(15,23,42,0.7); padding:8px 10px; border-radius:8px; text-align:center; cursor:help;" title="Substation exposure estimate; it does not establish current grid stability.">
+                <div style="font-size:11px; color:#94a3b8;">SUBSTATION EXPOSURE</div>
                 <div style="font-size:16px; font-weight:800; color:{'#ef4444' if fp_val>0 else '#10b981'};">{fp_val} Substations</div>
-                <div style="font-size:10.5px; color:#94a3b8;">{'Blackout Risk' if fp_val>0 else 'Grid Stable'}</div>
+                <div style="font-size:10.5px; color:#94a3b8;">Scenario estimate; verify locally</div>
             </div>
             """, unsafe_allow_html=True)
 
@@ -1426,7 +1869,7 @@ with tab_geo:
         # Multi-Language Disaster Voice Broadcast Console
         st.markdown("""
         <div style="font-size:13px; font-weight:700; color:#38bdf8; margin-bottom:6px; display:flex; align-items:center; gap:6px;">
-            <span>📢</span> Official Disaster Voice Broadcast Alert
+            <span>📢</span> Draft Scenario Message & Voice Preview — Not an Official Alert
         </div>
         """, unsafe_allow_html=True)
 
@@ -1434,7 +1877,7 @@ with tab_geo:
         sample_advisory_text = (
             f"EMERGENCY CYCLONE ADVISORY FOR {sel_dist.upper()}: Threat Level {d_tier}. "
             f"{d_driver}. {fh_val} hospitals and {sr_val:.1f} km of arterial roadway at risk. "
-            f"Mandatory directive: {d_action}"
+            f"Suggested action for local review: {d_action}"
         )
 
         # Determine regional target language from user's active choice or state default
@@ -1484,7 +1927,7 @@ with tab_geo:
 
                 vc_1, vc_2 = st.columns([1.5, 1.0])
                 with vc_1:
-                    st.caption(f"🎙️ **Broadcast Voice**: {target_l_label} • AIR Disaster Bulletin")
+                    st.caption(f"🎙️ **Voice preview**: {target_l_label} • not transmitted")
                 with vc_2:
                     v_btn = st.button(
                         f"🔊 Synthesize Voice",
@@ -1524,25 +1967,28 @@ with tab_geo:
                 with st.expander(f"📄 Spoken Broadcast Script ({target_l_label})", expanded=False):
                     st.markdown(f"> {v_script}")
 
-    with st.expander("ℹ️ How are map layers, wind swaths, and surge inundation calculated?", expanded=False):
-        st.markdown("""
-**Reference scales & standards**
-- **IMD wind classes (knots):** Depression 17–27 · Deep Depression 28–33 · Cyclonic Storm 34–47 · Severe CS 48–63 · Very Severe CS 64–89 · Extremely Severe CS 90–119 · Super CS ≥120.
-- **Topography & Elevation:** USGS / NASA SRTM 30m Digital Elevation Model (retrieved via OpenTopodata free API with local offline caching).
-- **Critical Infrastructure:** OpenStreetMap (OSM) highway network (Trunk, Primary, Secondary) and healthcare facilities (Hospitals, Community Clinics).
-- **Storm Trajectory:** NOAA IBTrACS v4 verified archive & IMD / RSMC New Delhi real-time cyclonic bulletins.
-
-**Method**
-1. **Concentric wind swaths:** Computed from the cyclone core intensity: Core Eyewall Swath (>64 kts, 60 km radius), Gale-Force Destructive Zone (48–63 kts, 120 km radius), and Peripheral Squall Zone (34–47 kts, 220 km radius).
-2. **Surge inundation screening:** Peak coastal surge is modeled via the Jelesnianski inverted-barometer relation: `0.099 × (1013 − min central pressure)` metres. An inland ingress polygon is delineated by intersecting this surge height against coastal elevation contours (<5m SRTM contour).
-3. **Submerged highway calculation:** Geospatial line-intersection between the surge flood polygon and OSM road vectors calculates exact cut-off highway kilometers per district.
-4. **Healthcare facility flooding:** Facility coordinates are tested against the surge inundation polygon and SRTM elevation: facilities situated below local surge depth are flagged as inundated.
-
-**Limitations**
-- Inundation modeling uses hydrostatic bathtub screening; it does not solve 2D shallow-water hydrodynamic equations (SLOSH/ADCIRC) with tides, bathymetry, and bottom friction.
-- Road vectors reflect the OSM highway baseline; local debris, fallen trees, and temporary culvert blockages require field patrol verification.
-- Decision support for incident commanders, **not** an official IMD evacuation notice.
-""")
+    render_explanation(
+        "How does Situation & Hazard Mapping work?",
+        {
+            "what": "The map brings cyclone tracks, hazard layers, and critical infrastructure together so teams can see which coastal areas may need closer attention.",
+            "how": [
+                "Choose a state and cyclone scenario — the dashboard loads the selected track and district data.",
+                "Select a map layer: district risk & lifelines, impassable highways, surge zones, wind swaths, or the cyclone track timeline.",
+                "Compare exposed places using terrain elevation and mapped roads, hospitals, and shelters to identify where flooding or loss of access could matter.",
+                "Inspect individual districts — the side panel shows scenario-based risk scores and infrastructure indicators for the selected area."
+            ],
+            "benefit": "Officials can use one view to identify areas, roads, hospitals, or shelters that may deserve field checks or preparedness planning before landfall.",
+            "tech": [
+                "Google Earth Engine / SRTM elevation data — supports terrain and exposure screening (when authenticated).",
+                "OpenStreetMap-derived infrastructure baseline — supplies mapped roads and facilities where available.",
+                "Interactive Folium map layers — display cyclone tracks and selected hazard overlays.",
+                "NOAA IBTrACS historical tracks / configured scenarios — provide the storm track input."
+            ],
+            "limitations": "The cyclone track reflects the selected scenario (historical, synthetic, or user-supplied), not a live satellite feed. Surge and wind layers are screening estimates based on simplified physics proxies, not verified impacts or official forecasts. Infrastructure data is from a configured OSM-derived baseline, not a live Overpass query.",
+            "note": "Live ingestion of IMD/RSMC bulletins would need to be connected for real-time use. All displayed layers are decision-support aids, not confirmation of ground conditions."
+        },
+        icon="🗺️"
+    )
 
 
 
@@ -1551,8 +1997,14 @@ with tab_geo:
 # ==============================================================================
 with tab_voice:
     st.markdown("""
-    <div style="font-size:18px; font-weight:800; color:#38bdf8; display:flex; align-items:center; gap:8px; margin-bottom:4px;">
-        <span>📢</span> Multi-Channel Disaster Alert Delivery & Common Alerting Protocol (CAP) Hub
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:8px; margin-bottom:4px;">
+        <div style="font-size:18px; font-weight:800; color:#38bdf8; display:flex; align-items:center; gap:8px;">
+            <span>📢</span> Multi-Channel Disaster Alert Delivery & Common Alerting Protocol (CAP) Hub
+        </div>
+        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <span class="badge-google" title="Google Gemini AI: Translates urgent life-saving warning messages into natural everyday speech in 7 local Indian languages (Bengali, Hindi, Odia, etc.).">✨ Google Gemini Emergency Translations</span>
+            <span class="badge-google" title="Google Cloud Voice: Converts warning text into clear spoken voice announcements for radio broadcasts and loudspeaker vans.">🔊 Google Cloud Text-to-Speech</span>
+        </div>
     </div>
     <div style="font-size:13px; color:#cbd5e1; margin-bottom:14px;">
         Pre-formatted, copy-ready emergency broadcast messages for <b>SMS (160-char)</b>, <b>WhatsApp</b>, <b>Community Radio</b>, and <b>OASIS CAP 1.2 XML</b> for State Disaster Management Authorities.
@@ -1562,7 +2014,23 @@ with tab_voice:
     v_left, v_right = st.columns([1.1, 1.0], gap="large")
 
     with v_left:
-        st.markdown(f"<div style='font-size:14px; font-weight:700; color:#38bdf8; margin-bottom:8px;'>📱 Copy-Ready Multi-Channel Emergency Broadcasts ({active_lang_label})</div>", unsafe_allow_html=True)
+        if active_lang_code == "bn":
+            message_section_title = "📱 পরিস্থিতিভিত্তিক খসড়া বার্তা (বাংলা)"
+            message_preview_notice = (
+                "এটি শুধুমাত্র প্রস্তুত করা বার্তার প্রিভিউ। এটি কোনো সরকারি সতর্কবার্তা নয় এবং "
+                "পাঠানো হয়নি; ব্যবহারের আগে সব তথ্য যাচাই করুন এবং সংশ্লিষ্ট কর্তৃপক্ষের অনুমোদন নিন।"
+            )
+        else:
+            message_section_title = f"📱 Draft Scenario Messages ({active_lang_label})"
+            message_preview_notice = (
+                "Prepared message preview only. Not an official warning and not transmitted; "
+                "verify all details and obtain agency approval before any use."
+            )
+        st.markdown(
+            f"<div style='font-size:14px; font-weight:700; color:#38bdf8; margin-bottom:8px;'>{message_section_title}</div>",
+            unsafe_allow_html=True
+        )
+        st.warning(message_preview_notice)
         
         if get_localized_broadcast:
             tab2_loc = get_localized_broadcast(
@@ -1583,25 +2051,25 @@ with tab_voice:
             whatsapp_text = tab2_loc.get("whatsapp", "")
             pa_text = tab2_loc.get("pa", "")
         else:
-            sms_text = f"ALERT: Cyclone {selected_storm_name} landfall near {landfall_loc}. {sel_dist}: {d_tier} risk. Evacuate low-lying areas. Dial 1077 for NDRF help."[:160]
-            whatsapp_text = f"""🚨 *NDRF / SDMA EMERGENCY ALERT: CYCLONE {selected_storm_name.upper()}*
+            sms_text = f"DRAFT SCENARIO: Cyclone {selected_storm_name} near {landfall_loc}. {sel_dist}: {d_tier} screening estimate. Verify current official guidance before acting."[:160]
+            whatsapp_text = f"""*DRAFT SCENARIO MESSAGE — NOT AN OFFICIAL ALERT*
+Cyclone {selected_storm_name.upper()}
 *District*: {sel_dist}, {selected_state}
-*Threat Level*: {d_tier} RISK (Score {d_score:.1f}/100)
-*Peak Winds*: {peak_wind:.0f} kts ({peak_wind*1.852:.0f} km/h)
-*Expected Surge*: {calc_surge_m:.2f} meters
+*Scenario screening tier*: {d_tier} (Score {d_score:.1f}/100)
+*Scenario wind input*: {peak_wind:.0f} kts ({peak_wind*1.852:.0f} km/h)
+*Estimated surge*: {calc_surge_m:.2f} meters
 
-⚠️ *DIRECTIVE*: {d_action}
-• Emergency Control Room: 1077 (District) / 1070 (State)
-• Nearest Operational Shelter: Check CycloneShield Command
-_Sent via CycloneShield AI Command Center_"""
-            pa_text = f"Urgent alert: Cyclone {selected_storm_name} approaching {sel_dist}. Move to cyclone shelter immediately."
+⚠️ *Possible action for authorized review*: {d_action}
+Verify conditions, official guidance, and shelter status with local authorities.
+_Prepared by CycloneShield for review — not sent_"""
+            pa_text = f"Draft scenario message: Cyclone {selected_storm_name} near {sel_dist}. Check official local guidance and verified shelter information."
 
         # 1. SMS (160 characters limit)
-        st.markdown(f"**1. Emergency SMS (160 Characters Max — {active_lang_label}):**")
+        st.markdown(f"**1. Draft SMS (160 Characters Max — {active_lang_label}):**")
         st.code(sms_text, language="text")
 
         # 2. WhatsApp Emergency Broadcast
-        st.markdown(f"**2. WhatsApp Emergency Message (Formatted — {active_lang_label}):**")
+        st.markdown(f"**2. Draft WhatsApp Message (Formatted — {active_lang_label}):**")
         st.code(whatsapp_text, language="markdown")
 
         # 3. Community Radio & Megaphone Broadcast Script
@@ -1640,24 +2108,28 @@ _Sent via CycloneShield AI Command Center_"""
             use_container_width=True
         )
 
-    with st.expander("ℹ️ How are multilingual advisories and CAP 1.2 alerts generated?", expanded=False):
-        st.markdown("""
-**Reference scales & standards**
-- **OASIS Common Alerting Protocol (CAP) v1.2:** International emergency alert standard (ITU-T Rec. X.1303), conforming to NDMA SACHET national alert gateway specifications.
-- **Channel length constraints:** SMS (GSM-7 160-character budget), WhatsApp (rich markdown with tactical emoji formatting), Community Radio (phonetic spoken bulletin).
-- **Language support:** 7 coastal Indian languages (English, Hindi, Bengali, Odia, Telugu, Tamil, Gujarati) mapped to ISO 639-1 / BCP-47 locale standards.
-
-**Method**
-1. **Dynamic risk ingestion:** Alert text synthesizes active district parameters: evaluated threat level, IMD wind class, estimated coastal surge ingress, and landfall countdown window.
-2. **Context-aware directive synthesis:** Generates targeted instructions calibrated to threat tiers: mandatory evacuation deadlines, cyclone shelter reporting, fisherman sea-venture bans, and emergency helpline contacts (1077 / 112).
-3. **CAP 1.2 XML generation:** Constructs a validated XML document containing `<identifier>`, `<sender>`, `<status>Actual</status>`, `<msgType>Alert</msgType>`, `<scope>Public</scope>`, along with urgency, severity, certainty, and `<area>` polygon geocodes.
-4. **Voice synthesis:** Localized scripts stream into Google Cloud Text-to-Speech (or local neural TTS) with language-native neural voices for rural community radio dissemination.
-
-**Limitations**
-- CAP 1.2 XML payloads are structured for direct ingestion by State Disaster Management Authority (SDMA) gateways and SACHET; CycloneShield does not broadcast directly to live telecom cell towers without government agency authorization.
-- Automatic translations should be reviewed by state emergency public relations officers before broadcast during catastrophic events.
-""")
-
+    render_explanation(
+        "How do Voice Alerts and Broadcasts work?",
+        {
+            "what": "Prepares draft cyclone warning messages in multiple formats — SMS, WhatsApp, community radio scripts, and CAP 1.2 XML — with optional multilingual text and voice preview for officer review.",
+            "how": [
+                "Select the district and language — the app assembles an advisory using the current scenario's threat tier, wind, surge, and action guidance.",
+                "Review copy-ready drafts for SMS (160-char), WhatsApp (formatted), and public address scripts.",
+                "Generate a voice preview using text-to-speech when the voice service is available (click 'Synthesize Voice' to test).",
+                "Download a CAP 1.2 XML file — a machine-readable alert format compatible with India's SACHET gateway and broadcast systems — for authorised upload."
+            ],
+            "benefit": "Officials can prepare consistent, locally relevant warnings across channels in minutes instead of drafting and translating each one by hand, helping communities understand and act sooner.",
+            "tech": [
+                "Google Gemini (optional) — translates and localizes advisory text when a live API response is confirmed.",
+                "Google Cloud Text-to-Speech (optional) — generates spoken audio previews for supported languages when configured.",
+                "CAP 1.2 XML export — produces a standard alert file for authorised systems (SACHET, cell broadcast, radio).",
+                "Prepared offline templates and audio fallbacks — keep the workflow demonstrable when live services are unavailable."
+            ],
+            "limitations": "This tab prepares messages and files only; it does not transmit alerts to the public, send SMS/WhatsApp, or broadcast audio. All drafts require authorised review and approval before any use. Voice preview depends on the configured TTS service; offline fallback audio is pre-generated, not live synthesis.",
+            "note": "Live delivery would require integration with SDMA SACHET, cell broadcast gateways, SMS providers, or All India Radio — each needing official approval and configuration."
+        },
+        icon="📢"
+    )
 
 
 # ==============================================================================
@@ -1665,10 +2137,14 @@ _Sent via CycloneShield AI Command Center_"""
 # ==============================================================================
 with tab_vision:
     backend_vkey = get_resolved_api_key()
-    vision_status_pill = '<span class="source-badge-est">🔑 Gemini API key detected • not yet verified</span>' if backend_vkey else '<span class="source-badge-sim">🛡️ Zero-Key Calibrated Offline Mode</span>'
+    vision_status_pill = (
+        '<span class="source-badge-est" title="A Gemini API key is configured; this does not verify that a live request will succeed.">🔑 Gemini API key detected • Request unverified</span>'
+        if backend_vkey else
+        '<span class="source-badge-sim" title="Prepared offline benchmark results demonstrate the workflow; they are not Gemini analysis of the image.">🛡️ Prepared Offline Benchmark</span>'
+    )
 
     st.markdown(f"""
-    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
         <div>
             <div style="font-size:18px; font-weight:800; color:#38bdf8; display:flex; align-items:center; gap:8px;">
                 <span>📸</span> Field Ground Damage AI Photo Triage
@@ -1677,7 +2153,8 @@ with tab_vision:
                 Run live Gemini Vision when available, or inspect a clearly labeled offline benchmark result.
             </div>
         </div>
-        <div>
+        <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+            <span class="badge-google" title="Google Gemini Vision AI: Looks at disaster photos from drones or phones to check flood water depth, broken roofs, blocked roads, and rescue gear needed.">📸 Google Gemini Multimodal Vision</span>
             {vision_status_pill}
         </div>
     </div>
@@ -1766,7 +2243,15 @@ with tab_vision:
             st.success("Live response received from Google Gemini Vision.")
         elif backend_vkey:
             if st.session_state.get(live_attempt_key, False):
-                st.warning("No live Gemini result was used. This is the calibrated offline fallback; check API access, model availability, and quota before presenting.")
+                failure_reason = triage_res.get(
+                    "live_api_error",
+                    "Gemini did not return a usable response."
+                )
+                st.warning(
+                    f"Live Gemini analysis failed: {failure_reason} "
+                    "Showing a calibrated offline fallback, not image analysis. "
+                    "Resolve the API issue and retry before presenting."
+                )
             else:
                 st.info("Showing an offline benchmark reference. Click Run Damage Triage to test whether the configured Gemini key can return a live result.")
         else:
@@ -1807,7 +2292,7 @@ with tab_vision:
                         <div style="font-size:12.5px; color:#38bdf8; margin-top:2px;">📍 {triage_res.get('affected_infrastructure', 'Corridor')}</div>
                     </div>
                     <div style="text-align:right;">
-                        <span class="{'badge-critical' if sev_score>=4 else 'badge-high'}">● LEVEL {sev_score} / 5</span>
+                        <span class="{'badge-critical' if sev_score>=4 else 'badge-high'}" title="Damage severity from Level 1 (minor damage) to Level 5 (completely destroyed or deep underwater).">● LEVEL {sev_score} / 5</span>
                         <div style="font-size:12px; color:#cbd5e1; margin-top:4px;">Threat: <b>{t_tier}</b></div>
                     </div>
                 </div>
@@ -1816,7 +2301,7 @@ with tab_vision:
 
             # 4 Key Emergency Indicators
             m1, m2, m3, m4 = st.columns(4)
-            m1.markdown(f"<div class='kpi-card'><div class='kpi-label'>Water Level</div><div class='kpi-value' style='font-size:18px; color:#38bdf8;'>{water_str}</div></div>", unsafe_allow_html=True)
+            m1.markdown(f"<div class='kpi-card'><div class='kpi-label'>Flood Water Level</div><div class='kpi-value' style='font-size:18px; color:#38bdf8;'>{water_str}</div></div>", unsafe_allow_html=True)
             m2.markdown(f"<div class='kpi-card'><div class='kpi-label'>Road Access</div><div class='kpi-value' style='font-size:16px; color:#ef4444;'>{road_stat}</div></div>", unsafe_allow_html=True)
             m3.markdown(f"<div class='kpi-card'><div class='kpi-label'>Response Window</div><div class='kpi-value' style='font-size:16px; color:#f97316;'>{urgency_txt}</div></div>", unsafe_allow_html=True)
             confidence_value = f"{triage_res.get('confidence_score', 0.95)*100:.0f}%" if is_live_vision else "N/A"
@@ -1846,24 +2331,29 @@ with tab_vision:
             with st.expander("📄 View Machine-Parsable JSON (Collapsed)", expanded=False):
                 st.json(triage_res)
 
-    with st.expander("ℹ️ How does the multimodal AI damage triage work?", expanded=False):
-        st.markdown("""
-**Reference scales & standards**
-- **Damage Severity Scale (Levels 1 to 5):** Level 1 (Minor debris / superficial) · Level 2 (Waterlogging <0.3m / partial road block) · Level 3 (Severe waterlogging >0.5m / structural breach) · Level 4 (Severe structural failure / road impassable) · Level 5 (Catastrophic submergence >1.5m / total collapse).
-- **Vision Engine:** Google Gemini 2.5 Flash / 1.5 Flash multimodal vision API with zero-key offline calibrated benchmark fallback.
-- **Incident Protocol:** Calibrated to National Disaster Response Force (NDRF) standard operating procedures and search & rescue (SAR) operational guidelines.
-
-**Method**
-1. **Scene semantic analysis:** The vision model inspects uploaded disaster photographs for waterline height indicators, roof sheet displacement, downed power lines, tree fall density, and vehicle submergence.
-2. **Structured JSON extraction:** Produces validated parameters: `damage_severity_score` (1–5), `estimated_water_depth`, `road_passability`, `life_safety_risk`, `recommended_ndrf_action`, and `required_equipment` (e.g. inflatable motorized boats, tree clearers, dewatering pumps).
-3. **Response priority mapping:** Scores ≥ 4 trigger CRITICAL dispatch status with immediate 0–2 hour tactical intervention windows.
-4. **Zero-key offline fallback:** When operating in offline emergency bunkers or without an active API key, the system seamlessly serves pre-calibrated benchmark triage profiles for standard post-cyclone scenarios.
-
-**Limitations**
-- Serves as an automated prioritization queue to triage thousands of field crowdsourced or drone images; does not replace certified structural engineering safety sign-offs.
-- Image quality, night photography, or obscured angles can affect visual depth estimation.
-""")
-
+    render_explanation(
+        "How does Ground Damage Photo Triage work?",
+        {
+            "what": "Examines a disaster photo using Google Gemini Vision (when live access is available) to produce an initial damage assessment — severity level, estimated water depth, road access status, and suggested equipment — helping responders prioritize which reports to verify first.",
+            "how": [
+                "Choose a benchmark scene or upload a field photo (JPEG/PNG).",
+                "Select a Gemini vision model and click 'Run Damage Triage' — the app calls the API when a valid key is configured and a live response succeeds.",
+                "Review the structured output: damage type, severity score (1–5), threat tier, estimated water depth, road access impediment, and response window.",
+                "Check the recommended NDRF tactical action and required equipment list.",
+                "Use the severity score to prioritize human verification — the app does not auto-dispatch."
+            ],
+            "benefit": "After landfall, photos arrive faster than people can review them. Instant severity scores and suggested equipment let control rooms push the most serious incidents to the front of the queue and send the right resources sooner.",
+            "tech": [
+                "Google Gemini Multimodal Vision (gemini-2.5-flash, 2.0-flash, or 1.5-flash) — analyzes images only when a live API request succeeds.",
+                "Structured JSON response — organizes findings into severity, observations, water depth, access status, urgency, and recommended actions.",
+                "Prepared offline benchmark scenes — four predefined scenarios with reference outputs for demonstration when live API is unavailable.",
+                "Clear live/offline status badges — every result shows whether it came from a confirmed Gemini response or the offline fallback."
+            ],
+            "limitations": "The prototype analyses one photo at a time. Offline fallback shows only predefined benchmark examples, not live analysis of new uploads. AI findings are initial assessments only and must be verified by responders before any dispatch decision. Confidence scores are shown only for live Gemini responses.",
+            "note": "Scaling would require connecting photo sources (drones, field apps, citizen reports), bulk processing on cloud infrastructure, GPS/timestamp tagging for map integration, and a mandatory human-in-the-loop verification step."
+        },
+        icon="📸"
+    )
 
 
 # ==============================================================================
@@ -1871,11 +2361,14 @@ with tab_vision:
 # ==============================================================================
 with tab_matrix:
     st.markdown(f"""
-    <div style="font-size:18px; font-weight:800; color:#38bdf8; display:flex; align-items:center; gap:8px; margin-bottom:4px;">
-        <span>📊</span> {selected_state} Coastal District Vulnerability & Impact Matrix
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:8px; margin-bottom:4px;">
+        <div style="font-size:18px; font-weight:800; color:#38bdf8; display:flex; align-items:center; gap:8px;">
+            <span>📊</span> {selected_state} District Scenario Risk Matrix
+        </div>
+        <span class="source-badge-est" title="Configured scenario screening output. Not a current impact report or official warning.">Scenario estimate</span>
     </div>
     <div style="font-size:13px; color:#cbd5e1; margin-bottom:12px;">
-        Grounded in Census 2011 population records, OpenStreetMap healthcare locations, and hydrodynamic storm surge inundation contours.
+        Uses Census-era population references, available OSM-derived infrastructure data, and simplified wind/surge screening estimates. Outputs are scenario indicators for review, not observed impacts or official warnings.
     </div>
     """, unsafe_allow_html=True)
 
@@ -1887,32 +2380,35 @@ with tab_matrix:
         ]].copy()
         
         display_df.columns = [
-            "Rank", "District", "Population", "Local Wind (kts)", "IMD Wind Class", "Surge Proxy (m)",
-            "Wind Sub-score", "Surge Sub-score", "Risk Score (0-100)", "IMD Colour", "Threat Level",
-            "Evac Priority", "Flooded Hosp", "Flooded Shelters", "Cutoff Road (km)", "Action Directive"
+            "Rank", "District", "Population", "Scenario Wind (km/h)", "Wind Strength Estimate", "Seawater Rise (m)",
+            "Wind Rating", "Seawater Rise Rating", "Scenario Risk Score (0-100)", "Danger Level", "Threat Tier",
+            "Review Priority", "Hospitals at Modeled Risk", "Shelters at Modeled Risk", "Road Exposure Estimate (km)", "Possible Action (Review)"
         ]
 
         st.dataframe(display_df, use_container_width=True, hide_index=True)
 
-        with st.expander("ℹ️ How are these risk scores and colours calculated?", expanded=False):
-            st.markdown("""
-**Reference scales**
-- **IMD wind classes (knots):** Depression 17–27 · Deep Depression 28–33 · Cyclonic Storm 34–47 · Severe CS 48–63 · Very Severe CS 64–89 · Extremely Severe CS 90–119 · Super CS ≥120.
-- **IMD / NDMA colour-coded warnings:** Green (no action) · Yellow (watch – be aware) · Orange (alert – be prepared) · Red (warning – take action).
-
-**Method**
-1. **Local wind:** each track point's sustained wind is decayed with distance from that point (linear rise to a 30 km core radius, then a power-law fall-off). The strongest value over the track is used.
-2. **Surge proxy:** `0.099 × (1013 − min pressure)` metres, decayed with distance from the track and limited to track points within 100 km of land.
-3. **Sub-scores (0–100):** wind and surge are mapped through anchors placed on the IMD class boundaries (wind 34 kts → 30, 48 → 50, 64 → 70, 90 → 85, 120 → 100; surge 1 m → 50, 2 m → 70, 3 m → 85, 4 m → 100).
-4. **Risk score:** `max(wind, surge) + 0.1 × min(wind, surge)`, capped at 100.
-5. **Colour and tier from score:** ≥70 Red / CRITICAL (Priority 1) · ≥50 Orange / HIGH · ≥30 Yellow / MODERATE · otherwise Green / LOW.
-6. **Flooded facilities:** counted from the OpenStreetMap baseline where facility elevation is below the modelled surge. Only available for West Bengal and Bangladesh.
-
-**Limitations**
-- The wind profile and surge proxy are simplified; they ignore bathymetry, tide, coastline shape and forward speed.
-- IMD defines no surge-based colour rule; the surge anchors and score cut-offs are project conventions.
-- This is decision support, **not** an official IMD/NDMA warning. Follow SDMA/DDMA orders.
-""")
+        render_explanation(
+            "How are these risk scores and colours calculated?",
+            {
+                "what": "Compares coastal districts using scenario-based wind and seawater rise exposure, producing a 0–100 risk score, danger tier (LOW to CRITICAL), and infrastructure indicators for each district.",
+                "how": [
+                    "Estimate local wind exposure — storm-track wind values adjusted by distance from each district.",
+                    "Estimate seawater exposure — simplified pressure-based surge proxy adjusted by distance from the track.",
+                    "Convert inputs to sub-scores — wind and surge values mapped to project-defined 0–100 scales.",
+                    "Combine sub-scores — the higher sub-score contributes most, with a smaller contribution from the lower one; result capped at 100.",
+                    "Assign a danger tier — scores map to LOW, MODERATE, HIGH, or CRITICAL categories with corresponding display colours."
+                ],
+                "benefit": "Officers can see at a glance which districts rank highest and why, helping them decide where to pre-position rescue teams, prioritize evacuations, and focus hospital/shelter attention.",
+                "tech": [
+                    "Storm-track and district data — provide inputs for exposure estimates.",
+                    "Wind and seawater rise scoring — produces comparable district-level indicators using project-defined rules.",
+                    "Mapped lifeline data — adds road, hospital, and shelter indicators from configured OSM-derived baseline where available."
+                ],
+                "limitations": "Scores use simplified estimates and project-defined cut-offs, not official IMD/NDMA warning rules. Population references are Census-era; infrastructure data is from a configured OSM-derived baseline, not live verified status. Outputs are scenario screening indicators, not observed impacts or field-validated probabilities.",
+                "note": "Follow official IMD/NDMA orders. For real-time use, scores would need automatic recalculation on each new track/forecast, richer inputs (tide, rainfall, terrain), and wider state coverage."
+            },
+            icon="📊"
+        )
 
         csv_bytes = state_vuln_df.to_csv(index=False).encode("utf-8")
         st.download_button(
@@ -1959,17 +2455,17 @@ with tab_sim:
             st.rerun()
 
         sim_surge = st.slider(
-            "🌊 Surge Shift (metres):", -2.0, 3.0,
+            "🌊 Seawater Rise Shift (metres):", -2.0, 3.0,
             float(st.session_state["sim_surge_val"]), 0.2,
             help="How much to raise or lower the storm surge. Positive = more seawater pushed ashore. +1.5 m means 1.5 metres higher than the base forecast."
         )
         sim_wind = st.slider(
-            "💨 Wind Speed Shift (knots):", -30, 50,
+            "💨 Wind Speed Shift:", -30, 50,
             int(st.session_state["sim_wind_val"]), 5,
             help="How much to increase or decrease peak wind speed. Positive = stronger winds. 1 knot ≈ 1.85 km/h."
         )
         sim_rain = st.slider(
-            "🌧️ 48-hour Rainfall Shift (mm):", -100, 250,
+            "🌧️ 48-hour Extra Rainfall (mm):", -100, 250,
             int(st.session_state["sim_rain_val"]), 10,
             help="Extra rainfall over 48 hours. Heavy rain fills drainage and causes roads to flood even far from the coast."
         )
@@ -1988,22 +2484,114 @@ with tab_sim:
                     rain_delta_mm=float(sim_rain),
                     state_name=selected_state
                 )
-                st.markdown("<div style='font-size:14px; font-weight:700; color:#38bdf8; margin-bottom:8px;'>📊 Predicted Lifeline Failures Under Your Scenario</div>", unsafe_allow_html=True)
-                st.caption("Each row is a coastal district. Percentages show the AI model's predicted probability that roads will be blocked or hospitals will flood under the conditions you set above.")
+                st.markdown("<div style='font-size:14px; font-weight:700; color:#38bdf8; margin-bottom:8px;'>📊 Lifeline Screening Scores Under Your Scenario</div>", unsafe_allow_html=True)
+                st.caption("These model outputs use synthetic physics-inspired training scenarios and are not field-validated probabilities of real-world road closures or hospital flooding. Use them only to compare scenarios.")
 
                 show_sim = sim_res_df[[
                     "district_name", "sim_surge_m", "ml_road_cutoff_pct", "ml_road_tier",
                     "ml_hosp_inundation_pct", "ml_hosp_tier", "road_action"
                 ]].rename(columns={
                     "district_name": "District",
-                    "sim_surge_m": "Surge (m)",
-                    "ml_road_cutoff_pct": "Road Blocked %",
+                    "sim_surge_m": "Seawater Rise (m)",
+                    "ml_road_cutoff_pct": "Road Screening Score (%)",
                     "ml_road_tier": "Road Status",
-                    "ml_hosp_inundation_pct": "Hospital Flooded %",
+                    "ml_hosp_inundation_pct": "Hospital Screening Score (%)",
                     "ml_hosp_tier": "Hospital Status",
                     "road_action": "Recommended Action"
                 })
                 st.dataframe(show_sim, use_container_width=True, hide_index=True)
+
+                # Scenario-based action recommendations for review
+                st.markdown("<div style='height:14px;'></div>", unsafe_allow_html=True)
+                cmd_header_col1, cmd_header_col2 = st.columns([1.8, 1.0])
+                with cmd_header_col1:
+                    st.markdown("""
+                    <div style='font-size:15px; font-weight:800; color:#38bdf8; display:flex; align-items:center; gap:8px;'>
+                        <span>🧭</span> Possible Preparedness Actions — For Officer Review
+                    </div>
+                    """, unsafe_allow_html=True)
+                with cmd_header_col2:
+                    st.markdown("<div style='text-align:right;'><span class='source-badge-est' title='Scenario-based recommendations for review; no rescue resources are automatically deployed.'>Scenario recommendations</span></div>", unsafe_allow_html=True)
+
+                playbook_cache_key = f"whatif_playbook_{selected_state}_{sim_surge}_{sim_wind}_{sim_rain}"
+                if st.button("🧭 Generate Possible Actions for Review", type="primary", use_container_width=True):
+                    with st.spinner("Preparing scenario-based recommendations..."):
+                        if generate_whatif_tactical_playbook:
+                            playbook = generate_whatif_tactical_playbook(
+                                sim_res_df=sim_res_df,
+                                scenario_params={
+                                    "state_name": selected_state,
+                                    "surge_delta_m": sim_surge,
+                                    "wind_delta_kts": sim_wind,
+                                    "rain_delta_mm": sim_rain
+                                },
+                                api_key=active_gemini_key
+                            )
+                            st.session_state[playbook_cache_key] = playbook
+
+                active_playbook = st.session_state.get(playbook_cache_key)
+                if not active_playbook and generate_whatif_tactical_playbook:
+                    active_playbook = generate_whatif_tactical_playbook(
+                        sim_res_df=sim_res_df,
+                        scenario_params={
+                            "state_name": selected_state,
+                            "surge_delta_m": sim_surge,
+                            "wind_delta_kts": sim_wind,
+                            "rain_delta_mm": sim_rain
+                        },
+                        api_key=None
+                    )
+
+                if active_playbook:
+                    rcode = active_playbook.get("readiness_code", "CRITICAL RED")
+                    rcolor = "#ef4444" if "RED" in rcode else ("#f97316" if "ORANGE" in rcode else "#38bdf8")
+                    rbadge = active_playbook.get("engine", "Google Gemini")
+                    is_live = active_playbook.get("is_live_gemini", False)
+                    badge_cls = "badge-google-live" if is_live else "badge-google-fallback"
+                    playbook_tooltip = (
+                        "Live Gemini response for this request; recommendations are for human review and do not deploy resources."
+                        if is_live else
+                        "Prepared fallback recommendations for review; they do not deploy resources."
+                    )
+
+                    render_html(f"""
+                    <div class="google-card" style="border-left: 5px solid {rcolor};">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:8px;">
+                            <div>
+                                <span style="background:{rcolor}22; color:{rcolor}; border:1px solid {rcolor}; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:800;">● {rcode}</span>
+                                <h3 style="margin:6px 0 4px 0; font-size:18px; font-weight:800; color:#f8fafc;">Possible actions: {active_playbook.get('readiness_headline', 'review scenario')}</h3>
+                                <div style="font-size:13px; color:#cbd5e1; line-height:1.5;">{active_playbook.get('executive_brief', '')}</div>
+                            </div>
+                            <div>
+                                <span class="{badge_cls}" title="{playbook_tooltip}">{rbadge}</span>
+                            </div>
+                        </div>
+                    </div>
+                    """)
+
+                    pb_c1, pb_c2 = st.columns([1.1, 1.0], gap="medium")
+                    with pb_c1:
+                        st.markdown("**🚨 Possible Resource Actions (For Officer Review):**")
+                        for dep in active_playbook.get("tactical_deployments", []):
+                            render_html(f"""
+                            <div class="dispatch-item" style="border-left-color:{rcolor}; margin-bottom:8px; padding:10px 14px;">
+                                <div style="font-size:12px; font-weight:800; color:#38bdf8;">{dep.get('unit','NDRF Unit')} ➔ {dep.get('target_district','District')}</div>
+                                <div style="font-size:13px; color:#f1f5f9; margin-top:3px;"><b>Suggested action</b>: {dep.get('action','')}</div>
+                                <div style="font-size:11.5px; color:#94a3b8; margin-top:2px;">⚙️ <b>Equipment</b>: {dep.get('equipment','')}</div>
+                            </div>
+                            """)
+                    with pb_c2:
+                        st.markdown("**🚧 Evacuation Corridor & Lifeline Bypasses:**")
+                        render_html(f"""
+                        <div style="background:rgba(15,23,42,0.7); border:1px solid rgba(148,163,184,0.2); border-radius:8px; padding:12px 14px; margin-bottom:10px;">
+                            <div style="font-size:11.5px; font-weight:800; color:#f97316; text-transform:uppercase;">POSSIBLE CORRIDOR ACTION — REVIEW LOCALLY</div>
+                            <div style="font-size:13px; color:#cbd5e1; margin-top:4px; line-height:1.5;">{active_playbook.get('evacuation_corridor_directive','')}</div>
+                        </div>
+                        <div style="background:rgba(15,23,42,0.7); border:1px solid rgba(148,163,184,0.2); border-radius:8px; padding:12px 14px;">
+                            <div style="font-size:11.5px; font-weight:800; color:#38bdf8; text-transform:uppercase;">HOSPITAL SURGE DEFENSE</div>
+                            <div style="font-size:13px; color:#cbd5e1; margin-top:4px; line-height:1.5;">{active_playbook.get('hospital_resilience_action','')}</div>
+                        </div>
+                        """)
             except TypeError as te:
                 st.warning(
                     f"⚠️ The simulator engine needs a restart to pick up the latest version. "
@@ -2014,24 +2602,27 @@ with tab_sim:
         else:
             st.info("Predictive ML engine not loaded — check that `predictive_model.py` is present in the project folder.")
 
-    with st.expander("ℹ️ How does the What-If ML prediction model work?", expanded=False):
-        st.markdown("""
-**Reference scales & standards**
-- **Model Architecture:** HistGradientBoosting multi-target classifier (scikit-learn Histogram-based Gradient Boosting).
-- **Target Variables:** Highway cut-off probability (binary threshold ≥ 0.50) and critical hospital inundation probability (≥ 0.50).
-- **Calibration & Accuracy:** Evaluated via ROC-AUC (>0.92 on held-out test split) and Brier calibration score (<0.08) documented in Tab 8.
-
-**Method**
-1. **Dynamic feature engineering:** Computes real-time input feature vectors combining scenario shifts (wind delta up to ±50 kts, surge delta up to ±3.0m, rainfall delta up to ±250 mm) with baseline district topology (mean elevation, coastal proximity, population density).
-2. **Compound disaster interaction:** Captures nonlinear interactions (e.g. spring tide surge coinciding with intense torrential rainfall saturates coastal estuaries far more rapidly than linear sum models).
-3. **Probability classification:** Outputs continuous probability distributions for each coastal district, generating impact tiers: CRITICAL (≥ 75%), ELEVATED (50–74%), MODERATE (25–49%), and LOW (<25%).
-4. **Action directives:** Maps output probabilities into tactical NDRF pre-positioning directives and evacuation corridor alerts.
-
-**Limitations**
-- The predictive model is trained on physics-calibrated synthetic disaster scenarios representing historical Bay of Bengal and Arabian Sea storm climatology.
-- Micro-drainage anomalies, such as localized embankment breaches or culvert blockages, may create localized flooding variations not captured at district resolution.
-""")
-
+    render_explanation(
+        "How does the What-If Landfall Simulator work?",
+        {
+            "what": "Estimates how changes to a cyclone scenario (surge, wind, rainfall) could affect road access and hospital flooding across coastal districts, using a gradient-boosting model trained on synthetic physics-inspired scenarios.",
+            "how": [
+                "Adjust sliders for surge shift (±3 m), wind shift (±50 kts), and 48-hour rainfall shift (±250 mm), or click a preset (Spring Tide, Super Cyclone).",
+                "The model combines these changes with district features to produce scenario-based screening scores and impact tiers for road cut-offs and hospital inundation.",
+                "Review the district-level results table showing seawater rise, road/hospital screening scores, status tiers, and recommended actions.",
+                "Optionally generate a tactical playbook (when Gemini is available) with possible resource actions, evacuation corridor guidance, and hospital resilience measures for officer review."
+            ],
+            "benefit": "Officials can quickly test 'what if the storm gets stronger or the tide is higher?' and see which roads and hospitals could be at risk, so they can plan resources before conditions worsen.",
+            "tech": [
+                "Scikit-learn gradient-boosting model — estimates scenario-based road and hospital impacts from synthetic training data.",
+                "Interactive scenario sliders — apply user-selected changes to wind, surge, and rainfall inputs.",
+                "Optional Google Gemini playbook — generates a response summary when a live API response is confirmed; otherwise uses prepared fallback."
+            ],
+            "limitations": "The model is trained on synthetic physics-inspired scenarios, not real observed flooding or road-closure records. Results are screening estimates for scenario comparison, not forecasts or validated predictions. The playbook provides suggestions for human review only — no resources are deployed automatically.",
+            "note": "Real-time scaling would require linking to live official forecasts, retraining on observed events, parallel scenario execution on cloud infrastructure, and integration with response-planning workflows."
+        },
+        icon="🌪️"
+    )
 
 
 # ==============================================================================
@@ -2040,12 +2631,10 @@ with tab_sim:
 with tab_insurance:
     st.markdown("""
     <div style="font-size:18px; font-weight:800; color:#38bdf8; display:flex; align-items:center; gap:8px; margin-bottom:4px;">
-        <span>💰</span> Parametric Insurance Liquidity Trigger Dashboard
+        <span>💰</span> Emergency Relief Funds Dashboard
     </div>
     <div style="font-size:13px; color:#cbd5e1; margin-bottom:14px;">
-        Parametric insurance pays out <b>automatically</b> when wind speed or surge crosses a pre-agreed threshold —
-        <b>no claims process, no damage assessment delay.</b> Funds can be released <b>pre-landfall</b> to pay for
-        evacuation buses, generator fuel, medicine stockpiles, and cyclone shelter supplies.
+        Demonstrates how configured wind and surge values could be compared with example thresholds and mapped to example payout tiers. This is not an active insurance policy, a payment, or a fund-release workflow.
     </div>
     """, unsafe_allow_html=True)
 
@@ -2058,17 +2647,17 @@ with tab_insurance:
 
         # State-level trigger card
         ins_border = ins_result.color
-        ins_badge = "TRIGGERED ✅" if ins_result.is_triggered else "NOT YET TRIGGERED"
+        ins_badge = "SCENARIO THRESHOLD MET" if ins_result.is_triggered else "SCENARIO THRESHOLD NOT MET"
         render_html(f"""
         <div class="situation-card" style="border-left-color:{ins_border};">
             <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px;">
                 <div>
-                    <div style="font-size:12px; font-weight:700; color:{ins_border}; text-transform:uppercase; letter-spacing:0.8px;">💰 PARAMETRIC INSURANCE TRIGGER STATUS</div>
+                    <div style="font-size:12px; font-weight:700; color:{ins_border}; text-transform:uppercase; letter-spacing:0.8px;">💰 ILLUSTRATIVE SCENARIO THRESHOLD</div>
                     <h2 style="margin:4px 0 6px 0; font-size:22px; font-weight:800; color:#f8fafc;">{ins_result.tier_label}</h2>
                     <div style="font-size:13.5px; color:#cbd5e1; line-height:1.6;">
-                        🌪️ <b>Wind</b>: {ins_result.wind_kts:.0f} kts &nbsp;|&nbsp;
-                        🌊 <b>Surge</b>: {ins_result.surge_m:.2f} m &nbsp;|&nbsp;
-                        🎯 <b>Trigger Source</b>: {ins_result.trigger_source.upper()}<br>
+                        🌪️ <b>Wind</b>: {ins_result.wind_kts:.0f} kts ({ins_result.wind_kts*1.852:.0f} km/h) &nbsp;|&nbsp;
+                        🌊 <b>Seawater Rise</b>: {ins_result.surge_m:.2f} m &nbsp;|&nbsp;
+                        🎯 <b>Scenario input</b>: {ins_result.trigger_source.upper()}<br>
                         📋 {ins_result.description}
                     </div>
                 </div>
@@ -2076,12 +2665,12 @@ with tab_insurance:
                     <div style="font-size:30px; font-weight:900; color:{ins_border};">
                         ₹ {ins_result.payout_amount_cr:.0f} Cr
                     </div>
-                    <div style="font-size:12px; color:#94a3b8;">Auto-payout within {ins_result.time_to_payout_hours}h of trigger confirmation</div>
+                    <div style="font-size:12px; color:#94a3b8;">Example payout timing assumption: {ins_result.time_to_payout_hours}h after trigger confirmation</div>
                     <div style="font-size:11px; color:{ins_border}; font-weight:700; margin-top:4px;">{ins_badge}</div>
                 </div>
             </div>
             <div class="directive-box" style="margin-top:12px; margin-bottom:0;">
-                <div style="font-size:11px; font-weight:800; color:#ef4444; text-transform:uppercase;">🚨 NDRF / SDMA IMPLICATION:</div>
+                <div style="font-size:11px; font-weight:800; color:#ef4444; text-transform:uppercase;">🚨 POSSIBLE ACTION FOR AUTHORIZED REVIEW:</div>
                 <div style="font-size:13px; color:#f1f5f9; margin-top:2px;">{ins_result.ndrf_implication}</div>
             </div>
         </div>
@@ -2100,7 +2689,7 @@ with tab_insurance:
                     <div style="font-size:11px; font-weight:700; color:{tier['color']}; text-transform:uppercase;">{tier['tier_name']}</div>
                     <div style="font-size:18px; font-weight:900; color:#f8fafc; margin:4px 0;">₹ {STATE_DEFAULT_SUM_INSURED_CR.get(selected_state,500)*tier['payout_pct']:.0f} Cr</div>
                     <div style="font-size:11px; color:#94a3b8;">Wind ≥ {tier['wind_threshold']:.0f} kts<br>OR Surge ≥ {tier['surge_threshold']:.1f} m</div>
-                    <div style="font-size:12px; font-weight:700; color:{'#10b981' if is_active else '#64748b'}; margin-top:6px;">{'✅ ACTIVE' if is_active else '⭕ NOT MET'}</div>
+                    <div style="font-size:12px; font-weight:700; color:{'#10b981' if is_active else '#64748b'}; margin-top:6px;">{'✅ SCENARIO THRESHOLD MET' if is_active else '⭕ NOT MET'}</div>
                 </div>
                 """, unsafe_allow_html=True)
 
@@ -2122,17 +2711,17 @@ with tab_insurance:
                 "district_name", "population", "effective_wind_kts", "effective_surge_m",
                 "insurance_tier_name", "payout_pct", "payout_amount_cr", "ndrf_implication"
             ]]
-            ins_df.columns = ["District", "Population", "Wind (kts)", "Surge (m)",
-                               "Insurance Tier", "Payout %", "Payout (₹ Cr)", "NDRF Directive"]
-            ins_df["Payout %"] = (ins_df["Payout %"] * 100).apply(lambda x: f"{x:.0f}%")
+            ins_df.columns = ["District", "Population", "Wind (km/h)", "Seawater Rise (m)",
+                              "Example Tier", "Example Payout %", "Example Amount (₹ Cr)", "Possible Action (Review)"]
+            ins_df["Example Payout %"] = (ins_df["Example Payout %"] * 100).apply(lambda x: f"{x:.0f}%")
             st.dataframe(ins_df, use_container_width=True, hide_index=True)
 
             # Aggregate summary ribbon
             s1, s2, s3, s4 = st.columns(4)
-            s1.metric("Total State Payout", f"₹ {summary['total_payout_cr']:.0f} Cr")
-            s2.metric("Districts Triggered", f"{summary['triggered_districts']} / {summary['total_districts']}")
-            s3.metric("SDRF Utilisation", f"{summary['sdrf_utilization_pct']:.1f}%")
-            s4.metric("SDRF Sufficient?", "✅ YES" if summary['is_sdrf_sufficient'] else f"⚠️ GAP: ₹{summary['sdrf_gap_cr']:.0f} Cr")
+            s1.metric("Example Total Payout", f"₹ {summary['total_payout_cr']:.0f} Cr")
+            s2.metric("Scenario Thresholds Met", f"{summary['triggered_districts']} / {summary['total_districts']}")
+            s3.metric("Illustrative SDRF Share", f"{summary['sdrf_utilization_pct']:.1f}%")
+            s4.metric("Illustrative Balance", "✅ Within reference" if summary['is_sdrf_sufficient'] else f"⚠️ Example gap: ₹{summary['sdrf_gap_cr']:.0f} Cr")
 
             ins_csv = ins_df.to_csv(index=False).encode("utf-8")
             st.download_button(
@@ -2141,33 +2730,121 @@ with tab_insurance:
                 file_name=f"parametric_insurance_{selected_state.lower().replace(' ', '_')}_{selected_storm_name.lower()}.csv",
                 mime="text/csv"
             )
-    else:
-        st.info("Parametric insurance module not loaded. Ensure `parametric_insurance.py` is present in the project folder.")
 
-    with st.expander("ℹ️ How are parametric triggers and payouts calculated?", expanded=False):
-        st.markdown("""
-**The Core Concept (Plain Language)**
-- **Traditional insurance** pays after damage is surveyed — which takes weeks or months.
-- **Parametric insurance** pays automatically the moment physical weather parameters (wind speed or storm surge) cross a pre-agreed threshold — zero claims process, no proof-of-loss forms, no loss-adjuster delays.
-- **Operational Value**: State Disaster Management Authorities receive emergency liquidity *pre-landfall* (within 24–72 hours) to fund evacuation fleets, emergency food kitchens, backup generator diesel, and medical stockpiles.
+            # Illustrative capital-allocation scenario section
+            st.markdown("<div style='height:14px;'></div>", unsafe_allow_html=True)
+            ins_audit_col1, ins_audit_col2 = st.columns([1.8, 1.0])
+            with ins_audit_col1:
+                st.markdown("""
+                <div style='font-size:15px; font-weight:800; color:#38bdf8; display:flex; align-items:center; gap:8px;'>
+                    <span>💰</span> Example Liquidity Allocation — Decision Support
+                </div>
+                """, unsafe_allow_html=True)
+            with ins_audit_col2:
+                st.markdown("<div style='text-align:right;'><span class='badge-google' title='Optional advisory-generation integration; displayed calculations are examples and do not release funds.'>Illustrative calculation</span></div>", unsafe_allow_html=True)
 
-**Reference scales & policy benchmarks**
-- **International Frameworks:** Calibrated to World Bank Pacific Catastrophe Risk Insurance Company (PCRIC), Caribbean Catastrophe Risk Insurance Facility (CCRIF), and UNDP Disaster Risk Financing guidelines.
-- **State Disaster Response Fund (SDRF):** Baseline statutory corpus values established by the 15th Finance Commission (e.g. West Bengal ₹1,480 Cr, Odisha ₹1,200 Cr, Andhra Pradesh ₹1,050 Cr, Tamil Nadu ₹1,360 Cr, Gujarat ₹1,540 Cr).
+            ins_cache_key = f"ins_audit_{selected_state}_{peak_wind}_{calc_surge_m}"
+            if st.button("💰 Generate Example Allocation for Review", type="primary", use_container_width=True):
+                with st.spinner("Preparing an illustrative allocation for review..."):
+                    if generate_parametric_liquidity_audit:
+                        audit_res = generate_parametric_liquidity_audit(
+                            ins_result=ins_result,
+                            district_matrix=state_vuln_df.to_dict(orient="records"),
+                            state_name=selected_state,
+                            api_key=active_gemini_key
+                        )
+                        st.session_state[ins_cache_key] = audit_res
 
-**Method**
-1. **Trigger parameter monitoring:** Tracks real-time peak sustained wind (IMD knots) and peak surge height (metres) against agreed trigger criteria:
-   - **Tier 1 (Early Mobilization):** Wind ≥48 kts or Surge ≥1.0m → 10% SDRF allocation released within 24 hours.
-   - **Tier 2 (Moderate Landfall):** Wind ≥64 kts or Surge ≥2.0m → 25% SDRF allocation released within 48 hours.
-   - **Tier 3 (Severe Impact):** Wind ≥90 kts or Surge ≥3.0m → 50% SDRF allocation released within 72 hours.
-   - **Tier 4 (Catastrophic Super Cyclone):** Wind ≥120 kts or Surge ≥4.0m → 100% SDRF allocation released within 72 hours.
-2. **Independent verification:** Uses objective, tamper-proof meteorological data (IMD bulletins, NOAA IBTrACS, ECMWF observations) as an automated trigger oracle.
-3. **Fiscal sufficiency check:** Calculates the aggregate district payout and compares it against the active SDRF annual corpus to flag liquidity surpluses or funding gaps in real time.
+            active_audit = st.session_state.get(ins_cache_key)
+            if not active_audit and generate_parametric_liquidity_audit:
+                active_audit = generate_parametric_liquidity_audit(
+                    ins_result=ins_result,
+                    district_matrix=state_vuln_df.to_dict(orient="records"),
+                    state_name=selected_state,
+                    api_key=None
+                )
 
-**Limitations**
-- This dashboard models the parametric trigger architecture for state disaster finance planning. Real-world implementation requires an underwritten sovereign parametric insurance contract with multilateral development banks or global reinsurance syndicates.
-""")
+            if active_audit:
+                a_badge = active_audit.get("engine", "Google Gemini")
+                is_live_a = active_audit.get("is_live_gemini", False)
+                a_badge_cls = "badge-google-live" if is_live_a else "badge-google-fallback"
+                audit_tooltip = (
+                    "Live Google Gemini response for this request; calculated amounts remain illustrative and do not authorize payments."
+                    if is_live_a else
+                    "Built-in fallback example; amounts are illustrative and do not authorize payments."
+                )
 
+                render_html(f"""
+                <div class="google-card" style="border-left: 5px solid #10b981;">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:8px;">
+                        <div>
+                            <span style="background:rgba(16,185,129,0.18); color:#6ee7b7; border:1px solid #10b981; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:800;">ILLUSTRATIVE ALLOCATION SCENARIO — FOR REVIEW</span>
+                            <h3 style="margin:6px 0 4px 0; font-size:18px; font-weight:800; color:#f8fafc;">Example allocation: ₹ {active_audit.get('total_payout_cr', 0):.0f} Crore for {selected_state}</h3>
+                            <div style="font-size:13px; color:#cbd5e1; line-height:1.5;">{active_audit.get('executive_summary', '')}</div>
+                        </div>
+                        <div>
+                            <span class="{a_badge_cls}" title="{audit_tooltip}">{a_badge}</span>
+                        </div>
+                    </div>
+                </div>
+                """)
+
+                aud_c1, aud_c2 = st.columns([1.1, 1.0], gap="medium")
+                with aud_c1:
+                    st.markdown("**📋 Example district allocation (not a fund release):**")
+                    if active_audit.get("district_allocations"):
+                        alloc_df = pd.DataFrame(active_audit["district_allocations"])
+                        if "allocated_cr" in alloc_df.columns:
+                            alloc_df = alloc_df.rename(columns={
+                                "district_name": "District",
+                                "allocated_cr": "Allocated (₹ Cr)",
+                                "percentage": "Share %",
+                                "priority_need": "Operational Procurement Priority"
+                            })
+                            st.dataframe(alloc_df, use_container_width=True, hide_index=True)
+                with aud_c2:
+                    st.markdown("**📊 Example expenditure breakdown:**")
+                    if active_audit.get("budget_line_breakdown"):
+                        bl_df = pd.DataFrame(active_audit["budget_line_breakdown"])
+                        bl_df = bl_df.rename(columns={
+                            "category": "Expenditure Line",
+                            "amount_cr": "Budget (₹ Cr)",
+                            "percentage": "Share %"
+                        })
+                        st.dataframe(bl_df, use_container_width=True, hide_index=True)
+
+                    render_html(f"""
+                    <div style="background:rgba(15,23,42,0.7); border:1px solid rgba(16,185,129,0.3); border-radius:8px; padding:10px 14px; margin-top:8px;">
+                        <div style="font-size:11.5px; font-weight:800; color:#10b981; text-transform:uppercase;">FAST-TRACK GOVERNANCE AUDIT PROTOCOL</div>
+                        <div style="font-size:12.5px; color:#cbd5e1; margin-top:4px; line-height:1.4;">{active_audit.get('governance_audit_protocol','')}</div>
+                    </div>
+                    """)
+            else:
+                st.info("Parametric insurance module not loaded. Ensure `parametric_insurance.py` is present in the project folder.")
+
+    render_explanation(
+        "How are parametric triggers and payouts calculated?",
+        {
+            "what": "Illustrates how a pre-agreed, measurable trigger (wind speed and/or surge height) could be checked against scenario values and mapped to example payout tiers — showing the concept of parametric insurance for faster disaster finance.",
+            "how": [
+                "Read the current scenario's wind and surge values from the selected cyclone.",
+                "Compare against configured trigger tiers (each with wind/surge thresholds and a payout percentage).",
+                "Display the state-level trigger status, example payout amount, and a tier waterfall showing which thresholds are met.",
+                "Show a district-level matrix where each district receives a proportional payout based on its exposure to the cyclone core.",
+                "Optionally generate an illustrative liquidity allocation breakdown (when Gemini is available) with example district allocations and expenditure lines for officer review."
+            ],
+            "benefit": "During an actual cyclone, a parametric trigger checked against measured wind/surge could immediately show which districts qualify and the expected payout size — instead of waiting weeks for damage surveys — helping officials plan relief funding and procurement faster.",
+            "tech": [
+                "Configured wind/surge threshold tiers — define trigger levels and payout percentages for demonstration.",
+                "District exposure weighting — adjusts effective wind/surge per district based on distance from cyclone core.",
+                "Reference funding values (sum insured, SDRF corpus) — provide context only; not actual funds or approvals.",
+                "Optional Google Gemini advisory — generates an illustrative allocation narrative when a live response is confirmed; otherwise uses prepared fallback."
+            ],
+            "limitations": "This is a calculation prototype only — not an active insurance policy, verified trigger, or payment. No insurer, contractual policy, or payment service is connected. Trigger assessment uses scenario values, not live measured data. All payout amounts are illustrative examples for review.",
+            "note": "Real-world deployment would require authorised live data feeds (IMD bulletins, verified observations), scheduled recalculation, threshold alerting for decision-makers, cloud-scale infrastructure, and formal governance agreements with insurers/fund managers."
+        },
+        icon="💰"
+    )
 
 
 # ==============================================================================
@@ -2179,8 +2856,7 @@ with tab_met:
         <span>🌤️</span> Real-Time Meteorological Feed
     </div>
     <div style="font-size:13px; color:#cbd5e1; margin-bottom:14px;">
-        Live wind, rain, and pressure data sourced from <b>Open-Meteo ECMWF IFS</b> — updated every 15 minutes.
-        <b>Completely free, no API key required.</b> Includes offshore marine wave and swell forecast for surge amplification modelling.
+    Requests wind, rain, and pressure forecasts from <b>Open-Meteo ECMWF IFS</b> when available. Check the source/status badge and retrieval time to confirm a live response; fallback values are estimates. This is not an official IMD forecast.
     </div>
     """, unsafe_allow_html=True)
 
@@ -2201,7 +2877,7 @@ with tab_met:
     met_c1, met_c2 = st.columns([1.2, 1.0], gap="large")
 
     with met_c1:
-        st.markdown("<div style='font-size:14px; font-weight:700; color:#38bdf8; margin-bottom:8px;'>⚡ 72-Hour Landfall Forecast (ECMWF IFS)</div>", unsafe_allow_html=True)
+        st.markdown("<div style='font-size:14px; font-weight:700; color:#38bdf8; margin-bottom:8px;'>⚡ 72-Hour Weather Forecast for Scenario Location (Open-Meteo)</div>", unsafe_allow_html=True)
         with st.spinner("Fetching live Open-Meteo ECMWF data..."):
             if fetch_landfall_forecast:
                 met_data = fetch_landfall_forecast(met_lat, met_lon, hours_ahead=72)
@@ -2232,7 +2908,7 @@ with tab_met:
         st.markdown(f"""
         <div style="background:rgba(15,23,42,0.7); border-left:4px solid #38bdf8;
                     border-radius:8px; padding:10px 14px; margin-top:10px;">
-            <div style="font-size:11px; color:#94a3b8; text-transform:uppercase; font-weight:700;">IMD Storm Category (Forecast Peak)</div>
+            <div style="font-size:11px; color:#94a3b8; text-transform:uppercase; font-weight:700;">Indicative Category (Derived from Feed)</div>
             <div style="font-size:18px; font-weight:800; color:#38bdf8; margin-top:4px;">
                 {met_data.get('imd_category', '—')}
             </div>
@@ -2316,52 +2992,143 @@ with tab_met:
             </div>
             """, unsafe_allow_html=True)
 
-    with st.expander("ℹ️ How are real-time weather and offshore marine conditions fetched?", expanded=False):
+    # Google Gemini Compound Hazard & Estuarine Risk Synthesis Section
+    st.markdown("<div style='height:14px;'></div>", unsafe_allow_html=True)
+    met_syn_col1, met_syn_col2 = st.columns([1.8, 1.0])
+    with met_syn_col1:
         st.markdown("""
-**Reference scales & standards**
-- **Atmospheric Model:** ECMWF IFS (European Centre for Medium-Range Weather Forecasts Integrated Forecasting System) & NOAA GFS via Open-Meteo API.
-- **Offshore Marine Model:** ECMWF WAM (Wave Model) computing significant wave height, primary swell period, and wave direction.
-- **Licensing & Access:** Open-Meteo (CC-BY 4.0) — zero-authentication, public REST API updated every 15 minutes.
+        <div style='font-size:15px; font-weight:800; color:#38bdf8; display:flex; align-items:center; gap:8px;'>
+            <span>🌊</span> Google Gemini — Compound Hydro-Meteorological Hazard Briefing
+        </div>
+        """, unsafe_allow_html=True)
+    with met_syn_col2:
+        st.markdown("<div style='text-align:right;'><span class='badge-google' title='Google Gemini AI: Warns if heavy rains and huge sea waves will block river mouths and cause severe overflow into nearby coastal towns.'>✨ Google Gemini 2.5 Flash</span></div>", unsafe_allow_html=True)
 
-**Method**
-1. **Dynamic landfall geocoding:** Automatically resolves the target landfall latitude and longitude from active cyclone track coordinates (or primary state coastal coordinates) and issues a 72-hour forecast query.
-2. **Key meteorological variables:** Extracts hourly 10m sustained wind speeds, peak gust velocities, mean sea-level pressure, and cumulative rainfall.
-3. **Marine surge coupling & amplification:** Evaluates offshore wave energy: significant wave heights ≥ 3.5m combined with long swell periods (≥ 10 seconds) generate dynamic wave setup, amplifying hydrostatic surge levels by +15% to +45%.
-4. **District-level live snapshot:** Concurrently queries current conditions for the specific district selected in the top panel to provide real-time hyper-local weather situational awareness.
+    d_target_met = state_vuln_df.iloc[0].get("district_name", selected_state) if not state_vuln_df.empty else selected_state
+    met_cache_key = f"compound_briefing_{d_target_met}_{met_data.get('peak_wind_kmh',0)}"
+    if st.button("🌊 Generate Compound Threat Assessment (Google Gemini)", type="primary", use_container_width=True):
+        with st.spinner("Synthesizing compound surge, swell, and estuarine damming with Google Gemini..."):
+            if generate_compound_hazard_briefing:
+                briefing_res = generate_compound_hazard_briefing(
+                    met_snapshot=met_data,
+                    marine_snapshot=marine,
+                    district_name=d_target_met,
+                    api_key=active_gemini_key
+                )
+                st.session_state[met_cache_key] = briefing_res
 
-**Limitations**
-- Global numerical weather models use gridded forecast resolutions (~9–11 km); localized micro-scale convective squalls or bay headland wind funneling may diverge from model grid points.
-- The live status pill indicates telemetry connection state: real-time live feeds vs. calibrated fallback estimates when offline.
-""")
+    active_briefing = st.session_state.get(met_cache_key)
+    if not active_briefing and generate_compound_hazard_briefing:
+        active_briefing = generate_compound_hazard_briefing(
+            met_snapshot=met_data,
+            marine_snapshot=marine,
+            district_name=d_target_met,
+            api_key=None
+        )
 
+    if active_briefing:
+        b_badge = active_briefing.get("engine", "Google Gemini")
+        is_live_b = active_briefing.get("is_live_gemini", False)
+        b_badge_cls = "badge-google-live" if is_live_b else "badge-google-fallback"
+        briefing_tooltip = (
+            "Live Google Gemini AI: Actively analyzed live sea waves, wind, and rain to spot river overflow risks."
+            if is_live_b else
+            "Built-in River & Wave Model: Calculated river overflow risk using weather and tide formulas (no internet or API key needed)."
+        )
+        c_tier = active_briefing.get("compound_threat_tier", "CRITICAL RISK")
+        c_col = "#ef4444" if "CRITICAL" in c_tier else ("#f97316" if "HIGH" in c_tier else "#38bdf8")
+
+        render_html(f"""
+        <div class="google-card" style="border-left: 5px solid {c_col};">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:8px;">
+                <div>
+                    <span style="background:{c_col}22; color:{c_col}; border:1px solid {c_col}; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:800;">● {c_tier}</span>
+                    <h3 style="margin:6px 0 4px 0; font-size:18px; font-weight:800; color:#f8fafc;">River & Sea Threat Assessment: {d_target_met}</h3>
+                    <div style="font-size:12.5px; color:#94a3b8;"><b>Peak danger window</b>: <span style="color:#f8fafc;">{active_briefing.get('peak_danger_window_ist','Landfall Window')}</span></div>
+                </div>
+                <div>
+                    <span class="{b_badge_cls}" title="{briefing_tooltip}">{b_badge}</span>
+                </div>
+            </div>
+            <div style="font-size:13px; color:#cbd5e1; margin-top:10px; line-height:1.5;">
+                🌊 <b>Will heavy rain and huge sea waves block the river?</b>: {active_briefing.get('estuary_damming_assessment','')}<br>
+                ⚓ <b>What ports and ships should do</b>: {active_briefing.get('marine_port_directive','')}<br>
+                🚨 <b>What ground teams should do</b>: {active_briefing.get('ground_commander_action','')}
+            </div>
+        </div>
+        """)
+
+    render_explanation(
+        "How are real-time weather and offshore marine conditions fetched?",
+        {
+            "what": "Displays a 72-hour landfall-area weather forecast (wind, gusts, rainfall, pressure), offshore wave/swell conditions with surge amplification, and a district-level snapshot — all with clear source badges and retrieval timestamps.",
+            "how": [
+                "Determine forecast location — uses the active storm track's last waypoint when available, otherwise a default coastal coordinate for the selected state.",
+                "Request forecast data from Open-Meteo (ECMWF IFS) — fetches wind, gusts, rainfall, pressure, and derived IMD-style category when the service is reachable.",
+                "Retrieve marine conditions — shows peak wave height, swell height, wave period, and calculates a surge amplification factor from swell.",
+                "Fetch district-level snapshot — current wind, gust, rain rate, pressure, and next-6-hour forecasts for the selected district.",
+                "Check source/status badge and retrieval time on every panel — confirms whether values are from a live API response or a labeled fallback estimate."
+            ],
+            "benefit": "Officials can review expected wind, rain, wave, and surge conditions for the landfall area in one place with clear source attribution, helping them judge when conditions may become dangerous for rescue operations, port activity, and evacuation movement.",
+            "tech": [
+                "Open-Meteo forecast API (ECMWF IFS) — supplies weather values when reachable; clearly labeled fallback estimates when unavailable.",
+                "Marine forecast data — provides offshore wave, swell, and period data for surge amplification calculation.",
+                "Google Gemini (optional) — generates a compound hydro-meteorological hazard briefing when a live response is confirmed; otherwise uses a built-in river/wave model fallback.",
+                "Explicit source badges and timestamps — every panel shows data provenance (live API, estimate, or fallback)."
+            ],
+            "limitations": "This panel is not an official IMD cyclone-track forecast or warning. When live data is unavailable, the app shows clearly labeled estimates — check the source badge and retrieval time. No automatic refresh interval is implemented; no end-to-end data sharing between tabs or continuous real-time tracking unless verified in code. The Gemini compound briefing is optional and only runs on user click.",
+            "note": "Real-time scaling would require scheduled forecast refreshes, additional sources (IMD products, coastal observations), district-level coverage for all monitored areas, and automated threshold alerting."
+        },
+        icon="🌤️"
+    )
 
 
 # ==============================================================================
 # TAB 8: Technical Architecture & Evaluator Audit (Collapsed for Judges)
 # ==============================================================================
 with tab_tech:
-    st.markdown("""
-    <div style="font-size:18px; font-weight:800; color:#38bdf8; display:flex; align-items:center; gap:8px; margin-bottom:4px;">
-        <span>🛰️</span> Google Cloud Architecture & Hackathon Evaluator Audit Section
-    </div>
-    <div style="font-size:13px; color:#cbd5e1; margin-bottom:14px;">
-        Dedicated audit documentation for hackathon judges: Model leaderboards, ROC-AUC calibration, BigQuery NOAA SQL queries, Vertex AI Model Registry manifests, and serverless Cloud Run specifications.
-    </div>
-    """, unsafe_allow_html=True)
+    render_explanation(
+        "Technical Architecture & Evaluator Audit",
+        {
+            "what": "This section documents the actual architecture, data flow, model performance, deployment recipes, and Google service integrations used in CycloneShield. It distinguishes between what runs live, what is configured for future deployment, and what remains a prototype demonstration.",
+            "how": [
+                "Model Performance — Internal benchmark metrics for the synthetic-training scenario model (ROC-AUC, Brier Score, feature importance).",
+                "Deployment Recipe — Vertex AI and Cloud Run deployment blueprints (not the current hosting configuration).",
+                "Historical Storm Data — Optional BigQuery query path for NOAA IBTrACS records (the app may use its bundled cache instead).",
+                "How to Deploy — Dockerfile for Cloud Run deployment; capacity and cost depend on actual deployment settings.",
+                "Google Services Used — Inventory of each Google service integration, its role in the app, primary engine, and zero-key fallback."
+            ],
+            "benefit": "Judges and reviewers can verify what is genuinely implemented vs. what is a configured future integration, understand the synthetic-data limitations, and see the evidence needed before production deployment.",
+            "tech": [
+                "Python + Streamlit — Core application framework.",
+                "Folium + OpenStreetMap — Interactive geospatial mapping.",
+                "Scikit-learn (Gradient Boosting) — Local ML model for scenario-based lifeline screening.",
+                "Google Gemini (optional) — Multimodal vision, advisory generation, translation, bulletin parsing when live API succeeds.",
+                "Open-Meteo (ECMWF IFS) — Weather and marine forecast feed when reachable.",
+                "Google Earth Engine (optional) — Elevation/geospatial processing when authenticated.",
+                "Google BigQuery (optional) — Historical cyclone record queries.",
+                "Google Cloud Run / Vertex AI — Deployment blueprints; not the current runtime unless separately deployed."
+            ],
+            "limitations": "The ML model is trained and tested on synthetic physics-inspired scenarios only — metrics do not establish accuracy on real cyclone impacts. Vertex AI and Cloud Run are deployment recipes, not active managed services. Gemini features run only on explicit user action when a live response is confirmed; otherwise prepared fallbacks are shown. Earth Engine does not predict cyclones. BigQuery queries historical data only. No live alert delivery, fund release, or operational dispatch is implemented."
+        },
+        icon="⚙️",
+        expanded=False
+    )
 
-    tech_sub1, tech_sub2, tech_sub3, tech_sub4 = st.tabs([
-        "🔬 ML Model Benchmark & ROC-AUC Curves",
-        "☁️ Vertex AI-Ready Model Registry",
-        "🛰️ BigQuery NOAA Ingestion & SQL Query",
-        "🐳 Google Cloud Run Container Spec"
+    tech_sub1, tech_sub2, tech_sub3, tech_sub4, tech_sub5 = st.tabs([
+        "🔬 Model Performance",
+        "☁️ Deployment Recipe",
+        "🛰️ Historical Storm Data",
+        "🐳 How to Deploy",
+        "🌟 Google Services Used"
     ])
 
     with tech_sub1:
-        st.caption("📊 **What this shows:** How accurately CycloneShield's AI predicts road blockages and hospital flooding. **ROC-AUC** (Area Under the Curve) ranges from 0.5 (random guessing) to 1.0 (perfect prediction) — above 0.90 is excellent. **Brier Score** measures confidence calibration: 0.0 is perfect, lower is better.")
+        st.caption("📊 **What this shows:** Internal benchmark metrics for a model trained and tested on synthetic physics-inspired scenarios. These scores do not establish accuracy on real cyclone impacts or field-calibrated probabilities. **ROC-AUC** and **Brier Score** describe performance on this synthetic test split only.")
         st.markdown("**AI Model Accuracy Benchmark:**")
         st.markdown("""
-        - **Train / Test Split**: 80% of past disaster events used to train the model; 20% held back to verify accuracy — prevents the model from 'memorising' the answers.
-        - **Confidence Calibration**: Model confidence scores are tuned so a '70% flood risk' prediction genuinely occurs ~70% of the time.
+        - **Train / Test Split**: A held-out split from the synthetic scenario dataset; not past observed disaster outcomes.
+        - **Confidence Calibration**: Calibration describes scores against this synthetic dataset only, not observed real-world event frequencies.
         - **Accuracy Leaderboard** *(ROC-AUC: higher = better ↑ · Brier Score: lower = better ↓)*:
         """)
         if os.path.exists(METRICS_JSON_PATH):
@@ -2377,17 +3144,17 @@ with tab_tech:
             st.image(EVAL_PLOT_PATH, caption="CycloneShield Model Benchmark: (A) ROC Curves — how well the model separates flood vs. safe districts; (B) Precision-Recall — accuracy when predicting actual flood events; (C) Feature Importances — which inputs the model relies on most; (D) Reliability Diagram — does '70% confidence' really mean 70%?", use_container_width=True)
 
     with tech_sub2:
-        st.caption("☁️ **What this shows:** A blueprint for uploading this AI model to Google's managed cloud platform (Vertex AI), so it can serve live predictions at national scale without any manual server management. The model currently runs locally on CPU — this file is the exact specification needed for cloud deployment.")
-        st.markdown("**Google Vertex AI Cloud Deployment Blueprint:**")
+        st.caption("☁️ **What this shows:** A deployment recipe for Google Vertex AI. The model currently runs locally on CPU; no Vertex AI service or national-scale live inference is implied.")
+        st.markdown("**Google Vertex AI Cloud Deployment Recipe:**")
         st.markdown("""
-        The trained prediction model is saved as `lifeline_risk_model.joblib` and packaged with this schema. To go live on Google Vertex AI: upload the file, register this manifest, and the model can instantly serve real-time predictions for all 35 coastal districts in parallel.
+        The trained prediction model is saved as `lifeline_risk_model.joblib` and packaged with this schema. A production Vertex AI deployment would require separate provisioning, validation, monitoring, and an operational data pipeline.
         """)
         if os.path.exists(VERTEX_MANIFEST_PATH):
             with open(VERTEX_MANIFEST_PATH, "r", encoding="utf-8") as f:
                 st.json(json.load(f))
 
     with tech_sub3:
-        st.caption("🛰️ **What this shows:** The database query used to retrieve verified historical cyclone data from Google's free public hurricane database (BigQuery). This is how CycloneShield pulls storm records for all 13 major Indian cyclones without any manual downloads or file management.")
+        st.caption("🛰️ **What this shows:** The optional BigQuery query path for historical cyclone data. The application may use its bundled cache instead; historical records do not provide live cyclone forecasts.")
         st.markdown("**Google BigQuery: Historical Cyclone Data Query (NOAA Global Hurricane Database):**")
         if get_bigquery_pipeline:
             pipeline_inst = get_bigquery_pipeline()
@@ -2396,7 +3163,7 @@ with tab_tech:
             st.caption("Filtered to the North Indian Ocean only (Bay of Bengal + Arabian Sea) — reduces data scanned to under 1% of the full global dataset, costing a fraction of a cent per query.")
 
     with tech_sub4:
-        st.caption("🐳 **What this shows:** The deployment recipe (Dockerfile) that packages CycloneShield into a portable container for Google Cloud Run — a serverless platform where the app scales automatically from 0 to thousands of simultaneous users. Cloud Run costs ₹0 when no one is using the app (scale-to-zero pricing).")
+        st.caption("🐳 **What this shows:** A Docker deployment recipe for Google Cloud Run. It is a blueprint, not the current hosting configuration; capacity and charges depend on deployment settings and usage.")
         st.markdown("**Google Cloud Run Deployment Recipe (Dockerfile):**")
         st.code("""FROM python:3.11-slim
 ENV PYTHONUNBUFFERED=1 PORT=8080
@@ -2411,6 +3178,94 @@ USER appuser
 EXPOSE 8080
 ENTRYPOINT ["sh", "-c", "streamlit run cycloneshield/app.py --server.port=${PORT:-8080} --server.address=0.0.0.0"]""", language="dockerfile")
 
+    with tech_sub5:
+        st.caption("🌟 **What this shows:** An inventory of optional Google-service integration paths and prepared fallbacks. Fallback output is not a live service response or an operational decision.")
+        st.markdown("**Google Services Used & Fallbacks:**")
+
+        google_matrix_data = [
+            {
+                "Google Product": "Local scikit-learn model",
+                "App Location": "Tab 5: Landfall Scenario Modeler",
+                "Operational Decision Made": "Scenario-based lifeline screening and possible resource actions for officer review; no units are dispatched.",
+                "Primary Engine": "Local scikit-learn what-if model",
+                "Zero-Key Fallback": "Configured scenario rules"
+            },
+            {
+                "Google Product": "Local insurance calculation",
+                "App Location": "Tab 6: Emergency Relief Funds",
+                "Operational Decision Made": "Illustrative trigger and payout calculations; not an active policy or fund release.",
+                "Primary Engine": "Configured threshold rules",
+                "Zero-Key Fallback": "Example allocation model"
+            },
+            {
+                "Google Product": "Open-Meteo weather feed",
+                "App Location": "Tab 7: Real-Time Weather & Sea Conditions",
+                "Operational Decision Made": "Optional forecast request; confirm the source/status badge. Not an official IMD forecast or the risk model input.",
+                "Primary Engine": "Connected forecast API when available",
+                "Zero-Key Fallback": "Clearly labeled scenario estimate"
+            },
+            {
+                "Google Product": "✨ Google Gemini 2.5 Flash",
+                "App Location": "Sidebar: IMD Bulletin Ingestion",
+                "Operational Decision Made": "User-provided or fetched bulletin parsing; verify source and parsed track before use.",
+                "Primary Engine": "Bulletin ingestion/parser path",
+                "Zero-Key Fallback": "Configured historical examples"
+            },
+            {
+                "Google Product": "✨ Google Gemini 2.5 Flash",
+                "App Location": "Tab 1 & Tab 2: Broadcast Hub",
+                "Operational Decision Made": "Prepared multilingual draft messages and voice workflow; not live Gemini translation or public alert delivery.",
+                "Primary Engine": "Templates and optional speech services",
+                "Zero-Key Fallback": "Prepared text/audio examples"
+            },
+            {
+                "Google Product": "📸 Gemini Multimodal Vision",
+                "App Location": "Tab 3: Ground Damage Triage",
+                "Operational Decision Made": "User-triggered photo analysis only when a live Gemini response is confirmed; otherwise a prepared offline benchmark.",
+                "Primary Engine": "Optional Gemini Vision API",
+                "Zero-Key Fallback": "Prepared benchmark scene profile"
+            },
+            {
+                "Google Product": "🌍 Google Earth Engine (GEE)",
+                "App Location": "Tab 1: Situation & Hazard Maps",
+                "Operational Decision Made": "Geospatial data: Can provide or process elevation layers for screening; does not predict cyclones or confirm flooding.",
+                "Primary Engine": "earthengine-api (SRTM90_V4 / 30m)",
+                "Zero-Key Fallback": "OpenTopodata / Local GeoJSON Cache"
+            },
+            {
+                "Google Product": "🛰️ Google BigQuery",
+                "App Location": "Tab 8 & Data Pipeline",
+                "Operational Decision Made": "Storm Database: Searches historical records in seconds to compare the current cyclone with past major Indian storms.",
+                "Primary Engine": "BigQuery Python API with Dry-Run Validator",
+                "Zero-Key Fallback": "Curated 13-Cyclone Offline JSON Cache"
+            },
+            {
+                "Google Product": "☁️ Google Cloud Run",
+                "App Location": "Deployment Architecture",
+                "Operational Decision Made": "Deployment option: Cloud Run can host the application when separately deployed; capacity and cost depend on configuration.",
+                "Primary Engine": "Google Cloud Run (gcloud run deploy)",
+                "Zero-Key Fallback": "Docker local runtime / Streamlit Cloud"
+            },
+            {
+                "Google Product": "🧪 Google Colab",
+                "App Location": "Submission Package",
+                "Operational Decision Made": "1-Click Testing: Lets anyone run and test the complete project in Google Cloud without installing anything.",
+                "Primary Engine": "Google Colab Free GPU/CPU Runtime",
+                "Zero-Key Fallback": "Local Jupyter Notebook (.ipynb)"
+            }
+        ]
+
+        st.dataframe(pd.DataFrame(google_matrix_data), use_container_width=True, hide_index=True)
+
+        render_html("""
+        <div style="background:rgba(66,133,244,0.1); border:1px solid rgba(66,133,244,0.3); border-radius:8px; padding:12px 16px; margin-top:10px;">
+            <div style="font-weight:700; color:#93c5fd; font-size:13.5px;">🛡️ Demo Fallbacks & Service Status:</div>
+            <div style="font-size:12.5px; color:#cbd5e1; margin-top:4px; line-height:1.5;">
+                Some workflows have prepared fallback examples for demonstration. These are not interchangeable with live service responses; check each panel's status and source labels. Network requests and external services may fail or be unavailable.
+            </div>
+        </div>
+        """)
+
 
 # ==============================================================================
 # 7. Data Transparency & State Pilot Rollout Footer
@@ -2423,14 +3278,14 @@ with foot_c1:
     st.markdown("""
     <div style="background:rgba(15,23,42,0.85); border:1px solid rgba(148,163,184,0.2); border-radius:10px; padding:16px;">
         <div style="font-size:13px; font-weight:800; color:#38bdf8; margin-bottom:8px;">
-            🛡️ DATA PROVENANCE & TRANSPARENCY NOTICE
+            🛡️ WHERE THE NUMBERS COME FROM (DATA PROVENANCE)
         </div>
         <div style="font-size:12px; color:#cbd5e1; line-height:1.6;">
-            • <span class="source-badge-real">Real Data</span>: NOAA IBTrACS v4 cyclone track archive, India Meteorological Department (IMD) / RSMC New Delhi active bulletin feeds, USGS/NASA SRTM 30m digital elevation (via OpenTopodata free API), OpenStreetMap healthcare, power substations & transport networks, Open-Meteo ECMWF IFS real-time weather.<br>
-            • <span class="source-badge-est">Screening Model</span>: Storm surge bathtub inundation is an inverted-barometer screening estimate (Jelesnianski empirical formula). Google Earth Engine (GEE) integration available when authenticated; OpenTopodata SRTM is the zero-auth free fallback. Full hydrodynamic SLOSH/ADCIRC validation is on roadmap.<br>
-            • <span class="source-badge-sim">Simulated Data</span>: NDRF tactical dispatch logs and ML training dataset are physics-calibrated synthetic models simulating Bay of Bengal & Arabian Sea coastal profiles.<br>
+            • <span class="source-badge-real" title="Historical/configured inputs and live service responses are distinct. Check the active source and status before calling a result live.">Historical / configured inputs</span>: Bundled NOAA-derived tracks, configured district profiles, Census-era references, and open-data-derived geospatial baselines. Optional IMD/RSMC, BigQuery, and Open-Meteo requests are live only when confirmed for the current request.<br>
+            • <span class="source-badge-est" title="Scenario estimates are not official forecasts or measured impacts.">Screening estimates</span>: Seawater rise and risk outputs are scenario estimates. Earth Engine can provide or process geospatial layers when authenticated; it does not predict cyclones. Live forecasts require a connected meteorological source.<br>
+            • <span class="source-badge-sim" title="Practice Simulation: Realistic test scenarios based on historic storms to train disaster response teams.">Simulated Data</span>: NDRF tactical dispatch logs and ML training dataset are physics-calibrated synthetic models simulating Bay of Bengal & Arabian Sea coastal profiles.<br>
             • <b>Vertex AI Status</b>: Pre-configured and packaged as Vertex AI-Ready; inference runs locally on CPU for zero-cost reproduction.<br>
-            • <b>Parametric Insurance</b>: Trigger tiers based on World Bank PCRIC and UNDP India Disaster Risk Financing framework; payout amounts calibrated to SDRF 2023-24 state corpus values.
+            • <b>Insurance demonstration</b>: Illustrative trigger and payout calculations only — not an active policy, verified trigger, or payment.
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -2445,7 +3300,7 @@ with foot_c2:
             1. <b>Ingest Local Geospatial Layers</b> (Week 1): Provide district shelter GeoJSON & hospital shapefiles.<br>
             2. <b>Configure Radio & SMS Endpoints</b> (Week 2): Link regional AIR radio frequency & SDMA SMS gateway.<br>
             3. <b>Control Room Training</b> (2 Hours): Onboard district duty officers on the 5-step operational workflow.<br>
-            4. <b>Deploy on Serverless Cloud Run</b>: Scale-to-zero serverless architecture ($0 idle cost).
+            4. <b>Optional deployment</b>: Cloud Run is a deployment path requiring separate configuration, validation, and operating-cost review.
         </div>
     </div>
     """, unsafe_allow_html=True)

@@ -83,7 +83,7 @@ def build_deck():
     blank_layout = prs.slide_layouts[6]
 
     # =========================================================================
-    # SLIDE 1: Title + Core Promise + Live Demo
+    # SLIDE 1: Title + Core Promise + Hosted Prototype
     # =========================================================================
     s1 = prs.slides.add_slide(blank_layout)
     apply_slide_bg(s1)
@@ -112,14 +112,14 @@ def build_deck():
     p1.font.name = "Arial"
 
     p2 = tf.add_paragraph()
-    p2.text = "Predicting Cut-Off Evacuation Roads & Flooded Lifelines 48 Hours Before Landfall"
+    p2.text = "Turning Storm Scenarios into Clearer District Priorities"
     p2.font.size = Pt(20)
     p2.font.bold = True
     p2.font.color.rgb = ACCENT_CYAN
     p2.font.name = "Arial"
 
     p3 = tf.add_paragraph()
-    p3.text = "A district-level operational decision layer that converts cyclone tracks into specific infrastructure intelligence."
+    p3.text = "A decision-support prototype for reviewing configured storm scenarios and possible preparedness actions."
     p3.font.size = Pt(14)
     p3.font.color.rgb = TEXT_MUTED
     p3.font.name = "Arial"
@@ -129,7 +129,7 @@ def build_deck():
     tf1 = c1.text_frame
     tf1.word_wrap = True
     p = tf1.paragraphs[0]
-    p.text = "🌐 LIVE WORKING DEMO"
+    p.text = "🌐 INTERACTIVE PROTOTYPE"
     p.font.bold = True
     p.font.size = Pt(12)
     p.font.color.rgb = ACCENT_CYAN
@@ -138,7 +138,7 @@ def build_deck():
     p.font.size = Pt(11)
     p.font.color.rgb = TEXT_WHITE
     p = tf1.add_paragraph()
-    p.text = "Interactive Command Center with full spatial hazard and district ranking."
+    p.text = "Interactive view of configured scenarios, screening outputs, and district priorities."
     p.font.size = Pt(10)
     p.font.color.rgb = TEXT_MUTED
 
@@ -177,9 +177,9 @@ def build_deck():
     p.font.color.rgb = TEXT_MUTED
 
     add_speaker_note(s1, (
-        "Good morning, judges. When a tropical cyclone forms in the Bay of Bengal, meteorologists can track where it is headed. "
-        "However, district authorities still face a critical blind spot: which state highways will submerge, and which hospitals will lose power? "
-        "CycloneShield bridges this last-mile gap by converting raw storm forecasts into specific, lifeline-level infrastructure risk predictions 48 hours before landfall."
+        "Good morning, judges. Weather agencies track cyclones, and response officers make operational decisions. "
+        "CycloneShield is not a replacement for either. It is a decision-support prototype designed to turn a selected storm scenario and configured district information "
+        "into clearer lifeline priorities and possible actions for people to review."
     ))
 
     # =========================================================================
@@ -249,18 +249,18 @@ def build_deck():
     p.font.size = Pt(12.5)
     p.font.color.rgb = TEXT_WHITE
     p = tf.add_paragraph()
-    p.text = "\n• Critical questions unanswered: Will State Highway 3 remain passable for ambulances?"
+    p.text = "\n• Critical questions unanswered: Could State Highway 3 remain passable for ambulances?"
     p.font.size = Pt(12.5)
     p.font.color.rgb = TEXT_WHITE
     p = tf.add_paragraph()
-    p.text = "\n• Which primary health centers will lose basement power before landfall?"
+    p.text = "\n• Which primary health centers may need backup power before landfall?"
     p.font.size = Pt(12)
     p.font.color.rgb = TEXT_MUTED
 
     add_speaker_note(s2, (
-        "India's coastal districts house over 188 million citizens according to the 2011 Census. When a cyclone develops, the India Meteorological Department provides accurate weather forecasts. "
+        "India's coastal districts house over 188 million citizens according to the 2011 Census. When a cyclone develops, the India Meteorological Department provides official weather forecasts. "
         "However, a District Magistrate or State Disaster Management officer cannot deploy ambulances based solely on wind speed isobars. "
-        "They need to know if State Highway 3 will be cut off, whether rural clinics will flood, and how to broadcast alerts when cell networks fail. That is the critical last-mile operational gap."
+        "They need to assess whether State Highway 3 could be cut off, which rural clinics may face flooding, and how to prepare alerts when cell networks fail. That is the critical last-mile operational gap."
     ))
 
     # =========================================================================
@@ -268,15 +268,15 @@ def build_deck():
     # =========================================================================
     s3 = prs.slides.add_slide(blank_layout)
     apply_slide_bg(s3)
-    add_header(s3, "The Solution: End-to-End Decision Pipeline",
-               "CycloneShield converts raw track forecasts into field directives through five automated steps.")
+    add_header(s3, "The Solution: Decision-Support Workflow",
+               "Configured scenarios and data become screening outputs for human review—not official forecasts or dispatches.")
 
     steps = [
-        ("1. Ingest Track", "NOAA IBTrACS live ingest (IMD-compatible format planned).\nWind, pressure, position.", "[Real data]"),
-        ("2. Compute Hazards", "Hydrodynamic surge formula + 30m SRTM satellite elevation.\nCoastal bathtub flood zone.", "[Real data]"),
-        ("3. Intersect Lifelines", "Spatial overlay against OpenStreetMap:\nState highways, hospitals, and relief shelters.", "[Real data]"),
-        ("4. Explainable Scoring", "Transparent 0–100 district vulnerability score.\nIdentifies primary local risk drivers.", "[Simulated risk]"),
-        ("5. Google AI Action", "Gemini operational advisories & trilingual broadcast audio.\nEnglish, Hindi, and Bengali.", "[Live / Cached]")
+        ("1. Select Scenario", "Bundled historical track or user-supplied file.\nConfirm any live query in the app.", "[Cached / Input]"),
+        ("2. Review Hazards", "Surge and rainfall screening estimates.\nEarth Engine can process geospatial layers.", "[Estimate / Optional]"),
+        ("3. View Lifelines", "Configured district profiles and open-data-derived baselines.\nNot a fresh live asset overlay.", "[Configured]"),
+        ("4. Compare Priorities", "Rules and local ML produce screening scores.\nPossible actions are for officer review.", "[Scenario output]"),
+        ("5. Inspect a Photo", "Explicit Gemini Vision request if configured and confirmed.\nOtherwise prepared offline benchmark.", "[Live / Benchmark]")
     ]
 
     sw = Inches(2.25)
@@ -301,11 +301,9 @@ def build_deck():
         p.font.color.rgb = TEXT_WHITE
 
     add_speaker_note(s3, (
-        "CycloneShield operates as an end-to-end decision pipeline in five automated steps. "
-        "First, it ingests storm coordinates and central pressure. Second, it models coastal storm surge against 30-meter satellite elevation data. "
-        "Third, it spatially intersects predicted flood zones with OpenStreetMap lifelines. "
-        "Fourth, it scores district vulnerability from 0 to 100 with clear explainability. "
-        "Finally, Google Gemini generates operational field directives and multilingual broadcast alerts."
+        "CycloneShield demonstrates how a selected storm scenario and configured district profiles can be organized into maps, screening scores, and possible preparedness actions. "
+        "Live forecasts require a connected weather source. Earth Engine helps with geospatial data; it does not predict cyclones. "
+        "The prototype does not replace official forecasts or automatically dispatch responders."
     ))
 
     # =========================================================================
@@ -313,32 +311,32 @@ def build_deck():
     # =========================================================================
     s4 = prs.slides.add_slide(blank_layout)
     apply_slide_bg(s4)
-    add_header(s4, "Live Working Prototype: Cyclone Remal Scenario",
-               "Tested end-to-end on Cyclone Remal across the Bengal delta in the live deployed app.")
+    add_header(s4, "Prepared Demonstration: Cyclone Remal Scenario",
+               "Configured screening outputs—not observed impacts or a validated forecast.")
 
     # Left: 3 concise bullet cards
     c_left = add_card(s4, Inches(0.8), Inches(1.8), Inches(4.8), Inches(4.8))
     tf = c_left.text_frame
     tf.word_wrap = True
     p = tf.paragraphs[0]
-    p.text = "🎯 Operational Highlights (Remal Scenario)"
+    p.text = "🎯 Scenario Highlights (Remal)"
     p.font.bold = True
     p.font.size = Pt(14)
     p.font.color.rgb = ACCENT_CYAN
     p = tf.add_paragraph()
-    p.text = "\n• 39.6 km Exposed Highways: Pinpointed critical submersion along State Highway 3 [Real OSM data]."
+    p.text = "\n• District rankings and lifeline screening help compare possible priorities; they do not confirm road closures."
     p.font.size = Pt(11.5)
     p.font.color.rgb = TEXT_WHITE
     p = tf.add_paragraph()
-    p.text = "\n• 5 Clinics at Risk: Flagged 5 high-risk health facilities out of 47 evaluated along the coastal belt [Simulated risk]."
+    p.text = "\n• Facility results use configured profiles and scenario rules, not live asset-by-asset analysis."
     p.font.size = Pt(11.5)
     p.font.color.rgb = TEXT_WHITE
     p = tf.add_paragraph()
-    p.text = "\n• South 24 Parganas Ranked #1: Priority 1 evacuation tier (Vulnerability: 82.4/100; Population: ~8.16M, Census 2011)."
+    p.text = "\n• Population figures are Census-era references; scores are screening outputs for review."
     p.font.size = Pt(11.5)
     p.font.color.rgb = TEXT_WHITE
     p = tf.add_paragraph()
-    p.text = "\n• Rapid Execution: Full spatial hazard mapping and scoring executes in seconds."
+    p.text = "\n• The map is a scenario view, not a live satellite feed or official warning."
     p.font.size = Pt(11)
     p.font.color.rgb = TEXT_MUTED
 
@@ -354,9 +352,9 @@ def build_deck():
         p.font.color.rgb = TEXT_MUTED
 
     add_speaker_note(s4, (
-        "Here is our working prototype executing on Cyclone Remal. In the Bengal delta, CycloneShield evaluated 47 coastal health facilities and flagged 5 at critical inundation risk. "
-        "It identified exactly 39.6 kilometers of cut-off roadway along the State Highway 3 corridor, and ranked South 24 Parganas as Priority 1 for immediate asset staging. "
-        "The live application is running online today, proving the end-to-end concept works."
+        "This is a configured Cyclone Remal scenario in our interactive prototype. "
+        "The map and risk matrix help compare modeled priorities; they are not confirmed road closures or clinic flooding. "
+        "State profiles and thresholds need local validation before operational use."
     ))
 
     # =========================================================================
@@ -364,32 +362,32 @@ def build_deck():
     # =========================================================================
     s5 = prs.slides.add_slide(blank_layout)
     apply_slide_bg(s5)
-    add_header(s5, "Google AI at Work: Multimodal Intelligence",
-               "Google AI bridges raw data into plain-language directives and aerial damage triage.")
+    add_header(s5, "Google Tools: Defined Roles",
+               "Connected services are used only for their specific data or analysis tasks.")
 
     # Left: 3 short bullets
     c_left = add_card(s5, Inches(0.8), Inches(1.8), Inches(5.2), Inches(4.8))
     tf = c_left.text_frame
     tf.word_wrap = True
     p = tf.paragraphs[0]
-    p.text = "🤖 Three Google AI Integrations"
+    p.text = "🤖 Bounded Roles & Demo Modes"
     p.font.bold = True
     p.font.size = Pt(14)
     p.font.color.rgb = ACCENT_CYAN
     p = tf.add_paragraph()
-    p.text = "\n1. Gemini 1.5 Pro Advisories [Live]: Generates district-specific resource staging recommendations for SDRF and medical officers."
+    p.text = "\n1. Gemini advisory code exists; displayed broadcasts use prepared templates, not live Gemini."
     p.font.size = Pt(11.5)
     p.font.color.rgb = TEXT_WHITE
     p = tf.add_paragraph()
-    p.text = "\n2. Gemini Multimodal Vision [Live Prototype]: Triages post-landfall drone photos to detect breached embankments and flooded roadways."
+    p.text = "\n2. Gemini Vision is optional and user-triggered; offline benchmark output is not model analysis."
     p.font.size = Pt(11.5)
     p.font.color.rgb = TEXT_WHITE
     p = tf.add_paragraph()
-    p.text = "\n3. Multilingual Speech [30 Cached Clips]: Google Cloud TTS & gTTS pipeline delivers spoken radio alerts in Bengali, Hindi, & English."
+    p.text = "\n3. Earth Engine can supply/process geospatial layers; it does not forecast cyclones. Weather must come from a connected source."
     p.font.size = Pt(11.5)
     p.font.color.rgb = TEXT_WHITE
     p = tf.add_paragraph()
-    p.text = "\nWithout AI: Responders face raw coordinate tables, English-only text PDFs, and manual photo inspection bottlenecks."
+    p.text = "\nAll generated messages are drafts for review; the demo does not issue alerts or dispatch resources."
     p.font.size = Pt(11)
     p.font.color.rgb = ACCENT_ORANGE
 
@@ -405,9 +403,9 @@ def build_deck():
         p.font.color.rgb = TEXT_MUTED
 
     add_speaker_note(s5, (
-        "We harness Google AI across three distinct operational layers. Gemini 1.5 Pro synthesizes complex geospatial data into plain-language field directives for emergency managers. "
-        "Gemini Vision triages post-disaster drone imagery in real-time to detect breached embankments. "
-        "And our multilingual voice architecture ensures spoken warnings reach vulnerable communities in Bengali and Hindi over battery-powered radios."
+        "Gemini Vision can analyze an explicitly submitted image when a live request succeeds; otherwise the displayed photo result is a prepared offline benchmark. "
+        "Earth Engine supports geospatial data work, not cyclone prediction. Weather forecasts require a connected meteorological source. "
+        "These tools support analysis and presentation; people and agencies remain responsible for decisions and alerts."
     ))
 
     # =========================================================================
@@ -415,8 +413,8 @@ def build_deck():
     # =========================================================================
     s6 = prs.slides.add_slide(blank_layout)
     apply_slide_bg(s6)
-    add_header(s6, "Explainable Risk Scoring: Built for Field Trust",
-               "A transparent 0–100 composite score that tells duty officers exactly why a district is at risk.")
+    add_header(s6, "Risk Screening: Explainable, Not Validated",
+               "Scenario scores help organize review; they are not field-validated impact probabilities.")
 
     # 4 Dimension cards
     dims = [
@@ -452,14 +450,14 @@ def build_deck():
     p.font.size = Pt(11.5)
     p.font.color.rgb = ACCENT_CYAN
     p = tf_b.add_paragraph()
-    p.text = "Every district score decomposes into a plain-language explanation, eliminating black-box distrust during emergency evacuations."
+    p.text = "Configured profiles and synthetic training data limit real-world interpretation; local validation and officer review are required."
     p.font.size = Pt(10.5)
     p.font.color.rgb = TEXT_MUTED
 
     add_speaker_note(s6, (
-        "In life-or-death emergency operations, black-box AI cannot be trusted. Our 0 to 100 vulnerability score is completely transparent. "
-        "It weights four critical lifelines: healthcare facilities at 35%, road severance at 25%, shelter deficits at 25%, and power substations at 15%. "
-        "Duty officers see not just a number, but the exact primary driver behind it, allowing them to justify evacuation orders with confidence."
+        "The dashboard displays scenario-based screening scores and configured profiles. "
+        "The underlying model uses synthetic physics-inspired training data, so these outputs are not field-validated probabilities. "
+        "They can help structure review but cannot justify or issue an evacuation decision on their own."
     ))
 
     # =========================================================================
@@ -468,7 +466,7 @@ def build_deck():
     s7 = prs.slides.add_slide(blank_layout)
     apply_slide_bg(s7)
     add_header(s7, "Predictive ML & Validation: Honest Methodology",
-               "Calibrated Gradient Boosting predicts lifeline failure risks ahead of landfall.")
+               "The prototype compares scenarios; it does not provide a validated operational forecast.")
 
     # Left: ML Details Card
     c_left = add_card(s7, Inches(0.8), Inches(1.8), Inches(5.4), Inches(4.8))
@@ -484,11 +482,11 @@ def build_deck():
     p.font.size = Pt(11)
     p.font.color.rgb = TEXT_WHITE
     p = tf.add_paragraph()
-    p.text = "\n• Internal Consistency Metrics [Simulated Dataset, n=3,600]:\n  - Highway Cut-Off: ROC-AUC 0.9739 | PR-AUC 0.9042 | Brier 0.0497\n  - Hospital Inundation: ROC-AUC 0.9758 | PR-AUC 0.8877 | Brier 0.0457"
+    p.text = "\n• Benchmark metrics use synthetic scenarios (n=3,600); they do not establish real-world predictive accuracy."
     p.font.size = Pt(11)
     p.font.color.rgb = TEXT_WHITE
     p = tf.add_paragraph()
-    p.text = "\n• Methodology: Stratified random 80/20 train/test split. Pre-split scaling and Platt probability calibration."
+    p.text = "\n• Outputs are screening scores under configured inputs, not calibrated probabilities of real-world failure."
     p.font.size = Pt(10.5)
     p.font.color.rgb = TEXT_MUTED
     p = tf.add_paragraph()
@@ -512,10 +510,9 @@ def build_deck():
         p.font.color.rgb = TEXT_MUTED
 
     add_speaker_note(s7, (
-        "To forecast lifeline failures before landfall, we developed Calibrated Gradient Boosting models. "
-        "On our physically calibrated dataset of 3,600 coastal records, the models achieved strong internal consistency, with ROC-AUCs exceeding 0.97. "
-        "Crucially, we must be completely honest: these labels are physics-simulated, not historical damage logs. "
-        "Our immediate next engineering step is leave-one-storm-out cross-validation against verified post-disaster field damage reports."
+        "The what-if view compares model outputs as scenario inputs change. "
+        "Training and test data are synthetic, so benchmark metrics show internal performance on those scenarios—not real-world predictive accuracy. "
+        "Field validation against verified damage records is required."
     ))
 
     # =========================================================================
@@ -524,17 +521,17 @@ def build_deck():
     s8 = prs.slides.add_slide(blank_layout)
     apply_slide_bg(s8)
     add_header(s8, "Who It Serves: Actionable Decisions by Persona",
-               "Delivering the exact operational decision each disaster responder needs to make differently.")
+               "Helping officers consider options—without replacing their judgment or authority.")
 
     personas = [
-        ("🚒 NDRF / SDRF Battalions", "Pre-stage Rescue Assets Ahead of Time",
-         "• Stages inflatable rescue boats and tree-clearing saws along unflooded bypass routes.\n• Avoids deploying heavy convoys into doomed bottlenecks on State Highway 3.\n• Decision impact: Zero stranded rescue vehicles; faster post-landfall access.",
+        ("🚒 NDRF / SDRF Battalions", "Review Possible Staging Options",
+         "• Compare possible boat, pump, and access-route staging locations against scenario risks.\n• Validate roads and local conditions before use.\n• No rescue units are automatically deployed.",
          ACCENT_ORANGE),
-        ("🏛️ District Magistrates & SDMA", "Targeted Evacuation & Medical Protection",
-         "• Orders prioritized village evacuations in South 24 Parganas 24 hours earlier.\n• Protects rural PHC backup generators and moves ICUs to elevated structures.\n• Decision impact: Proactive resource allocation instead of reactive triage.",
+        ("🏛️ District Magistrates & SDMA", "Consider Preparedness Actions",
+         "• Review possible evacuation, facility-continuity, and resource-prioritization actions.\n• Validate local data and thresholds.\n• Authorized officers retain all decision authority.",
          ACCENT_CYAN),
-        ("📻 Coastal Delta Communities", "Life-Saving Warnings in Mother Tongue",
-         "• Listens to clear, localized voice bulletins in Bengali and Hindi on battery radios.\n• Receives specific guidance on which local high-ground cyclone shelters have space.\n• Decision impact: Actionable evacuation for non-English, low-literacy citizens.",
+        ("📻 Coastal Delta Communities", "Agency-Approved Warnings",
+         "• Draft messages and voice workflows can be reviewed for local use.\n• Public alerts require agency approval and connected delivery channels.\n• The prototype does not send alerts.",
          ACCENT_GREEN)
     ]
 
@@ -560,10 +557,9 @@ def build_deck():
         p.font.color.rgb = TEXT_MUTED
 
     add_speaker_note(s8, (
-        "CycloneShield delivers distinct decisions for three key stakeholders. "
-        "NDRF rescue battalions pre-stage inflatable boats outside predicted inundation zones. "
-        "District Magistrates order targeted evacuations and protect vulnerable hospital backup generators 24 hours earlier. "
-        "And coastal fishing communities receive clear spoken advisories in Bengali and Hindi over battery-powered radios."
+        "CycloneShield does not replace weather agencies or rescue officers. "
+        "It is designed to help them turn complex information into clearer priorities and faster decisions. "
+        "It recommends possible actions for review; it does not deploy resources, issue evacuations, or send public warnings."
     ))
 
     # =========================================================================
@@ -572,7 +568,7 @@ def build_deck():
     s9 = prs.slides.add_slide(blank_layout)
     apply_slide_bg(s9)
     add_header(s9, "Built for India: Operational Scope vs Roadmap",
-               "Tested in West Bengal today, architected to scale across all 13 coastal states and UTs.")
+               "Five configured state profiles are a starting point for validation—not national operational coverage.")
 
     # Two clear comparison cards
     cw = Inches(5.6)
@@ -583,24 +579,24 @@ def build_deck():
     tf = c_today.text_frame
     tf.word_wrap = True
     p = tf.paragraphs[0]
-    p.text = "✅ OPERATIONAL TODAY (TESTED)"
+    p.text = "✅ CONFIGURED DEMONSTRATION"
     p.font.bold = True
     p.font.size = Pt(14)
     p.font.color.rgb = ACCENT_GREEN
     p = tf.add_paragraph()
-    p.text = "\n• Active Storm Scenario: Cyclone Remal (May 2024) fully operational end-to-end; Dana & Yaas tracks ingested [Dana/Yaas app UI to verify]."
+    p.text = "\n• Historical storm examples are selected from a bundled catalog; confirm any live query separately."
     p.font.size = Pt(11.5)
     p.font.color.rgb = TEXT_WHITE
     p = tf.add_paragraph()
-    p.text = "\n• Operational Geography: West Bengal coastal districts (South 24 Parganas, Purba Medinipur); cross-border Satkhira as regional context."
+    p.text = "\n• Five state profiles use configured districts and scenario data; they are not agency integrations."
     p.font.size = Pt(11.5)
     p.font.color.rgb = TEXT_WHITE
     p = tf.add_paragraph()
-    p.text = "\n• Working Languages: English, Hindi, and Bengali (30 cached broadcast audio alert files in repo)."
+    p.text = "\n• Seven language choices; messages and audio paths require review and per-run verification."
     p.font.size = Pt(11.5)
     p.font.color.rgb = TEXT_WHITE
     p = tf.add_paragraph()
-    p.text = "\n• Live Ingestion: NOAA IBTrACS v4 North Indian Ocean dataset."
+    p.text = "\n• Compatible user-supplied track files can be explored; no live IMD feed is implied."
     p.font.size = Pt(11)
     p.font.color.rgb = TEXT_MUTED
 
@@ -614,7 +610,7 @@ def build_deck():
     p.font.size = Pt(14)
     p.font.color.rgb = ACCENT_CYAN
     p = tf.add_paragraph()
-    p.text = "\n• Regional States (Phase 2): Odisha, Andhra Pradesh, Tamil Nadu, Kerala, Maharashtra, and Gujarat."
+    p.text = "\n• State partners must validate local boundaries, assets, populations, and thresholds."
     p.font.size = Pt(11.5)
     p.font.color.rgb = TEXT_WHITE
     p = tf.add_paragraph()
@@ -622,7 +618,7 @@ def build_deck():
     p.font.size = Pt(11.5)
     p.font.color.rgb = TEXT_WHITE
     p = tf.add_paragraph()
-    p.text = "\n• Official Data Feeds: Direct IMD cyclone bulletin API ingestion (IMD-compatible schema ready)."
+    p.text = "\n• Live forecast and official bulletin sources require separate connection and validation."
     p.font.size = Pt(11.5)
     p.font.color.rgb = TEXT_WHITE
     p = tf.add_paragraph()
@@ -631,9 +627,8 @@ def build_deck():
     p.font.color.rgb = TEXT_MUTED
 
     add_speaker_note(s9, (
-        "CycloneShield is proven today on Cyclone Remal across West Bengal's coastal districts, with full trilingual audio in English, Hindi, and Bengali. "
-        "Because our architecture uses global satellite elevation and open-source infrastructure grids, scaling to Odisha, Andhra Pradesh, and Gujarat requires configuring state boundary polygons and regional language TTS. "
-        "Expanding to all thirteen coastal states and integrating direct IMD feeds forms our immediate Phase 2 roadmap."
+        "The prototype includes five configured state profiles and language choices. "
+        "Operational scaling requires local data validation, appropriate connected weather sources, and agency-approved workflows."
     ))
 
     # =========================================================================
@@ -648,7 +643,7 @@ def build_deck():
         ("Week 1: Data Integration", "• Ingest state GIS layers: PHC locations, district roads, shelter capacities.\n• Configure state-specific boundary polygons.\n• Operator: SDMA GIS cell with 1 data engineer."),
         ("Week 2: IMD Feed Hookup", "• Connect IMD bulletin ingestion parser.\n• Validate real-time wind swath contours against IMD warning zones.\n• Operator: State Emergency Operations Centre (SEOC)."),
         ("Week 3: Alert Channels", "• Connect Common Alerting Protocol (CAP) XML export.\n• Setup WhatsApp bot for district duty officers.\n• Pre-cache regional audio alerts for community radio."),
-        ("Week 4: Tabletop Exercise", "• Simulate historical storm scenario with NDRF/SDRF officers.\n• Measure end-to-end dispatch timeline.\n• Finalize standard operating procedure (SOP).")
+        ("Week 4: Tabletop Exercise", "• Review a historical scenario with agency partners.\n• Evaluate outputs and limitations.\n• Agree next steps before any production deployment.")
     ]
 
     ww = Inches(2.7)
@@ -677,16 +672,13 @@ def build_deck():
     p.font.size = Pt(11)
     p.font.color.rgb = ACCENT_ORANGE
     p = tf_c.add_paragraph()
-    p.text = "• Prototype runs within Google Cloud free-tier quotas during testing.\n• Production SDMA deployment utilizes low-cost serverless container hosting (Cloud Run / Vertex AI spec); production Earth Engine requires commercial licensing."
+    p.text = "• Service quotas, hosting costs, and licensing depend on the configured deployment.\n• Cloud Run / Vertex AI are deployment options; production Earth Engine access and operational integrations require separate review."
     p.font.size = Pt(10)
     p.font.color.rgb = TEXT_MUTED
 
     add_speaker_note(s10, (
-        "We do not ask disaster authorities to overhaul their existing operations. "
-        "We propose a practical four-week pilot with a State Disaster Management Authority. "
-        "In weeks one and two, we ingest state GIS assets and connect bulletin feeds. "
-        "In weeks three and four, we link Common Alerting Protocol feeds and run a tabletop exercise with NDRF commanders. "
-        "The prototype runs serverless and incurs minimal compute overhead during readiness."
+        "We propose a controlled pilot with a state partner: validate local data, review draft outputs, and run a tabletop exercise. "
+        "Production hosting, live alert channels, and operational use would require separate approval, integration, and safeguards."
     ))
 
     # =========================================================================
@@ -718,7 +710,7 @@ def build_deck():
     p.font.size = Pt(11)
     p.font.color.rgb = TEXT_WHITE
     p = tf.add_paragraph()
-    p.text = "\n• 48h Evacuation Window: Enables advance road clearance and bypass logistics before storm landfall."
+    p.text = "\n• Potential use: support review of priorities; no claim of people currently protected or actions already taken."
     p.font.size = Pt(11)
     p.font.color.rgb = TEXT_WHITE
 
@@ -740,7 +732,7 @@ def build_deck():
     p.font.size = Pt(11)
     p.font.color.rgb = TEXT_WHITE
     p = tf.add_paragraph()
-    p.text = "\n• Single Storm Active: Only Cyclone Remal fully tested end-to-end in the live dashboard today."
+    p.text = "\n• Insurance trigger amounts are illustrative calculations, not an active policy or payment."
     p.font.size = Pt(11)
     p.font.color.rgb = TEXT_WHITE
 
@@ -835,9 +827,9 @@ def build_deck():
     p.font.color.rgb = ACCENT_GREEN
 
     add_speaker_note(s12, (
-        "CycloneShield proves that modern AI can transform passive weather bulletins into proactive, life-saving infrastructure intelligence. "
-        "Our working prototype is live online, fully reproducible via GitHub and Google Colab, and designed specifically for Indian disaster management. "
-        "We invite the judges to test the live dashboard, and we look forward to collaborating with disaster authorities on our upcoming coastal pilot. Thank you."
+        "CycloneShield is not trying to replace weather agencies or rescue officers. "
+        "It is designed to help them turn complex information into clearer priorities and faster decisions. "
+        "We are seeking a partner to validate the data and test the workflow in a controlled tabletop pilot. Thank you."
     ))
 
     # Save presentation

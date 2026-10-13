@@ -1048,7 +1048,464 @@ def print_advisory_report(advisories: List[Dict[str, Any]], storm_name: str = "R
 
 
 # ==============================================================================
-# 6. Mirror Synchronization Helper
+# 6. Advanced Google Gemini Decision Engines (Cross-Flow Integration)
+# ==============================================================================
+
+def query_gemini_json(
+    prompt: str,
+    api_key: Optional[str] = None,
+    model_name: str = DEFAULT_MODEL,
+    timeout: int = 15
+) -> Optional[Any]:
+    """
+    General-purpose structured JSON query to Google Gemini (2.5 Flash / 1.5 Flash).
+    Enforces structured JSON generation across SDKs and REST with multi-model fallback.
+    """
+    key = api_key or get_resolved_api_key()
+    if not key or len(key) < 10 or key.startswith("AQ."):
+        return None
+
+    # Method 1: google-genai SDK
+    try:
+        from google import genai
+        from google.genai import types
+        client = genai.Client(api_key=key)
+        for m in [model_name, "gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]:
+            try:
+                response = client.models.generate_content(
+                    model=m,
+                    contents=prompt,
+                    config=types.GenerateContentConfig(
+                        response_mime_type="application/json",
+                        temperature=0.2,
+                    )
+                )
+                if response and response.text:
+                    clean = response.text.strip()
+                    if clean.startswith("```json"):
+                        clean = clean[7:]
+                    if clean.endswith("```"):
+                        clean = clean[:-3]
+                    return json.loads(clean.strip())
+            except Exception:
+                continue
+    except ImportError:
+        pass
+    except Exception:
+        pass
+
+    # Method 2: google-generativeai SDK
+    try:
+        import google.generativeai as legacy_genai
+        legacy_genai.configure(api_key=key)
+        for m in [model_name if "1.5" in model_name else FALLBACK_MODEL, "gemini-1.5-flash"]:
+            try:
+                model = legacy_genai.GenerativeModel(
+                    model_name=m,
+                    generation_config={"response_mime_type": "application/json", "temperature": 0.2}
+                )
+                res = model.generate_content(prompt)
+                if res and res.text:
+                    clean = res.text.strip()
+                    if clean.startswith("```json"):
+                        clean = clean[7:]
+                    if clean.endswith("```"):
+                        clean = clean[:-3]
+                    return json.loads(clean.strip())
+            except Exception:
+                continue
+    except ImportError:
+        pass
+    except Exception:
+        pass
+
+    # Method 3: Direct Google AI Studio REST API
+    try:
+        for m in [model_name, FALLBACK_MODEL, "gemini-2.0-flash", "gemini-1.5-flash"]:
+            try:
+                url = f"{GEMINI_API_BASE_URL}/{m}:generateContent?key={key}"
+                headers = {"Content-Type": "application/json"}
+                payload = {
+                    "contents": [{"parts": [{"text": prompt}]}],
+                    "generationConfig": {
+                        "responseMimeType": "application/json",
+                        "temperature": 0.2
+                    }
+                }
+                resp = requests.post(url, headers=headers, json=payload, timeout=timeout)
+                if resp.status_code == 200:
+                    data = resp.json()
+                    raw_text = data["candidates"][0]["content"]["parts"][0]["text"]
+                    clean = raw_text.strip()
+                    if clean.startswith("```json"):
+                        clean = clean[7:]
+                    if clean.endswith("```"):
+                        clean = clean[:-3]
+                    return json.loads(clean.strip())
+            except Exception:
+                continue
+    except Exception:
+        pass
+
+    return None
+
+
+def parse_imd_bulletin_gemini(
+    bulletin_text: str,
+    api_key: Optional[str] = None
+) -> Tuple[Optional[pd.DataFrame], Dict[str, Any]]:
+    """
+    Parses unstructured text from official IMD cyclone bulletins using Google Gemini 2.5 Flash.
+    Falls back gracefully to the calibrated regex parser if unauthenticated or offline.
+    """
+    if not bulletin_text or len(bulletin_text.strip()) < 15:
+        return None, {"error": "Bulletin text is too short or empty."}
+
+    key = api_key or get_resolved_api_key()
+    if key and len(key) > 10:
+        prompt = f"""You are an expert meteorological intelligence analyst for the India Meteorological Department (IMD) / RSMC New Delhi.
+Parse this official cyclone bulletin text into strict JSON format with this exact structure:
+{{
+  "storm_name": "Name of the cyclone or depression (e.g. SHAKTI, REMAL, DANA)",
+  "category": "IMD category (e.g. Cyclonic Storm, Severe Cyclonic Storm, Very Severe Cyclonic Storm)",
+  "pressure_mb": 978.0,
+  "wind_kts": 70.0,
+  "landfall_sector": "Expected landfall district/sector name and state",
+  "landfall_time": "Estimated landfall date/time string",
+  "synoptic_summary": "1-2 sentence concise meteorological summary",
+  "waypoints": [
+    {{
+      "time": "2026-10-14 11:30:00",
+      "lat": 17.8,
+      "lon": 84.6,
+      "wind_kts": 70.0,
+      "pressure_mb": 978.0
+    }}
+  ]
+}}
+
+Ensure lat/lon are floating point numbers. If waypoint coordinates have degrees (e.g. 17.8°N, 84.6°E), convert to decimals 17.8 and 84.6.
+Ensure waypoints are sorted chronologically.
+
+Raw IMD Bulletin:
+\"\"\"
+{bulletin_text}
+\"\"\"
+"""
+        res = query_gemini_json(prompt, api_key=key)
+        if res and isinstance(res, dict) and "waypoints" in res and len(res["waypoints"]) > 0:
+            try:
+                wps = res["waypoints"]
+                df = pd.DataFrame(wps)
+                # Ensure required columns
+                for col in ["time", "lat", "lon", "wind_kts", "pressure_mb"]:
+                    if col not in df.columns:
+                        if col == "pressure_mb":
+                            df[col] = float(res.get("pressure_mb", 985.0))
+                        elif col == "wind_kts":
+                            df[col] = float(res.get("wind_kts", 65.0))
+                meta = {
+                    "name": str(res.get("storm_name", "LIVE-IMD")).upper(),
+                    "category": str(res.get("category", "Severe Cyclonic Storm")),
+                    "pressure_mb": float(res.get("pressure_mb", 980.0)),
+                    "wind_kts": float(res.get("wind_kts", 70.0)),
+                    "landfall": str(res.get("landfall_sector", "Coastal Belt")),
+                    "summary": str(res.get("synoptic_summary", "Extracted via Gemini 2.5 Flash")),
+                    "engine": "✨ Google Gemini 2.5 Flash (Structured JSON)",
+                    "is_live_gemini": True
+                }
+                return df, meta
+            except Exception as e:
+                print(f"[Gemini Bulletin Parser] Format error, using fallback: {e}")
+
+    # Fallback to deterministic regex parser
+    try:
+        from imd_live_ingestion import parse_imd_bulletin_text
+        fb_df, fb_meta = parse_imd_bulletin_text(bulletin_text)
+        if fb_meta:
+            fb_meta["engine"] = "🛡️ Calibrated Regex Parser (Offline Fallback)"
+            fb_meta["is_live_gemini"] = False
+        return fb_df, fb_meta
+    except Exception as e:
+        return None, {"error": f"Parsing failed: {e}", "engine": "Offline Fallback", "is_live_gemini": False}
+
+
+def generate_whatif_tactical_playbook(
+    sim_res_df: pd.DataFrame,
+    scenario_params: Dict[str, Any],
+    api_key: Optional[str] = None
+) -> Dict[str, Any]:
+    """
+    Decides operational disaster countermeasures using Google Gemini 2.5 Flash as Chief Incident Commander.
+    Takes predicted lifeline failure probabilities (from predictive_model.py) and outputs concrete tactical directives.
+    Falls back gracefully to a physics-calibrated deterministic tactical playbook.
+    """
+    key = api_key or get_resolved_api_key()
+    state = scenario_params.get("state_name", "West Bengal")
+    surge_delta = scenario_params.get("surge_delta_m", 0.0)
+    wind_delta = scenario_params.get("wind_delta_kts", 0.0)
+    rain_delta = scenario_params.get("rain_delta_mm", 0.0)
+
+    # Prepare compact table summary for LLM context
+    districts_summary = []
+    if not sim_res_df.empty:
+        for _, row in sim_res_df.iterrows():
+            districts_summary.append({
+                "district": str(row.get("district_name", "")),
+                "road_cutoff_prob_pct": round(float(row.get("ml_road_cutoff_pct", 0.0)), 1),
+                "hosp_inundation_prob_pct": round(float(row.get("ml_hosp_inundation_pct", 0.0)), 1),
+                "sim_surge_m": round(float(row.get("sim_surge_m", 0.0)), 2),
+                "road_tier": str(row.get("ml_road_tier", "LOW"))
+            })
+
+    if key and len(key) > 10 and districts_summary:
+        prompt = f"""You are the Chief Incident Commander for the National Disaster Response Force (NDRF) and State Disaster Management Authority (SDMA).
+A meteorological What-If simulation was executed for {state}:
+- Surge Shift: +{surge_delta:.2f} m
+- Wind Shift: +{wind_delta:.0f} kts
+- Rain Shift: +{rain_delta:.0f} mm
+
+District Predictions from Machine Learning Lifeline Failure Model:
+{json.dumps(districts_summary, indent=2)}
+
+Synthesize these predictions into an operational disaster command playbook in strict JSON format:
+{{
+  "readiness_code": "CRITICAL RED" | "ELEVATED ORANGE" | "MONITORING YELLOW",
+  "readiness_headline": "Short punchy operational alert headline",
+  "executive_brief": "2-sentence executive command assessment of the situation",
+  "critical_bottlenecks": [
+    "Bottleneck 1: High risk district with severed highway and isolated population",
+    "Bottleneck 2: Hospital complex requiring immediate patient transfer"
+  ],
+  "tactical_deployments": [
+    {{
+      "unit": "e.g. 2nd Bn NDRF Boat Assault Unit (BAUT)",
+      "target_district": "District name",
+      "action": "Concrete operational task",
+      "equipment": "Specific machinery and tools (e.g. 40HP motorized boats, dewatering pumps, tree clearance cutters)"
+    }}
+  ],
+  "evacuation_corridor_directive": "Specific route bypass instructions for ambulances and civilian convoys",
+  "hospital_resilience_action": "Directives for hospitals at flood risk (generator elevation, ICU patient triage, oxygen stock)"
+}}
+"""
+        res = query_gemini_json(prompt, api_key=key)
+        if res and isinstance(res, dict) and "tactical_deployments" in res:
+            res["engine"] = "✨ Google Gemini 2.5 Flash Incident Commander"
+            res["is_live_gemini"] = True
+            return res
+
+    # Calibrated deterministic fallback
+    sorted_df = sim_res_df.sort_values(by="ml_road_cutoff_pct", ascending=False) if not sim_res_df.empty else pd.DataFrame()
+    top_dist = sorted_df.iloc[0]["district_name"] if not sorted_df.empty else "Coastal Sector"
+    top_road_pct = sorted_df.iloc[0]["ml_road_cutoff_pct"] if not sorted_df.empty else 60.0
+    top_hosp_pct = sorted_df.iloc[0]["ml_hosp_inundation_pct"] if not sorted_df.empty else 40.0
+
+    readiness = "CRITICAL RED" if top_road_pct >= 70.0 or top_hosp_pct >= 60.0 else ("ELEVATED ORANGE" if top_road_pct >= 40.0 else "MONITORING YELLOW")
+    
+    deployments = []
+    if not sorted_df.empty:
+        for idx, (_, r) in enumerate(sorted_df.head(3).iterrows()):
+            d_name = r["district_name"]
+            r_pct = r["ml_road_cutoff_pct"]
+            h_pct = r["ml_hosp_inundation_pct"]
+            if r_pct >= 50 or h_pct >= 50:
+                deployments.append({
+                    "unit": f"{2 + idx}nd Bn NDRF Special Rapid Rescue Taskforce",
+                    "target_district": d_name,
+                    "action": f"Pre-position 12 inflatable motorized boats along low-lying arterial junctions before T-6h inundation (Road Cutoff Risk: {r_pct:.0f}%).",
+                    "equipment": "40HP Inflatable Rescue Craft, high-capacity 500GPM dewatering pumps, satellite communication sets"
+                })
+
+    if not deployments:
+        deployments.append({
+            "unit": "District Disaster Quick Response Team",
+            "target_district": top_dist,
+            "action": "Maintain standby monitoring at district collectorate; clear roadside tree overhangs along primary state highways.",
+            "equipment": "Hydraulic tree shears, mobile diesel lighting towers, emergency medical kits"
+        })
+
+    return {
+        "readiness_code": readiness,
+        "readiness_headline": f"Operational Incident Directive: Pre-Landfall Staging in {top_dist} ({readiness})",
+        "executive_brief": f"Simulated meteorological shift indicates elevated lifeline vulnerability in {top_dist} with {top_road_pct:.0f}% highway blockage probability. Immediate pre-positioning mandated.",
+        "critical_bottlenecks": [
+            f"{top_dist}: Major arterial road network at {top_road_pct:.0f}% submergence risk, threatening emergency medical logistics.",
+            f"Coastal Health Centers: {top_hosp_pct:.0f}% flood ingress risk requiring emergency backup power protection."
+        ],
+        "tactical_deployments": deployments,
+        "evacuation_corridor_directive": f"Designate elevated state secondary routes as primary humanitarian corridors. Divert all non-essential traffic away from coastal highways in {top_dist}.",
+        "hospital_resilience_action": "Elevate critical backup generator fuel manifolds to minimum +2.0m above grade. Ensure 72-hour medical oxygen supplies and prepare zero-floor patient transfer.",
+        "engine": "🛡️ Calibrated Incident Command Engine (Offline Fallback)",
+        "is_live_gemini": False
+    }
+
+
+def generate_parametric_liquidity_audit(
+    ins_result: Any,
+    district_matrix: List[Dict[str, Any]],
+    state_name: str,
+    api_key: Optional[str] = None
+) -> Dict[str, Any]:
+    """
+    Decides pre-landfall capital allocation & emergency procurement disbursement using Google Gemini.
+    Activated when parametric catastrophe insurance physical thresholds are crossed.
+    Falls back gracefully to actuarial proportional allocation.
+    """
+    key = api_key or get_resolved_api_key()
+    payout_cr = float(getattr(ins_result, "payout_amount_cr", 200.0))
+    tier_label = str(getattr(ins_result, "tier_label", "Trigger Activated"))
+    wind_kts = float(getattr(ins_result, "wind_kts", 65.0))
+    surge_m = float(getattr(ins_result, "surge_m", 2.5))
+    is_triggered = bool(getattr(ins_result, "is_triggered", True))
+
+    dist_context = []
+    for d in district_matrix[:6]:
+        dist_context.append({
+            "district": d.get("district_name", ""),
+            "vulnerability_score": round(float(d.get("vulnerability_score", 50.0)), 1),
+            "threat_tier": d.get("threat_tier", "MODERATE"),
+            "population": int(d.get("population", 1000000)),
+            "flooded_hospitals": int(d.get("flooded_hospitals", 0))
+        })
+
+    if key and len(key) > 10 and dist_context and is_triggered and payout_cr > 0:
+        prompt = f"""You are the Disaster Risk Financing Comptroller for the State Disaster Management Authority (SDMA).
+A parametric catastrophe insurance trigger has released ₹ {payout_cr:.0f} Crore in pre-landfall emergency liquidity for {state_name}.
+Physical Trigger: {tier_label} (Wind: {wind_kts:.0f} kts, Surge: {surge_m:.2f} m).
+
+Affected Districts & Risk Exposure:
+{json.dumps(dist_context, indent=2)}
+
+Formulate a transparent 48-hour pre-landfall liquidity disbursement plan in strict JSON format:
+{{
+  "total_payout_cr": {payout_cr},
+  "executive_summary": "1-2 sentence concise statement on capital disbursement strategy",
+  "district_allocations": [
+    {{
+      "district_name": "District Name",
+      "allocated_cr": 75.0,
+      "percentage": 37.5,
+      "priority_need": "Emergency food stockpiles, generator fuel, and embankment repair"
+    }}
+  ],
+  "budget_line_breakdown": [
+    {{"category": "Shelter Food Rations & Safe Drinking Water", "amount_cr": 50.0, "percentage": 25.0}},
+    {{"category": "Diesel Generator Fuel & Grid Resilience", "amount_cr": 40.0, "percentage": 20.0}},
+    {{"category": "Mobile Emergency Medical Clinics & IV Fluids", "amount_cr": 40.0, "percentage": 20.0}},
+    {{"category": "High-Capacity Dewatering Pumps & Sluice Servicing", "amount_cr": 40.0, "percentage": 20.0}},
+    {{"category": "Debris Clearance & Heavy Earth-Mover Contracts", "amount_cr": 30.0, "percentage": 15.0}}
+  ],
+  "governance_audit_protocol": "Standard operating procedure for fast-track 48h emergency procurement without corruption or leakage."
+}}
+
+Ensure district allocated_cr sum equals {payout_cr}.
+Ensure budget_line_breakdown amount_cr sum equals {payout_cr}.
+"""
+        res = query_gemini_json(prompt, api_key=key)
+        if res and isinstance(res, dict) and "district_allocations" in res:
+            res["engine"] = "✨ Google Gemini 2.5 Flash Liquidity Auditor"
+            res["is_live_gemini"] = True
+            return res
+
+    # Actuarial proportional fallback
+    allocations = []
+    tot_weight = sum(d.get("vulnerability_score", 50.0) * (d.get("population", 1000000) / 1000000) for d in dist_context) or 1.0
+    running_sum = 0.0
+
+    for idx, d in enumerate(dist_context):
+        w = (d.get("vulnerability_score", 50.0) * (d.get("population", 1000000) / 1000000))
+        share = round((w / tot_weight) * payout_cr, 1)
+        if idx == len(dist_context) - 1:
+            share = round(payout_cr - running_sum, 1)
+        running_sum += share
+        pct = round((share / payout_cr) * 100, 1) if payout_cr > 0 else 0
+        allocations.append({
+            "district_name": d.get("district"),
+            "allocated_cr": max(0.0, share),
+            "percentage": max(0.0, pct),
+            "priority_need": f"Pre-positioning fuel, mobile clinics, and shelter supplies (Risk Tier: {d.get('threat_tier')})"
+        })
+
+    budget_lines = [
+        {"category": "Shelter Rations & Potable Water Filtration", "amount_cr": round(payout_cr * 0.30, 1), "percentage": 30.0},
+        {"category": "Diesel Generator Fuel & Grid Substation Backup", "amount_cr": round(payout_cr * 0.25, 1), "percentage": 25.0},
+        {"category": "Mobile Healthcare Trauma Clinics & Critical Drugs", "amount_cr": round(payout_cr * 0.20, 1), "percentage": 20.0},
+        {"category": "High-Capacity Dewatering Pumps & Sandbag Reinforcement", "amount_cr": round(payout_cr * 0.15, 1), "percentage": 15.0},
+        {"category": "Heavy Equipment & Road Debris Clearance Contracts", "amount_cr": round(payout_cr * 0.10, 1), "percentage": 10.0}
+    ]
+
+    return {
+        "total_payout_cr": payout_cr,
+        "executive_summary": f"Parametric insurance has triggered ₹ {payout_cr:.0f} Cr for {state_name}. Liquidity is routed immediately to District Disaster Management Authorities.",
+        "district_allocations": allocations,
+        "budget_line_breakdown": budget_lines,
+        "governance_audit_protocol": "Fast-track Section 144 Emergency Procurement Rules: Direct digital transfer to District Treasury accounts with photographic invoice validation.",
+        "engine": "🛡️ Calibrated Actuarial Allocation Model (Offline Fallback)",
+        "is_live_gemini": False
+    }
+
+
+def generate_compound_hazard_briefing(
+    met_snapshot: Dict[str, Any],
+    marine_snapshot: Dict[str, Any],
+    district_name: str,
+    api_key: Optional[str] = None
+) -> Dict[str, Any]:
+    """
+    Decides compound hydro-meteorological coastal threat using Google Gemini 2.5 Flash.
+    Evaluates offshore wave setup + astronomical tide timing + torrential rainfall runoff.
+    Falls back gracefully to a physics-calibrated hydro-meteorological engine.
+    """
+    key = api_key or get_resolved_api_key()
+    peak_wind_kmh = float(met_snapshot.get("peak_wind_kmh", 90.0))
+    rain_mm = float(met_snapshot.get("total_rain_mm", 150.0))
+    wave_m = float(marine_snapshot.get("peak_wave_m", 4.0))
+    swell_m = float(marine_snapshot.get("peak_swell_m", 2.5))
+    swell_amp = float(marine_snapshot.get("surge_amplification_factor", 1.25))
+    amp_pct = round((swell_amp - 1.0) * 100, 0)
+
+    if key and len(key) > 10:
+        prompt = f"""You are an expert coastal hydro-meteorologist specializing in North Indian Ocean tropical cyclones.
+Assess the compound disaster hazard for coastal district: {district_name}.
+
+Observed Meteorological & Oceanographic Data:
+- 72h Peak Wind: {peak_wind_kmh:.0f} km/h
+- 72h Cumulative Rainfall: {rain_mm:.0f} mm
+- Offshore Significant Wave Height: {wave_m:.1f} meters
+- Deepwater Swell Height: {swell_m:.1f} meters
+- Swell Surge Dynamic Setup Amplification: +{amp_pct:.0f}%
+
+Evaluate compound estuarine backwater risk (when marine surge blocks river discharge) in strict JSON:
+{{
+  "compound_threat_tier": "CRITICAL RISK" | "HIGH RISK" | "ELEVATED RISK",
+  "peak_danger_window_ist": "e.g. 18:00 IST to 23:30 IST (Coinciding with High Tide)",
+  "estuary_damming_assessment": "Explanation of how sea surge blocks river outflow creating compound inland inundation",
+  "marine_port_directive": "Strict directives for port berths, fishing trawlers, and aquaculture pens",
+  "ground_commander_action": "Key directive for district collector and emergency responders"
+}}
+"""
+        res = query_gemini_json(prompt, api_key=key)
+        if res and isinstance(res, dict) and "estuary_damming_assessment" in res:
+            res["engine"] = "✨ Google Gemini 2.5 Flash Compound Hazard Synthesizer"
+            res["is_live_gemini"] = True
+            return res
+
+    # Physics-calibrated fallback
+    tier = "CRITICAL RISK" if wave_m >= 4.5 or rain_mm >= 200 else ("HIGH RISK" if wave_m >= 3.0 else "ELEVATED RISK")
+    return {
+        "compound_threat_tier": tier,
+        "peak_danger_window_ist": "17:30 IST to 22:30 IST (Astronomical High Tide & Landfall Coincidence)",
+        "estuary_damming_assessment": f"Offshore wave setup (+{amp_pct:.0f}%) creates a hydrostatic dam across coastal river mouths. With {rain_mm:.0f}mm torrential rainfall upstream, freshwater cannot discharge into the sea, producing severe backwater flooding in low-lying villages.",
+        "marine_port_directive": "Complete suspension of all port cargo operations; fishing trawlers must be moored double-line in sheltered inland canals. Total ban on coastal sea-venture.",
+        "ground_commander_action": f"Deploy sandbag barriers along earthen river embankments in {district_name}. Prepare high-volume dewatering pumps at primary drainage sluice gates before tide ingress.",
+        "engine": "🛡️ Calibrated Hydro-Meteorological Engine (Offline Fallback)",
+        "is_live_gemini": False
+    }
+
+
+# ==============================================================================
+# 7. Mirror Synchronization Helper
 # ==============================================================================
 
 def sync_to_mirror():

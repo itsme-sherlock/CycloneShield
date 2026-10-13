@@ -496,17 +496,17 @@ This section is a practical answer guide for questions about the three top selec
 
 ### “What if a new cyclone forms tomorrow morning? How does CycloneShield ingest it?”
 
-“We designed CycloneShield specifically with a real-time ingestion engine (`imd_live_ingestion.py`). Under the cyclone selector, you can choose `🔴 [LIVE] Ingest Active IMD Bulletin / 2026 Cyclone`. It offers four operational modes:
-1. **Live RSMC Status & Polling**: Connects directly to RSMC New Delhi (`rsmcnewdelhi.imd.gov.in`) to check active tropical cyclone advisories and basin vigilance status.
+“The live selector can fetch the latest dated cyclone outlook/bulletin linked from the official RSMC New Delhi index. The UI shows the source and issue date. It downloads the selected PDF and updates the active track only when it can parse at least two distinct rows containing explicit timestamps, positions, wind speeds, and central pressure. An outlook without a complete track is shown as an official product, but does not become a track or trigger a synthetic replacement. It offers four modes:
+1. **Live RSMC product refresh**: Fetches the latest dated product listed at `rsmcnewdelhi.imd.gov.in`; it does not claim that finding a bulletin means a cyclone is active.
 2. **Raw IMD Text Bulletin Parser**: Duty officers can paste text directly from an official IMD National Cyclone Warning Centre bulletin. The parser automatically extracts the storm name, central pressure, maximum sustained wind, and 6-hourly forecast waypoints.
-3. **Active 2026 Emerging Scenarios**: We include 1-click active post-monsoon scenarios (such as Cyclone SHAKTI in the Bay of Bengal or Deep Depression BOB 02) to demonstrate instant readiness for emerging storms.
+3. **Synthetic demo scenarios**: Hard-coded SHAKTI / BOB-02 / MONTHA / NILOFAR-II tracks are test data only, not current alerts or IMD observations.
 4. **Interactive Coastal Landfall Builder**: Operators can select any coastal district, dial in wind and pressure parameters, and synthesize a physical 5-point approach trajectory.
 
-Once ingested, the new cyclone drives the entire 8-tab pipeline in under 1 second: calculating dynamic wind swaths, inverted-barometer surge depth, cut-off highways, hospital threats, multilingual warning broadcasts, and parametric insurance triggers.”
+When a verified track is loaded, it drives the dashboard's scenario calculations. Those downstream impact figures remain screening estimates, not official IMD forecasts or observed impacts.”
 
 ### “Does CycloneShield depend only on historical NOAA data, or can it run on live operational feeds?”
 
-“Historical NOAA IBTrACS data provides our calibrated benchmark scenarios (like REMAL, AMPHAN, and FANI). But the ingestion engine accepts any live 3-hourly IMD bulletin (via text paste, structured CSV, or live RSMC server poll). The moment an operational bulletin is ingested, it overrides the historical archive and evaluates real-world impact for the new storm's exact trajectory.”
+“Historical NOAA IBTrACS data provides benchmark tracks. The live IMD control fetches the latest dated product linked by RSMC New Delhi. If the document contains complete explicit forecast waypoints, it can load those; otherwise the app reports that no track was parsed and leaves the active track unchanged. Manual text/CSV import is also available. This does not authenticate a bulletin or turn screening calculations into real-world impact observations.”
 
 ### “How do you handle unformatted IMD text bulletins or PDF releases?”
 

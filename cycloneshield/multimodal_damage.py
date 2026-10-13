@@ -354,7 +354,8 @@ def call_gemini_vision_api(
     image_bytes: bytes,
     mime_type: str,
     api_key: str,
-    model_name: str = DEFAULT_VISION_MODEL
+    model_name: str = DEFAULT_VISION_MODEL,
+    failure_reasons: Optional[List[str]] = None
 ) -> Optional[Dict[str, Any]]:
     """
     Submits disaster photo to Google Gemini API (gemini-2.5-flash / gemini-1.5-flash).
@@ -419,13 +420,23 @@ def call_gemini_vision_api(
                     parsed["processing_source"] = f"Google AI Studio REST API ({target_model})"
                     print(f"[CycloneShield Vision] Successfully triaged damage via REST API ({target_model})!")
                     return parsed
-            elif resp.status_code in [429, 400, 403]:
-                print(f"[CycloneShield Vision] API Key limit/status {resp.status_code}. Fast fallback to calibrated triage.")
-                break
             else:
-                print(f"[CycloneShield Vision] Model {target_model} HTTP {resp.status_code}: {resp.text[:100]}...")
+                status_hint = {
+                    400: "request was rejected",
+                    401: "API key was not accepted",
+                    403: "API access was denied",
+                    404: "model was not found",
+                    429: "quota or rate limit was reached",
+                }.get(resp.status_code, "service request failed")
+                reason = f"Gemini returned HTTP {resp.status_code}: {status_hint}."
+                if failure_reasons is not None and not failure_reasons:
+                    failure_reasons.append(reason)
+                print(f"[CycloneShield Vision] {reason}")
         except Exception as e:
-            print(f"[CycloneShield Vision] REST error for {target_model}: {e}")
+            reason = f"Gemini REST request failed ({type(e).__name__})."
+            if failure_reasons is not None and not failure_reasons:
+                failure_reasons.append(reason)
+            print(f"[CycloneShield Vision] {reason}")
             break
 
     # Method B: Google GenAI SDK (google-genai) as secondary fallback
@@ -463,11 +474,18 @@ def call_gemini_vision_api(
                         print(f"[CycloneShield Vision] Successfully triaged damage via `google-genai` SDK ({target_model})!")
                         return parsed
             except Exception as model_err:
-                print(f"[CycloneShield Vision] SDK model '{target_model}' note: {str(model_err)[:100]}")
+                reason = f"Gemini SDK request failed for {target_model} ({type(model_err).__name__})."
+                if failure_reasons is not None and not failure_reasons:
+                    failure_reasons.append(reason)
+                print(f"[CycloneShield Vision] {reason}")
     except ImportError:
-        pass
+        if failure_reasons is not None and not failure_reasons:
+            failure_reasons.append("The google-genai SDK is not installed.")
     except Exception as e:
-        print(f"[CycloneShield Vision] `google-genai` SDK notice: {e}")
+        reason = f"Gemini SDK could not be initialized ({type(e).__name__})."
+        if failure_reasons is not None and not failure_reasons:
+            failure_reasons.append(reason)
+        print(f"[CycloneShield Vision] {reason}")
 
     return None
 
@@ -508,11 +526,18 @@ def analyze_damage_image(
     # 2. Check API Key
     resolved_key = api_key or get_resolved_api_key()
     result = None
+    live_api_failures: List[str] = []
 
     if resolved_key and not force_offline:
         masked_key = resolved_key[:4] + "..." + resolved_key[-4:] if len(resolved_key) > 8 else "***"
         print(f"[Vision Engine] Using Gemini API Key ({masked_key}) to analyze '{target_name}'...")
-        result = call_gemini_vision_api(image_bytes, mime_type, resolved_key, model_name=model_name)
+        result = call_gemini_vision_api(
+            image_bytes,
+            mime_type,
+            resolved_key,
+            model_name=model_name,
+            failure_reasons=live_api_failures
+        )
 
     if not result:
         if force_offline:
@@ -545,6 +570,8 @@ def analyze_damage_image(
     from datetime import datetime
     result["analyzed_at"] = datetime.now().strftime("%I:%M:%S %p")
     result["is_live_api"] = bool(resolved_key and not force_offline and "gemini" in str(result.get("model_used", "")).lower() and "offline" not in str(result.get("model_used", "")).lower())
+    if not result["is_live_api"] and live_api_failures:
+        result["live_api_error"] = live_api_failures[0]
 
     return result
 

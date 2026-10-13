@@ -1,9 +1,9 @@
 # 🌀 CycloneShield — Multi-Hazard Cyclone Impact & Infrastructure Vulnerability Forecaster
 
-> **CycloneShield is an interactive cyclone decision-support prototype for Indian coastal states. It combines historical NOAA cyclone tracks and real-time India Meteorological Department (IMD / RSMC New Delhi) bulletin ingestion with scenario-based hazard screening, a local what-if model, multilingual message templates, optional Gemini Vision triage, and an optional real-time weather feed. It demonstrates workflows for prioritizing critical lifelines and preparing messages; it is not an official forecast, field-validated impact model, or operational alerting system.**
+> **CycloneShield is an interactive cyclone decision-support prototype for Indian coastal states. It combines historical NOAA cyclone tracks with an on-demand fetch of the latest dated India Meteorological Department (IMD / RSMC New Delhi) cyclone outlook/bulletin. It loads a live track only when the downloaded official document contains at least two complete, explicit waypoint rows; it does not infer a track from an outlook or fall back to synthetic demo data. Other views use scenario-based hazard screening, a local what-if model, multilingual message templates, optional Gemini Vision triage, and an optional weather feed. It is not an official forecast, field-validated impact model, or operational alerting system.**
 
 [![Live Demo](https://img.shields.io/badge/Streamlit%20App-Live%20Demo-FF4B4B?logo=streamlit&logoColor=white)](https://cycloneshield-vawrqbhtbgu8i6cafhbf3q.streamlit.app/)
-[![IMD / RSMC](https://img.shields.io/badge/IMD%20%2F%20RSMC-Live%20Ingestion-FF6F00)](https://rsmcnewdelhi.imd.gov.in/)
+[![IMD / RSMC](https://img.shields.io/badge/IMD%20%2F%20RSMC-Live%20Bulletin%20Fetch-FF6F00)](https://rsmcnewdelhi.imd.gov.in/)
 [![Google Cloud Run](https://img.shields.io/badge/Google%20Cloud-Run%20Ready-4285F4?logo=googlecloud&logoColor=white)](https://cloud.google.com/run)
 [![Google BigQuery](https://img.shields.io/badge/Google%20BigQuery-Public%20Dataset-009688?logo=googlebigquery&logoColor=white)](https://cloud.google.com/bigquery)
 [![Gemini 2.5 Flash](https://img.shields.io/badge/Google%20Gemini-2.5%20Flash-8E75C4?logo=googlegemini&logoColor=white)](https://aistudio.google.com/)
