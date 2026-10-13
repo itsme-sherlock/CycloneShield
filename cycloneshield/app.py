@@ -6,7 +6,7 @@ Designed for District Magistrates (DMs), SDMA duty officers, and NDRF commanders
 
 Key Capabilities:
   - Multi-State & Multi-Cyclone Coverage: West Bengal, Odisha, Andhra Pradesh, Tamil Nadu, Gujarat
-  - Live Custom Track Ingestion: Upload/enter live IMD cyclone bulletins (CSV / manual entry)
+  - Latest official IMD/RSMC bulletin retrieval; operator and validated track ingestion
   - Synoptic Intensity & Dynamic Wind Swaths (NOAA IBTrACS)
   - Coastal Bathtub Storm Surge Inundation (SRTM 30m DEM Screening Model)
   - Multi-Hazard Critical Infrastructure Exposure (OpenStreetMap: Hospitals, Shelters, Roads, Power)
@@ -24,6 +24,7 @@ import json
 import base64
 import math
 import datetime
+import html as html_lib
 from typing import Dict, Any, List, Optional, Tuple
 from PIL import Image
 import textwrap
@@ -186,6 +187,7 @@ except ImportError:
 try:
     from imd_live_ingestion import (
         check_live_imd_rsmc_status,
+        fetch_latest_imd_bulletin,
         parse_imd_bulletin_text,
         load_emerging_scenario,
         build_custom_approach_track,
@@ -194,6 +196,7 @@ try:
     )
 except ImportError:
     check_live_imd_rsmc_status = None
+    fetch_latest_imd_bulletin = None
     parse_imd_bulletin_text = None
     load_emerging_scenario = None
     build_custom_approach_track = None
@@ -470,7 +473,7 @@ with ctrl_col1:
 with ctrl_col2:
     cyclone_options = [
         *[f"{c['name']} ({c['year']}) — {c['category']}" for c in STATE_CYCLONES[selected_state]],
-        "🔴 [LIVE] Ingest Active IMD Bulletin / 2026 Cyclone"
+        "🔴 [LIVE] Fetch Latest IMD Bulletin / Track"
     ]
     
     selected_cyclone_label = st.selectbox(
@@ -478,7 +481,7 @@ with ctrl_col2:
         options=cyclone_options,
         index=0,
         key=f"cyclone_event_for_{selected_state}",
-        help="Select historical cyclone benchmark or ingest live IMD track points to simulate real-time impact."
+        help="Select a historical benchmark or fetch the latest official RSMC bulletin. A track is loaded only if explicit waypoints can be parsed."
     )
     is_custom_track = any(k in selected_cyclone_label for k in ["[LIVE]", "Custom", "Ingest"])
     selected_storm_name = selected_cyclone_label.split()[0] if not is_custom_track else "CUSTOM"
@@ -609,60 +612,90 @@ if not state_districts:
 
 
 # ==============================================================================
-# 3. Live IMD / RSMC Real-Time Cyclone Ingestion Command Center
+# 3. Live IMD / RSMC Bulletin Retrieval & Cyclone Track Ingestion
 # ==============================================================================
 custom_track_df = None
 if is_custom_track:
-    with st.expander("🛰️ IMD Live Basin Command & Real-Time Cyclone Ingestion Engine", expanded=True):
+    with st.expander("🛰️ IMD / RSMC Live Bulletin & Track Ingestion", expanded=True):
         st.markdown("""
         <div style="font-size:13px; color:#cbd5e1; margin-bottom:10px; line-height:1.5;">
-            Direct operational integration with the <b>India Meteorological Department (IMD)</b> & <b>RSMC New Delhi</b> (WMO North Indian Ocean Regional Centre).
-            When a new cyclone or depression forms, ingest live coordinates, raw text advisories, or active 2026 scenarios to instantly drive the entire 8-tab command center.
+            Fetch the latest published cyclone outlook/bulletin from <b>IMD / RSMC New Delhi</b>. The app changes the active track only when the official document contains at least two complete, explicit waypoints; demo scenarios and operator uploads are separate.
         </div>
         """, unsafe_allow_html=True)
 
-        # Live RSMC Basin Status Banner
+        # Live RSMC product status
         rsmc_info = None
-        if check_live_imd_rsmc_status:
-            if "live_rsmc_status" not in st.session_state or st.session_state.get("refresh_rsmc_requested", False):
+        if st.session_state.get("refresh_rsmc_requested", False) and fetch_latest_imd_bulletin:
+            with st.spinner("Fetching the latest official RSMC bulletin and checking for explicit track waypoints..."):
+                live_track_df, rsmc_info = fetch_latest_imd_bulletin()
+                st.session_state["live_rsmc_status"] = rsmc_info
+                if live_track_df is not None and not live_track_df.empty:
+                    st.session_state["custom_track_df"] = live_track_df
+                    st.session_state["custom_track_meta"] = rsmc_info
+                    st.session_state["imd_refresh_notice"] = {
+                        "level": "success",
+                        "message": f"Loaded {len(live_track_df)} explicit waypoints from {rsmc_info.get('latest_product_title', 'the latest IMD product')}."
+                    }
+                else:
+                    st.session_state["imd_refresh_notice"] = {
+                        "level": "warning",
+                        "message": rsmc_info.get("track_status", "No verified track was found; the active dashboard track was not changed.")
+                    }
+                st.session_state["refresh_rsmc_requested"] = False
+        elif check_live_imd_rsmc_status:
+            if "live_rsmc_status" not in st.session_state:
                 with st.spinner("Connecting to RSMC New Delhi live server..."):
                     st.session_state["live_rsmc_status"] = check_live_imd_rsmc_status()
-                    st.session_state["refresh_rsmc_requested"] = False
             rsmc_info = st.session_state.get("live_rsmc_status")
 
         stat_col1, stat_col2 = st.columns([2.2, 1.0])
         with stat_col1:
-            badge_txt = rsmc_info.get("status_badge", "🟢 BASIN VIGILANCE ACTIVE") if rsmc_info else "🟢 BASIN VIGILANCE ACTIVE"
-            summary_txt = rsmc_info.get("summary", "Connected to IMD / RSMC feeds.") if rsmc_info else "Connected to IMD / RSMC feeds."
+            badge_txt = html_lib.escape(rsmc_info.get("status_badge", "⚪ IMD CONNECTION UNAVAILABLE")) if rsmc_info else "⚪ IMD CONNECTION UNAVAILABLE"
+            summary_txt = html_lib.escape(rsmc_info.get("summary", "IMD / RSMC status is not available.")) if rsmc_info else "IMD / RSMC status is not available."
+            checked_at = html_lib.escape(rsmc_info.get("timestamp", "Not checked")) if rsmc_info else "Not checked"
             st.markdown(f"""
             <div style="background:rgba(15,23,42,0.85); border:1px solid rgba(56,189,248,0.25); border-radius:8px; padding:10px 14px; margin-bottom:12px;">
                 <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
                     <div>
                         <span style="font-size:12px; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.15); padding:3px 8px; border-radius:4px;">{badge_txt}</span>
-                        <span style="font-size:11px; color:#94a3b8; margin-left:8px;">Source: <a href="https://rsmcnewdelhi.imd.gov.in" target="_blank" style="color:#7dd3fc; text-decoration:none;">rsmcnewdelhi.imd.gov.in</a></span>
+                        <span style="font-size:11px; color:#94a3b8; margin-left:8px;">Source: <a href="https://rsmcnewdelhi.imd.gov.in" target="_blank" style="color:#7dd3fc; text-decoration:none;">RSMC New Delhi</a></span>
                     </div>
-                    <div style="font-size:11px; color:#94a3b8;">Checked: {rsmc_info.get('timestamp','Real-Time') if rsmc_info else 'Real-Time'}</div>
+                    <div style="font-size:11px; color:#94a3b8;">Checked: {checked_at}</div>
                 </div>
                 <div style="font-size:12px; color:#cbd5e1; margin-top:6px;">{summary_txt}</div>
             </div>
             """, unsafe_allow_html=True)
+            if rsmc_info and rsmc_info.get("latest_product_url"):
+                st.link_button(
+                    f"Open latest IMD product: {rsmc_info.get('latest_product_title', 'RSMC bulletin')}",
+                    rsmc_info["latest_product_url"],
+                    use_container_width=True
+                )
+            if rsmc_info and rsmc_info.get("issued_at"):
+                st.caption(f"Official issue date: {rsmc_info['issued_at']}")
+            notice = st.session_state.pop("imd_refresh_notice", None)
+            if notice:
+                if notice["level"] == "success":
+                    st.success(notice["message"])
+                else:
+                    st.warning(notice["message"])
         with stat_col2:
-            if st.button("🔄 Poll Live RSMC Server", use_container_width=True, help="Queries RSMC New Delhi for the latest active tropical cyclone bulletins."):
+            if st.button("🔄 Fetch Latest IMD Update", use_container_width=True, help="Downloads the latest dated RSMC outlook/bulletin and loads a track only if explicit waypoints are present."):
                 st.session_state["refresh_rsmc_requested"] = True
                 st.rerun()
 
         # Ingestion Modes
         ingest_t1, ingest_t2, ingest_t3, ingest_t4 = st.tabs([
-            "⚡ Active 2026 Emerging Scenarios",
+            "🧪 Synthetic Demo Scenarios",
             "📋 Paste Raw IMD Bulletin Text",
             "🎯 Coastal Landfall Builder",
             "📁 Upload IMD CSV Track"
         ])
 
         with ingest_t1:
-            st.markdown("<div style='font-size:12.5px; color:#cbd5e1; margin-bottom:8px;'><b>1-Click Emerging Cyclone Readiness</b>: Simulate realistic post-monsoon systems threatening India's coast.</div>", unsafe_allow_html=True)
+            st.markdown("<div style='font-size:12.5px; color:#cbd5e1; margin-bottom:8px;'><b>Demo-only scenarios</b>: Hard-coded synthetic tracks for testing; these are not current IMD alerts or observations.</div>", unsafe_allow_html=True)
             sc_keys = list(EMERGING_SCENARIOS.keys()) if EMERGING_SCENARIOS else []
-            sel_sc_key = st.selectbox("Select Active 2026 Alert Scenario:", options=sc_keys, index=0)
+            sel_sc_key = st.selectbox("Select a synthetic demo scenario:", options=sc_keys, index=0)
             
             sc_preview = EMERGING_SCENARIOS.get(sel_sc_key, {})
             p_c1, p_c2, p_c3, p_c4 = st.columns(4)
@@ -671,12 +704,12 @@ if is_custom_track:
             p_c3.metric("Peak Wind", f"{sc_preview.get('peak_wind_kts', 0):.0f} kts")
             p_c4.metric("Min Pressure", f"{sc_preview.get('min_pressure_mb', 0):.0f} mb")
             
-            if st.button(f"⚡ Ingest & Launch '{sc_preview.get('storm_name','Alert')}' Scenario", type="primary", use_container_width=True):
+            if st.button(f"🧪 Load demo scenario '{sc_preview.get('storm_name','Demo')}'", type="primary", use_container_width=True):
                 if load_emerging_scenario:
                     s_df, s_meta = load_emerging_scenario(sel_sc_key)
                     st.session_state["custom_track_df"] = s_df
                     st.session_state["custom_track_meta"] = s_meta
-                    st.success(f"✅ Successfully ingested Cyclone {s_meta['name']} ({s_meta['category']})!")
+                    st.success(f"Loaded synthetic demo track {s_meta['name']} ({s_meta['category']}); this is not an IMD observation.")
                     st.rerun()
 
         with ingest_t2:
@@ -698,7 +731,7 @@ if is_custom_track:
             )
             col_b1, col_b2 = st.columns([1.0, 1.0])
             with col_b1:
-                if st.button("📋 Paste Sample Live IMD Bulletin (Cyclone SHAKTI)", use_container_width=True):
+                if st.button("📋 Paste Synthetic Sample Bulletin (SHAKTI)", use_container_width=True):
                     st.session_state["raw_bulletin_input"] = sample_imd_bulletin_text
                     st.rerun()
             with col_b2:
@@ -2426,7 +2459,7 @@ with foot_c1:
             🛡️ DATA PROVENANCE & TRANSPARENCY NOTICE
         </div>
         <div style="font-size:12px; color:#cbd5e1; line-height:1.6;">
-            • <span class="source-badge-real">Real Data</span>: NOAA IBTrACS v4 cyclone track archive, India Meteorological Department (IMD) / RSMC New Delhi active bulletin feeds, USGS/NASA SRTM 30m digital elevation (via OpenTopodata free API), OpenStreetMap healthcare, power substations & transport networks, Open-Meteo ECMWF IFS real-time weather.<br>
+            • <span class="source-badge-real">Real Data</span>: Historical NOAA IBTrACS v4 cyclone archive; latest IMD / RSMC New Delhi bulletin or outlook when fetched; USGS/NASA SRTM 30m elevation (via OpenTopodata), OpenStreetMap records, and Open-Meteo forecast data.<br>
             • <span class="source-badge-est">Screening Model</span>: Storm surge bathtub inundation is an inverted-barometer screening estimate (Jelesnianski empirical formula). Google Earth Engine (GEE) integration available when authenticated; OpenTopodata SRTM is the zero-auth free fallback. Full hydrodynamic SLOSH/ADCIRC validation is on roadmap.<br>
             • <span class="source-badge-sim">Simulated Data</span>: NDRF tactical dispatch logs and ML training dataset are physics-calibrated synthetic models simulating Bay of Bengal & Arabian Sea coastal profiles.<br>
             • <b>Vertex AI Status</b>: Pre-configured and packaged as Vertex AI-Ready; inference runs locally on CPU for zero-cost reproduction.<br>

@@ -1,24 +1,21 @@
 """
-CycloneShield - IMD Live Cyclone Ingestion & Basin Vigilance Engine
+CycloneShield - IMD Bulletin Retrieval & Track Ingestion
 ===================================================================
-Connects directly to the India Meteorological Department (IMD) / RSMC New Delhi
-bulletin feeds, parses official IMD cyclone advisories, and enables real-time
-ingestion of newly forming tropical cyclones across the North Indian Ocean basin
-(Bay of Bengal & Arabian Sea).
+Fetches the latest dated cyclone outlook/bulletin published by RSMC New Delhi,
+parses explicit track rows when present, and supports operator-supplied IMD text
+bulletins across the North Indian Ocean basin (Bay of Bengal & Arabian Sea).
 
 Key Capabilities:
-  1. Live RSMC New Delhi / IMD Status Checker:
-     Queries https://rsmcnewdelhi.imd.gov.in/ for active cyclone bulletins,
-     tropical weather outlooks, and depression alerts.
+  1. Live RSMC New Delhi / IMD Product Checker:
+     Reads the latest dated cyclone outlook/bulletin link from the official index.
   2. Raw IMD Text Bulletin Parser:
      Parses official IMD National Cyclone Warning Centre (NCWC) bulletins into
      standardized track waypoints [time, lat, lon, wind_kts, pressure_mb, category].
-  3. Real-Time Emerging Cyclone Generator:
-     Generates physical 5-point approach tracks for emerging tropical depressions
-     or newly named cyclones threatening coastal states (WB, Odisha, AP, TN, Gujarat).
-  4. Automatic State & Landfall Detection:
+  3. Synthetic Demo Scenarios:
+     Provides hard-coded demonstration tracks, explicitly separate from live IMD data.
+  4. Interactive Track Builder:
      Calculates nearest landfall coastal district and state automatically from
-     the storm's projected trajectory.
+     a user-configured demonstration trajectory.
 """
 
 from __future__ import annotations
@@ -26,20 +23,38 @@ from __future__ import annotations
 import re
 import os
 import json
-import urllib3
+import html
+import io
+from urllib.parse import unquote, urljoin, urlparse
 from datetime import datetime, timezone, timedelta
 from typing import Dict, Any, List, Optional, Tuple
 
 import requests
 import pandas as pd
 import numpy as np
-
-# Suppress insecure HTTPS warning for public IMD certs
-urllib3.disable_warnings()
+try:
+    from pypdf import PdfReader
+    from pypdf.errors import PdfReadError
+except ImportError:
+    PdfReader = None
+    PdfReadError = None
 
 RSMC_BASE_URL = "https://rsmcnewdelhi.imd.gov.in"
 IMD_MAUSAM_URL = "https://mausam.imd.gov.in"
-REQUEST_TIMEOUT_SEC = 8
+REQUEST_TIMEOUT_SEC = 15
+MAX_IMD_PDF_BYTES = 12 * 1024 * 1024
+IMD_PRODUCT_PATTERN = re.compile(
+    r"(?:tropical[\s_-]*weather[\s_-]*outlook|national[\s_-]*bulletin|"
+    r"special[\s_-]*bulletin|splbltn)",
+    re.IGNORECASE,
+)
+IMD_WAYPOINT_PATTERN = re.compile(
+    r"(?P<date>\d{1,2}[./-]\d{1,2}[./-]\d{2,4})\s*[/\s]\s*"
+    r"(?P<clock>\d{3,4})\s*(?:UTC|IST)?\s*[:|,\s]+\s*"
+    r"(?P<lat>\d{1,2}(?:\.\d+)?)\s*°?\s*(?P<ns>[NS])?\s*[/|,]\s*"
+    r"(?P<lon>\d{2,3}(?:\.\d+)?)\s*°?\s*(?P<ew>[EW])?",
+    re.IGNORECASE,
+)
 
 # IMD Beaufort Classification
 IMD_INTENSITY_TIERS = [
@@ -67,63 +82,240 @@ def classify_imd_wind(wind_kts: float) -> Tuple[str, str]:
 
 def check_live_imd_rsmc_status() -> Dict[str, Any]:
     """
-    Connects to RSMC New Delhi and checks for active cyclone warnings or bulletins.
-    Returns status dictionary indicating active storm presence or normal vigilance.
+    Checks the official RSMC index and reports its latest dated cyclone product.
     """
-    headers = {
-        "User-Agent": "CycloneShield/2.0 (Disaster-Response-Platform; contact@cycloneshield.in)"
-    }
     result = {
         "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),
         "source": "RSMC New Delhi / India Meteorological Department",
-        "has_active_cyclone": False,
+        "connected": False,
+        "has_active_cyclone": None,
         "active_storm_name": None,
-        "status_title": "Normal Vigilance Mode",
-        "status_badge": "🟢 NO ACTIVE SEVERE CYCLONE IN BASIN",
+        "status_title": "IMD bulletin status unavailable",
+        "status_badge": "⚪ IMD CONNECTION UNAVAILABLE",
         "bulletin_links": [],
-        "summary": "No active tropical cyclone or depression advisory currently issued by RSMC New Delhi for the Bay of Bengal or Arabian Sea."
+        "summary": "The app could not verify the latest RSMC bulletin. No cyclone status is inferred."
     }
 
     try:
-        resp = requests.get(RSMC_BASE_URL, headers=headers, timeout=REQUEST_TIMEOUT_SEC, verify=False)
-        if resp.status_code == 200:
-            html = resp.text
-            # Check for active tropical weather outlook or bulletin pdfs
-            bulletin_matches = re.findall(
-                r'href=[\'"]([^\'"]*(?:bulletin|outlook|cyclone|depression)[^\'"]*\.pdf)[\'"]',
-                html, re.IGNORECASE
-            )
-            clean_links = []
-            for link in set(bulletin_matches):
-                full_url = link if link.startswith("http") else f"{RSMC_BASE_URL}/{link.lstrip('/')}"
-                clean_links.append(full_url)
-            result["bulletin_links"] = clean_links[:5]
+        product = _fetch_latest_imd_product()
+    except requests.RequestException as exc:
+        result["error"] = f"RSMC request failed: {exc}"
+        result["summary"] = "Could not reach the official RSMC index. No cyclone status is inferred."
+        return result
 
-            # Detect if there is a named cyclone or depression active in the page text
-            # Look for explicit system names or warnings
-            alert_keywords = ["cyclonic storm", "deep depression", "cyclone warning", "depression over"]
-            found_alerts = []
-            for kw in alert_keywords:
-                matches = re.findall(rf'({kw}\s+[A-Za-z0-9\-]+)', html, re.IGNORECASE)
-                if matches:
-                    found_alerts.extend(matches)
+    if product is None:
+        result.update({
+            "connected": True,
+            "status_title": "No current cyclone product recognized",
+            "status_badge": "🟡 IMD INDEX REACHED",
+            "summary": "The RSMC site responded, but no dated cyclone outlook or bulletin was recognized."
+        })
+        return result
 
-            # Check if "No Cyclone" is present
-            no_cyclone = "no cyclone" in html.lower()
-
-            if found_alerts and not no_cyclone:
-                active_name = found_alerts[0].strip().title()
-                result["has_active_cyclone"] = True
-                result["active_storm_name"] = active_name
-                result["status_title"] = f"Active System Detected: {active_name}"
-                result["status_badge"] = f"🔴 ACTIVE SYSTEM: {active_name.upper()}"
-                result["summary"] = f"RSMC New Delhi reports active weather system: {active_name}. Ingest track details below to run full vulnerability simulation."
-            else:
-                result["summary"] = "RSMC New Delhi reports no active cyclonic storm in Bay of Bengal / Arabian Sea at this hour. Basin conditions are under standard 24x7 satellite monitoring."
-    except Exception as e:
-        result["summary"] = f"RSMC query status: Live connection attempted ({str(e)[:60]}). Offline resilient cache active."
+    result.update({
+        "connected": True,
+        "status_title": "Latest official IMD product",
+        "status_badge": "🔵 OFFICIAL IMD PRODUCT AVAILABLE",
+        "latest_product_title": product["title"],
+        "latest_product_url": product["url"],
+        "issued_at": product["issued_at"],
+        "product_type": product["product_type"],
+        "bulletin_links": [product["url"]],
+        "summary": (
+            f"Latest product listed by RSMC: {product['title']} "
+            f"(issue date {product['issued_at'] or 'not identified'}). "
+            "This confirms a published product, not an active cyclone or parsed track."
+        )
+    })
 
     return result
+
+
+def _find_latest_imd_product(index_html: str) -> Optional[Dict[str, Any]]:
+    """Finds the newest dated outlook/bulletin link in the official RSMC index."""
+    candidates = []
+    for position, href_match in enumerate(re.finditer(
+        r"""href\s*=\s*["']([^"']+)["']""", index_html, re.IGNORECASE
+    )):
+        href = html.unescape(href_match.group(1))
+        decoded_href = unquote(href)
+        filename = decoded_href.rsplit("/", 1)[-1]
+        if not IMD_PRODUCT_PATTERN.search(filename):
+            continue
+
+        issue_match = re.search(
+            r"(?<!\d)(\d{1,2})[._-](\d{1,2})[._-](20\d{2})(?!\d)",
+            filename
+        )
+        issued_at = None
+        issue_date = datetime.min.replace(tzinfo=timezone.utc)
+        if issue_match:
+            day, month, year = (int(part) for part in issue_match.groups())
+            try:
+                issue_date = datetime(year, month, day, tzinfo=timezone.utc)
+                issued_at = issue_date.strftime("%Y-%m-%d")
+            except ValueError:
+                continue
+
+        title = re.sub(r"\.pdf$", "", filename, flags=re.IGNORECASE)
+        title = re.sub(r"[_-]+", " ", title).strip()
+        product_type = (
+            "Tropical Weather Outlook"
+            if re.search(r"tropical[\s_-]*weather[\s_-]*outlook", filename, re.IGNORECASE)
+            else "Cyclone Bulletin"
+        )
+        url = urljoin(f"{RSMC_BASE_URL}/", href)
+        parsed_url = urlparse(url)
+        if parsed_url.scheme != "https" or parsed_url.hostname != urlparse(RSMC_BASE_URL).hostname:
+            continue
+        candidates.append((issue_date, position, {
+            "title": title,
+            "url": url,
+            "issued_at": issued_at,
+            "product_type": product_type
+        }))
+
+    if not candidates:
+        return None
+    return max(candidates, key=lambda candidate: (candidate[0], candidate[1]))[2]
+
+
+def _fetch_latest_imd_product() -> Optional[Dict[str, Any]]:
+    response = requests.get(
+        f"{RSMC_BASE_URL}/",
+        headers={"User-Agent": "CycloneShield/2.0 (IMD public bulletin reader)"},
+        timeout=REQUEST_TIMEOUT_SEC
+    )
+    response.raise_for_status()
+    return _find_latest_imd_product(response.text)
+
+
+def parse_imd_published_track(bulletin_text: str) -> Tuple[Optional[pd.DataFrame], Dict[str, Any]]:
+    """Parses only explicit per-waypoint time, position, wind, and pressure rows."""
+    waypoints = []
+    for line in bulletin_text.splitlines():
+        point_match = IMD_WAYPOINT_PATTERN.search(line)
+        if not point_match:
+            continue
+
+        wind_match = re.search(
+            r"(?<![\d-])(\d{2,3}(?:\.\d+)?)\s*(?:KNOTS|KTS)\b",
+            line,
+            re.IGNORECASE
+        )
+        pressure_match = re.search(
+            r"(?<!\d)(\d{3,4}(?:\.\d+)?)\s*(?:HPA|MB)\b",
+            line,
+            re.IGNORECASE
+        )
+        if not wind_match or not pressure_match:
+            continue
+
+        date_text = point_match.group("date")
+        date_formats = ("%d.%m.%Y", "%d-%m-%Y", "%d/%m/%Y", "%d.%m.%y", "%d-%m-%y", "%d/%m/%y")
+        waypoint_time = None
+        for date_format in date_formats:
+            try:
+                waypoint_time = datetime.strptime(date_text, date_format)
+                break
+            except ValueError:
+                continue
+        if waypoint_time is None:
+            continue
+
+        clock = point_match.group("clock").zfill(4)
+        try:
+            waypoint_time = waypoint_time.replace(hour=int(clock[:2]), minute=int(clock[2:]))
+        except ValueError:
+            continue
+
+        latitude = float(point_match.group("lat"))
+        longitude = float(point_match.group("lon"))
+        if point_match.group("ns") and point_match.group("ns").upper() == "S":
+            latitude *= -1
+        if point_match.group("ew") and point_match.group("ew").upper() == "W":
+            longitude *= -1
+        wind_kts = float(wind_match.group(1))
+        pressure_mb = float(pressure_match.group(1))
+        if not (-35 <= latitude <= 35 and 35 <= longitude <= 115):
+            continue
+        if not (0 < wind_kts <= 200 and 800 <= pressure_mb <= 1100):
+            continue
+        waypoints.append({
+            "time": waypoint_time,
+            "lat": latitude,
+            "lon": longitude,
+            "wind_kts": wind_kts,
+            "pressure_mb": pressure_mb
+        })
+
+    track_df = pd.DataFrame(waypoints)
+    if len(track_df) < 2:
+        return None, {
+            "track_status": (
+                "The latest document did not contain at least two complete waypoint rows "
+                "with explicit timestamps, coordinates, wind, and pressure. The dashboard track was not changed."
+            )
+        }
+
+    track_df = track_df.drop_duplicates(subset=["time", "lat", "lon"]).sort_values("time").reset_index(drop=True)
+    if len(track_df) < 2:
+        return None, {
+            "track_status": "The latest document did not contain two distinct waypoints. The dashboard track was not changed."
+        }
+    return track_df, {
+        "name": "IMD-LIVE",
+        "category": classify_imd_wind(float(track_df["wind_kts"].max()))[0],
+        "peak_wind_kts": float(track_df["wind_kts"].max()),
+        "min_pressure_mb": float(track_df["pressure_mb"].min()),
+        "total_observations": len(track_df),
+        "track_status": f"Parsed {len(track_df)} explicit waypoints from the official IMD document."
+    }
+
+
+def fetch_latest_imd_bulletin() -> Tuple[Optional[pd.DataFrame], Dict[str, Any]]:
+    """Downloads the latest dated official RSMC product and loads only explicit tracks."""
+    result = check_live_imd_rsmc_status()
+    product_url = result.get("latest_product_url")
+    if not product_url:
+        result["track_status"] = "No downloadable current product was identified; the dashboard track was not changed."
+        return None, result
+    if PdfReader is None:
+        result["track_status"] = "PDF parsing is unavailable. Install the pypdf dependency; the dashboard track was not changed."
+        return None, result
+
+    try:
+        response = requests.get(product_url, timeout=REQUEST_TIMEOUT_SEC)
+        response.raise_for_status()
+    except requests.RequestException as exc:
+        result["error"] = f"Could not download the latest RSMC product: {exc}"
+        result["summary"] = "The RSMC index was reached, but its latest product could not be downloaded."
+        result["track_status"] = "No track was loaded; the dashboard track was not changed."
+        return None, result
+
+    pdf_bytes = response.content
+    if len(pdf_bytes) > MAX_IMD_PDF_BYTES:
+        result["track_status"] = "The RSMC product exceeded the safe download limit; the dashboard track was not changed."
+        return None, result
+    if not pdf_bytes.startswith(b"%PDF-"):
+        result["track_status"] = "The latest RSMC product was not a readable PDF; the dashboard track was not changed."
+        return None, result
+
+    try:
+        reader = PdfReader(io.BytesIO(pdf_bytes), strict=False)
+        bulletin_text = "\n".join(page.extract_text() or "" for page in reader.pages[:20])
+    except PdfReadError as exc:
+        result["error"] = f"Could not read the latest RSMC PDF: {exc}"
+        result["track_status"] = "No track was loaded; the dashboard track was not changed."
+        return None, result
+
+    track_df, track_meta = parse_imd_published_track(bulletin_text)
+    result.update(track_meta)
+    if track_df is not None:
+        result["status_badge"] = "🟢 LIVE IMD TRACK PARSED"
+        result["data_source"] = f"RSMC New Delhi — {result['latest_product_title']}"
+        result["source_url"] = product_url
+    return track_df, result
 
 
 # ---------------------------------------------------------------------------
@@ -361,7 +553,7 @@ def load_emerging_scenario(scenario_key: str) -> Tuple[pd.DataFrame, Dict[str, A
         "total_observations": len(df),
         "target_state": sc["target_state"],
         "target_district": sc["landfall_district"],
-        "data_source": "IMD Live Basin Emerging Alert Model"
+        "data_source": "Synthetic Demo Scenario (not an IMD bulletin)"
     }
     return df, meta
 
