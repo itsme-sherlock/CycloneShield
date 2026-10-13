@@ -516,7 +516,100 @@ with ctrl_col3:
 
 
 # ==============================================================================
-# 2. Live IMD / RSMC Real-Time Cyclone Ingestion Command Center
+# 2. Dynamic Coastal District Geospatial Database
+# ==============================================================================
+
+@st.cache_data
+def load_all_coastal_districts() -> List[Dict[str, Any]]:
+    """Loads all 35 coastal districts across West Bengal, Odisha, AP, TN, Gujarat."""
+    dist_path = os.path.join(DATA_DIR, "coastal_districts.geojson")
+    if os.path.exists(dist_path):
+        with open(dist_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            return [feat["properties"] for feat in data.get("features", [])]
+    return []
+
+@st.cache_data
+def load_cyclone_track_data(storm_name: str, state_name: str) -> Tuple[pd.DataFrame, Dict[str, Any]]:
+    """Fetches standardized cyclone track from local NOAA cache or BigQuery pipeline."""
+    sample_path = os.path.join(DATA_DIR, "noaa_sample_tracks.json")
+    if os.path.exists(sample_path):
+        with open(sample_path, "r", encoding="utf-8") as f:
+            catalog = json.load(f)
+            if storm_name.upper() in catalog:
+                s_meta = catalog[storm_name.upper()]
+                df = pd.DataFrame(s_meta.get("track", []))
+                if not df.empty and "time" in df.columns:
+                    df["time"] = pd.to_datetime(df["time"])
+                return df, s_meta
+
+    # Fallback to BigQuery pipeline client
+    if get_bigquery_pipeline:
+        try:
+            pipeline = get_bigquery_pipeline()
+            df, meta = pipeline.fetch_cyclone_track(storm_name)
+            return df, meta
+        except Exception:
+            pass
+
+    return pd.DataFrame(), {}
+
+# Fallback district database covering all 5 key coastal disaster states
+STATE_FALLBACK_DISTRICTS: Dict[str, List[Dict[str, Any]]] = {
+    "West Bengal": [
+        {"district_name": "South 24 Parganas", "lat": 22.15, "lon": 88.55, "population": 8161961, "coastal_zone": "Sundarbans Estuary", "hq": "Alipore"},
+        {"district_name": "North 24 Parganas", "lat": 22.72, "lon": 88.48, "population": 10009781, "coastal_zone": "Ichamati Estuary", "hq": "Barasat"},
+        {"district_name": "Purba Medinipur", "lat": 21.93, "lon": 87.77, "population": 5095875, "coastal_zone": "Digha - Mandarmani Coast", "hq": "Tamluk"},
+        {"district_name": "Kolkata", "lat": 22.57, "lon": 88.36, "population": 4496694, "coastal_zone": "Hooghly Urban Basin", "hq": "Kolkata"},
+        {"district_name": "Howrah", "lat": 22.59, "lon": 88.26, "population": 4850029, "coastal_zone": "Lower Damodar Basin", "hq": "Howrah"},
+    ],
+    "Odisha": [
+        {"district_name": "Puri", "lat": 19.81, "lon": 85.83, "population": 1698730, "coastal_zone": "Chilika - Puri Shoreline", "hq": "Puri"},
+        {"district_name": "Jagatsinghpur", "lat": 20.25, "lon": 86.17, "population": 1136971, "coastal_zone": "Paradeep Port Sector", "hq": "Jagatsinghpur"},
+        {"district_name": "Kendrapara", "lat": 20.50, "lon": 86.42, "population": 1440361, "coastal_zone": "Bhitarkanika Mangroves", "hq": "Kendrapara"},
+        {"district_name": "Bhadrak", "lat": 21.05, "lon": 86.50, "population": 1506522, "coastal_zone": "Dhamra Port Shore", "hq": "Bhadrak"},
+        {"district_name": "Balasore", "lat": 21.49, "lon": 86.93, "population": 2320529, "coastal_zone": "Chandipur Coast", "hq": "Balasore"},
+        {"district_name": "Ganjam", "lat": 19.38, "lon": 85.05, "population": 3529031, "coastal_zone": "Gopalpur Port Coast", "hq": "Chatrapur"},
+    ],
+    "Andhra Pradesh": [
+        {"district_name": "Visakhapatnam", "lat": 17.68, "lon": 83.21, "population": 4290589, "coastal_zone": "Vizag Major Port & Harbor", "hq": "Visakhapatnam"},
+        {"district_name": "Srikakulam", "lat": 18.29, "lon": 83.89, "population": 2703114, "coastal_zone": "North AP Coastal Border", "hq": "Srikakulam"},
+        {"district_name": "Vizianagaram", "lat": 18.11, "lon": 83.40, "population": 2344474, "coastal_zone": "Bhimunipatnam Sector", "hq": "Vizianagaram"},
+        {"district_name": "East Godavari", "lat": 16.98, "lon": 82.24, "population": 5286474, "coastal_zone": "Kakinada - Godavari Delta", "hq": "Kakinada"},
+        {"district_name": "Krishna", "lat": 16.18, "lon": 81.13, "population": 4517398, "coastal_zone": "Machilipatnam Coast", "hq": "Machilipatnam"},
+        {"district_name": "Bapatla", "lat": 15.90, "lon": 80.46, "population": 1586918, "coastal_zone": "Suryalanka - Nizampatnam Shore", "hq": "Bapatla"},
+        {"district_name": "SPSR Nellore", "lat": 14.44, "lon": 79.98, "population": 2963557, "coastal_zone": "Krishnapatnam Port Belt", "hq": "Nellore"},
+    ],
+    "Tamil Nadu": [
+        {"district_name": "Chennai", "lat": 13.08, "lon": 80.27, "population": 7088403, "coastal_zone": "Coromandel Urban Coast", "hq": "Chennai"},
+        {"district_name": "Chengalpattu", "lat": 12.68, "lon": 79.98, "population": 2556244, "coastal_zone": "Mahabalipuram Shore", "hq": "Chengalpattu"},
+        {"district_name": "Cuddalore", "lat": 11.75, "lon": 79.76, "population": 2605914, "coastal_zone": "Cuddalore Port Shoreline", "hq": "Cuddalore"},
+        {"district_name": "Nagapattinam", "lat": 10.76, "lon": 79.84, "population": 1616450, "coastal_zone": "Vedaranyam - Point Calimere", "hq": "Nagapattinam"},
+        {"district_name": "Thiruvarur", "lat": 10.77, "lon": 79.63, "population": 1264277, "coastal_zone": "Cauvery Delta Estuary", "hq": "Thiruvarur"},
+        {"district_name": "Ramanathapuram", "lat": 9.36, "lon": 78.83, "population": 1353445, "coastal_zone": "Pamban - Rameswaram Island", "hq": "Ramanathapuram"},
+    ],
+    "Gujarat": [
+        {"district_name": "Kutch", "lat": 23.24, "lon": 69.66, "population": 2092371, "coastal_zone": "Gulf of Kutch - Jakhau Port", "hq": "Bhuj"},
+        {"district_name": "Devbhumi Dwarka", "lat": 22.24, "lon": 68.96, "population": 752484, "coastal_zone": "Dwarka Promontory", "hq": "Khambhalia"},
+        {"district_name": "Jamnagar", "lat": 22.47, "lon": 70.07, "population": 2160119, "coastal_zone": "Marine National Park Shore", "hq": "Jamnagar"},
+        {"district_name": "Porbandar", "lat": 21.64, "lon": 69.60, "population": 585449, "coastal_zone": "Saurashtra Open Arabian Sea", "hq": "Porbandar"},
+        {"district_name": "Gir Somnath", "lat": 20.90, "lon": 70.36, "population": 1217477, "coastal_zone": "Veraval Fishing Port", "hq": "Veraval"},
+        {"district_name": "Bhavnagar", "lat": 21.76, "lon": 72.15, "population": 2880365, "coastal_zone": "Gulf of Khambhat", "hq": "Bhavnagar"},
+    ]
+}
+
+# Load District Data
+all_districts = load_all_coastal_districts()
+state_districts = [
+    d for d in all_districts 
+    if d.get("state_or_division", "").strip().lower() == selected_state.strip().lower()
+]
+if not state_districts:
+    state_districts = STATE_FALLBACK_DISTRICTS.get(selected_state, STATE_FALLBACK_DISTRICTS.get("West Bengal", []))
+
+
+# ==============================================================================
+# 3. Live IMD / RSMC Real-Time Cyclone Ingestion Command Center
 # ==============================================================================
 custom_track_df = None
 if is_custom_track:
@@ -703,97 +796,10 @@ if is_custom_track:
 
 
 
+
 # ==============================================================================
-# 3. Dynamic Data Loading & Spatial Harmonization
+# 4. Load Cyclone Track Data & Landfall Parameters
 # ==============================================================================
-
-@st.cache_data
-def load_all_coastal_districts() -> List[Dict[str, Any]]:
-    """Loads all 35 coastal districts across West Bengal, Odisha, AP, TN, Gujarat."""
-    dist_path = os.path.join(DATA_DIR, "coastal_districts.geojson")
-    if os.path.exists(dist_path):
-        with open(dist_path, "r", encoding="utf-8") as f:
-            data = json.load(f)
-            return [feat["properties"] for feat in data.get("features", [])]
-    return []
-
-@st.cache_data
-def load_cyclone_track_data(storm_name: str, state_name: str) -> Tuple[pd.DataFrame, Dict[str, Any]]:
-    """Fetches standardized cyclone track from local NOAA cache or BigQuery pipeline."""
-    sample_path = os.path.join(DATA_DIR, "noaa_sample_tracks.json")
-    if os.path.exists(sample_path):
-        with open(sample_path, "r", encoding="utf-8") as f:
-            catalog = json.load(f)
-            if storm_name.upper() in catalog:
-                s_meta = catalog[storm_name.upper()]
-                df = pd.DataFrame(s_meta.get("track", []))
-                if not df.empty and "time" in df.columns:
-                    df["time"] = pd.to_datetime(df["time"])
-                return df, s_meta
-
-    # Fallback to BigQuery pipeline client
-    if get_bigquery_pipeline:
-        try:
-            pipeline = get_bigquery_pipeline()
-            df, meta = pipeline.fetch_cyclone_track(storm_name)
-            return df, meta
-        except Exception:
-            pass
-
-    return pd.DataFrame(), {}
-
-# Fallback district database covering all 5 key coastal disaster states
-STATE_FALLBACK_DISTRICTS: Dict[str, List[Dict[str, Any]]] = {
-    "West Bengal": [
-        {"district_name": "South 24 Parganas", "lat": 22.15, "lon": 88.55, "population": 8161961, "coastal_zone": "Sundarbans Estuary", "hq": "Alipore"},
-        {"district_name": "North 24 Parganas", "lat": 22.72, "lon": 88.48, "population": 10009781, "coastal_zone": "Ichamati Estuary", "hq": "Barasat"},
-        {"district_name": "Purba Medinipur", "lat": 21.93, "lon": 87.77, "population": 5095875, "coastal_zone": "Digha - Mandarmani Coast", "hq": "Tamluk"},
-        {"district_name": "Kolkata", "lat": 22.57, "lon": 88.36, "population": 4496694, "coastal_zone": "Hooghly Urban Basin", "hq": "Kolkata"},
-        {"district_name": "Howrah", "lat": 22.59, "lon": 88.26, "population": 4850029, "coastal_zone": "Lower Damodar Basin", "hq": "Howrah"},
-    ],
-    "Odisha": [
-        {"district_name": "Puri", "lat": 19.81, "lon": 85.83, "population": 1698730, "coastal_zone": "Chilika - Puri Shoreline", "hq": "Puri"},
-        {"district_name": "Jagatsinghpur", "lat": 20.25, "lon": 86.17, "population": 1136971, "coastal_zone": "Paradeep Port Sector", "hq": "Jagatsinghpur"},
-        {"district_name": "Kendrapara", "lat": 20.50, "lon": 86.42, "population": 1440361, "coastal_zone": "Bhitarkanika Mangroves", "hq": "Kendrapara"},
-        {"district_name": "Bhadrak", "lat": 21.05, "lon": 86.50, "population": 1506522, "coastal_zone": "Dhamra Port Shore", "hq": "Bhadrak"},
-        {"district_name": "Balasore", "lat": 21.49, "lon": 86.93, "population": 2320529, "coastal_zone": "Chandipur Coast", "hq": "Balasore"},
-        {"district_name": "Ganjam", "lat": 19.38, "lon": 85.05, "population": 3529031, "coastal_zone": "Gopalpur Port Coast", "hq": "Chatrapur"},
-    ],
-    "Andhra Pradesh": [
-        {"district_name": "Visakhapatnam", "lat": 17.68, "lon": 83.21, "population": 4290589, "coastal_zone": "Vizag Major Port & Harbor", "hq": "Visakhapatnam"},
-        {"district_name": "Srikakulam", "lat": 18.29, "lon": 83.89, "population": 2703114, "coastal_zone": "North AP Coastal Border", "hq": "Srikakulam"},
-        {"district_name": "Vizianagaram", "lat": 18.11, "lon": 83.40, "population": 2344474, "coastal_zone": "Bhimunipatnam Sector", "hq": "Vizianagaram"},
-        {"district_name": "East Godavari", "lat": 16.98, "lon": 82.24, "population": 5286474, "coastal_zone": "Kakinada - Godavari Delta", "hq": "Kakinada"},
-        {"district_name": "Krishna", "lat": 16.18, "lon": 81.13, "population": 4517398, "coastal_zone": "Machilipatnam Coast", "hq": "Machilipatnam"},
-        {"district_name": "Bapatla", "lat": 15.90, "lon": 80.46, "population": 1586918, "coastal_zone": "Suryalanka - Nizampatnam Shore", "hq": "Bapatla"},
-        {"district_name": "SPSR Nellore", "lat": 14.44, "lon": 79.98, "population": 2963557, "coastal_zone": "Krishnapatnam Port Belt", "hq": "Nellore"},
-    ],
-    "Tamil Nadu": [
-        {"district_name": "Chennai", "lat": 13.08, "lon": 80.27, "population": 7088403, "coastal_zone": "Coromandel Urban Coast", "hq": "Chennai"},
-        {"district_name": "Chengalpattu", "lat": 12.68, "lon": 79.98, "population": 2556244, "coastal_zone": "Mahabalipuram Shore", "hq": "Chengalpattu"},
-        {"district_name": "Cuddalore", "lat": 11.75, "lon": 79.76, "population": 2605914, "coastal_zone": "Cuddalore Port Shoreline", "hq": "Cuddalore"},
-        {"district_name": "Nagapattinam", "lat": 10.76, "lon": 79.84, "population": 1616450, "coastal_zone": "Vedaranyam - Point Calimere", "hq": "Nagapattinam"},
-        {"district_name": "Thiruvarur", "lat": 10.77, "lon": 79.63, "population": 1264277, "coastal_zone": "Cauvery Delta Estuary", "hq": "Thiruvarur"},
-        {"district_name": "Ramanathapuram", "lat": 9.36, "lon": 78.83, "population": 1353445, "coastal_zone": "Pamban - Rameswaram Island", "hq": "Ramanathapuram"},
-    ],
-    "Gujarat": [
-        {"district_name": "Kutch", "lat": 23.24, "lon": 69.66, "population": 2092371, "coastal_zone": "Gulf of Kutch - Jakhau Port", "hq": "Bhuj"},
-        {"district_name": "Devbhumi Dwarka", "lat": 22.24, "lon": 68.96, "population": 752484, "coastal_zone": "Dwarka Promontory", "hq": "Khambhalia"},
-        {"district_name": "Jamnagar", "lat": 22.47, "lon": 70.07, "population": 2160119, "coastal_zone": "Marine National Park Shore", "hq": "Jamnagar"},
-        {"district_name": "Porbandar", "lat": 21.64, "lon": 69.60, "population": 585449, "coastal_zone": "Saurashtra Open Arabian Sea", "hq": "Porbandar"},
-        {"district_name": "Gir Somnath", "lat": 20.90, "lon": 70.36, "population": 1217477, "coastal_zone": "Veraval Fishing Port", "hq": "Veraval"},
-        {"district_name": "Bhavnagar", "lat": 21.76, "lon": 72.15, "population": 2880365, "coastal_zone": "Gulf of Khambhat", "hq": "Bhavnagar"},
-    ]
-}
-
-# Load District Data
-all_districts = load_all_coastal_districts()
-state_districts = [
-    d for d in all_districts 
-    if d.get("state_or_division", "").strip().lower() == selected_state.strip().lower()
-]
-if not state_districts:
-    state_districts = STATE_FALLBACK_DISTRICTS.get(selected_state, STATE_FALLBACK_DISTRICTS.get("West Bengal", []))
 
 # Load Track Data
 if is_custom_track and custom_track_df is not None and not custom_track_df.empty:
@@ -1816,16 +1822,38 @@ with tab_matrix:
 
     if not state_vuln_df.empty:
         display_df = state_vuln_df[[
-            "rank", "district_name", "population", "vulnerability_score", "threat_tier",
+            "rank", "district_name", "population", "district_wind_kts", "imd_wind_class", "district_surge_m",
+            "wind_subscore", "surge_subscore", "vulnerability_score", "imd_colour", "threat_tier",
             "evacuation_priority", "flooded_hospitals", "flooded_shelters", "submerged_road_km", "action_directive"
         ]].copy()
         
         display_df.columns = [
-            "Rank", "District", "Population", "Risk Score (0-100)", "Threat Level",
+            "Rank", "District", "Population", "Local Wind (kts)", "IMD Wind Class", "Surge Proxy (m)",
+            "Wind Sub-score", "Surge Sub-score", "Risk Score (0-100)", "IMD Colour", "Threat Level",
             "Evac Priority", "Flooded Hosp", "Flooded Shelters", "Cutoff Road (km)", "Action Directive"
         ]
 
         st.dataframe(display_df, use_container_width=True, hide_index=True)
+
+        with st.expander("ℹ️ How are these risk scores and colours calculated?", expanded=False):
+            st.markdown("""
+**Reference scales**
+- **IMD wind classes (knots):** Depression 17–27 · Deep Depression 28–33 · Cyclonic Storm 34–47 · Severe CS 48–63 · Very Severe CS 64–89 · Extremely Severe CS 90–119 · Super CS ≥120.
+- **IMD / NDMA colour-coded warnings:** Green (no action) · Yellow (watch – be aware) · Orange (alert – be prepared) · Red (warning – take action).
+
+**Method**
+1. **Local wind:** each track point's sustained wind is decayed with distance from that point (linear rise to a 30 km core radius, then a power-law fall-off). The strongest value over the track is used.
+2. **Surge proxy:** `0.099 × (1013 − min pressure)` metres, decayed with distance from the track and limited to track points within 100 km of land.
+3. **Sub-scores (0–100):** wind and surge are mapped through anchors placed on the IMD class boundaries (wind 34 kts → 30, 48 → 50, 64 → 70, 90 → 85, 120 → 100; surge 1 m → 50, 2 m → 70, 3 m → 85, 4 m → 100).
+4. **Risk score:** `max(wind, surge) + 0.1 × min(wind, surge)`, capped at 100.
+5. **Colour and tier from score:** ≥70 Red / CRITICAL (Priority 1) · ≥50 Orange / HIGH · ≥30 Yellow / MODERATE · otherwise Green / LOW.
+6. **Flooded facilities:** counted from the OpenStreetMap baseline where facility elevation is below the modelled surge. Only available for West Bengal and Bangladesh.
+
+**Limitations**
+- The wind profile and surge proxy are simplified; they ignore bathymetry, tide, coastline shape and forward speed.
+- IMD defines no surge-based colour rule; the surge anchors and score cut-offs are project conventions.
+- This is decision support, **not** an official IMD/NDMA warning. Follow SDMA/DDMA orders.
+""")
 
         csv_bytes = state_vuln_df.to_csv(index=False).encode("utf-8")
         st.download_button(
