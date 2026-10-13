@@ -106,8 +106,8 @@ try:
 except ImportError:
     analyze_damage_image = None
     load_sample_damage_images = None
-    DEFAULT_VISION_MODEL = "gemini-3.1-flash-lite"
-    FALLBACK_VISION_MODEL = "gemini-3.7-flash"
+    DEFAULT_VISION_MODEL = "gemini-2.5-flash"
+    FALLBACK_VISION_MODEL = "gemini-1.5-flash"
     SAMPLE_DIR = os.path.join(DATA_DIR, "sample_damage")
 
 try:
@@ -152,6 +152,34 @@ except ImportError:
     get_bigquery_pipeline = None
     DEFAULT_BQ_DATASET = "bigquery-public-data.noaa_hurricanes"
     DEFAULT_BQ_TABLE = "bigquery-public-data.noaa_hurricanes.ibtracs_all"
+
+try:
+    from parametric_insurance import (
+        evaluate_parametric_trigger,
+        compute_district_parametric_matrix,
+        get_aggregate_payout_summary,
+        TRIGGER_TIERS,
+        STATE_DEFAULT_SUM_INSURED_CR,
+        SDRF_CORPUS_CR
+    )
+except ImportError:
+    evaluate_parametric_trigger = None
+    compute_district_parametric_matrix = None
+    get_aggregate_payout_summary = None
+    TRIGGER_TIERS = []
+    STATE_DEFAULT_SUM_INSURED_CR = {}
+    SDRF_CORPUS_CR = {}
+
+try:
+    from realtime_met import (
+        fetch_landfall_forecast,
+        fetch_marine_conditions,
+        fetch_district_met_snapshot
+    )
+except ImportError:
+    fetch_landfall_forecast = None
+    fetch_marine_conditions = None
+    fetch_district_met_snapshot = None
 
 # Page configuration
 st.set_page_config(
@@ -758,6 +786,19 @@ crit_districts = (state_vuln_df["threat_tier"] == "CRITICAL").sum()
 total_flooded_roads = round(float(state_vuln_df["submerged_road_km"].sum()), 1)
 total_flooded_hosps = int(state_vuln_df["flooded_hospitals"].sum())
 total_flooded_shelters = int(state_vuln_df["flooded_shelters"].sum())
+total_flooded_power = int(state_vuln_df["flooded_power_substations"].sum()) if "flooded_power_substations" in state_vuln_df.columns else 0
+
+# Parametric insurance — evaluate state-level trigger
+_ins_result = None
+if evaluate_parametric_trigger:
+    try:
+        _ins_result = evaluate_parametric_trigger(
+            wind_kts=peak_wind,
+            surge_m=calc_surge_m,
+            state_name=selected_state
+        )
+    except Exception:
+        _ins_result = None
 
 
 # ==============================================================================
@@ -870,11 +911,18 @@ with kpi_cols[4]:
     """)
 
 with kpi_cols[5]:
+    _ins_label = "NO TRIGGER"
+    _ins_color = "#3b82f6"
+    _ins_payout = "₹ 0 Cr"
+    if _ins_result and _ins_result.is_triggered:
+        _ins_label = f"TIER {_ins_result.active_tier} — {_ins_result.tier_name}"
+        _ins_color = _ins_result.color
+        _ins_payout = f"₹ {_ins_result.payout_amount_cr:.0f} Cr"
     render_html(f"""
-    <div class="kpi-card" title="Number of districts facing the highest life-threatening risk from combined storm surge and hurricane-force winds. Mandatory pre-landfall evacuation is required for all residents in these zones.">
-        <div class="kpi-label">Mandatory Evacuation Zones</div>
-        <div class="kpi-value" style="color:#ef4444;">{crit_districts} Districts</div>
-        <div class="kpi-sub">Highest life-threat — evacuate immediately</div>
+    <div class="kpi-card" title="Parametric insurance trigger tier. Payouts are automatic when wind/surge crosses thresholds — no claims needed. Funds release pre-landfall for evacuation, generator fuel and shelter supplies.">
+        <div class="kpi-label">Parametric Insurance Trigger</div>
+        <div class="kpi-value" style="color:{_ins_color}; font-size:17px;">{_ins_label}</div>
+        <div class="kpi-sub">Auto-payout: <b style="color:#f8fafc;">{_ins_payout}</b> · Activated now</div>
     </div>
     """)
 
@@ -886,13 +934,15 @@ render_html("<div style='height: 12px;'></div>")
 # 6. Master Step-by-Step Navigation Tabs
 # ==============================================================================
 
-tab_geo, tab_voice, tab_vision, tab_matrix, tab_sim, tab_tech = st.tabs([
+tab_geo, tab_voice, tab_vision, tab_matrix, tab_sim, tab_insurance, tab_met, tab_tech = st.tabs([
     "🗺️ 1. Situation & Hazard Maps",
     "📢 2. Voice Alerts & Broadcast Hub",
     "📸 3. Ground Damage Photo Triage",
     "📊 4. Multi-District Risk Matrix",
     "🌪️ 5. What-If Landfall Simulator",
-    "🛰️ 6. Technical Architecture & Evaluator Audit"
+    "💰 6. Parametric Insurance Triggers",
+    "🌤️ 7. Real-Time Met Feed",
+    "🛰️ 8. Technical Architecture & Evaluator Audit"
 ])
 
 
@@ -1155,12 +1205,13 @@ with tab_geo:
         )
         components.html(dyn_map_html, height=580, scrolling=False)
 
-        # Quick Plain-Language Cartographic Bar
+        # Quick Plain-Language Cartographic Bar with honest GEE badge
         st.markdown("""
         <div style="display:flex; justify-content:space-between; font-size:12px; color:#cbd5e1; background:rgba(30,41,59,0.7); padding:8px 14px; border-radius:8px; margin-top:6px;">
-            <div title="NASA SRTM: Shuttle Radar Topography Mission — satellite-measured terrain heights at 30-metre resolution across India's coastline.">🗺️ <b>Terrain Data</b>: NASA SRTM 30-m Satellite Elevation</div>
-            <div title="NOAA IBTrACS: International Best Track Archive for Climate Stewardship — the official global historical cyclone database maintained by the US National Oceanic and Atmospheric Administration.">🌪️ <b>Storm Tracks</b>: NOAA Global Historical Cyclone Archive</div>
-            <div title="OpenStreetMap: A community-mapped open geographic database covering hospitals, roads, and cyclone shelters across India.">🏥 <b>Infrastructure</b>: OpenStreetMap (Hospitals, Roads & Shelters)</div>
+            <div title="Elevation: USGS/NASA SRTM 30m queried via OpenTopodata free API. Google Earth Engine is used when credentials are present; OpenTopodata is the authenticated-free fallback.">🗺️ <b>Elevation</b>: SRTM 30m via OpenTopodata <span style='background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b;border-radius:4px;padding:1px 6px;font-size:10px;'>Screening Model</span></div>
+            <div title="NOAA IBTrACS v4: International Best Track Archive for Climate Stewardship — official global historical cyclone database.">🌪️ <b>Storm Tracks</b>: NOAA IBTrACS v4 <span style='background:#10b98122;color:#10b981;border:1px solid #10b981;border-radius:4px;padding:1px 6px;font-size:10px;'>Real Data</span></div>
+            <div title="OpenStreetMap: Community-mapped hospitals, cyclone shelters, power substations, and roads. Live Overpass API with offline baseline fallback.">🏥 <b>Infrastructure</b>: OpenStreetMap (OSM Overpass) <span style='background:#10b98122;color:#10b981;border:1px solid #10b981;border-radius:4px;padding:1px 6px;font-size:10px;'>Real Data</span></div>
+            <div title="Open-Meteo ECMWF IFS: Free real-time weather forecast, updated every 15 minutes. No API key required.">🌤️ <b>Weather</b>: Open-Meteo ECMWF IFS <span style='background:#10b98122;color:#10b981;border:1px solid #10b981;border-radius:4px;padding:1px 6px;font-size:10px;'>Live Feed</span></div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -1464,7 +1515,7 @@ _Sent via CycloneShield AI Command Center_"""
 # ==============================================================================
 with tab_vision:
     backend_vkey = get_resolved_api_key()
-    vision_status_pill = '<span class="source-badge-real">⚡ Gemini Vision API Connected</span>' if backend_vkey else '<span class="source-badge-sim">🛡️ Zero-Key Calibrated Vision Mode</span>'
+    vision_status_pill = '<span class="source-badge-est">🔑 Gemini API key detected • not yet verified</span>' if backend_vkey else '<span class="source-badge-sim">🛡️ Zero-Key Calibrated Offline Mode</span>'
 
     st.markdown(f"""
     <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
@@ -1473,7 +1524,7 @@ with tab_vision:
                 <span>📸</span> Field Ground Damage AI Photo Triage
             </div>
             <div style="font-size:13px; color:#cbd5e1; margin-top:2px;">
-                Upload drone or citizen disaster photos to instantly evaluate flood depth, structural damage level (1-5), and required NDRF equipment.
+                Run live Gemini Vision when available, or inspect a clearly labeled offline benchmark result.
             </div>
         </div>
         <div>
@@ -1490,7 +1541,7 @@ with tab_vision:
             horizontal=True
         )
     with v_c2:
-        vis_model_choice = st.selectbox("Gemini Vision Model:", ["gemini-3.1-flash-lite", "gemini-3.7-flash", "gemini-3.5-flash"], index=0)
+        vis_model_choice = st.selectbox("Gemini Vision Model:", ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"], index=0)
 
     sample_items = load_sample_damage_images() if load_sample_damage_images else []
     sel_img_path = None
@@ -1522,10 +1573,13 @@ with tab_vision:
     if sel_img_path or up_img_bytes:
         img_payload = sel_img_path if sel_img_path else up_img_bytes
         cache_key = f"triage_{target_img_name}"
+        live_attempt_key = f"{cache_key}_live_attempted"
 
-        run_triage_btn = st.button("🔍 Run Gemini Damage Triage", type="primary", use_container_width=False)
+        run_triage_btn = st.button("🔍 Run Damage Triage", type="primary", use_container_width=False)
         if run_triage_btn:
-            with st.spinner("Analyzing damage photo with Google Gemini Multimodal Vision..."):
+            st.session_state[live_attempt_key] = True
+            spinner_text = "Calling Google Gemini Vision..." if backend_vkey else "Running calibrated offline triage..."
+            with st.spinner(spinner_text):
                 if analyze_damage_image:
                     try:
                         triage_res = analyze_damage_image(
@@ -1557,6 +1611,17 @@ with tab_vision:
 
     # Display Triage Results in Clean Plain-Language Cards
     if triage_res:
+        is_live_vision = triage_res.get("is_live_api", False)
+        if is_live_vision:
+            st.success("Live response received from Google Gemini Vision.")
+        elif backend_vkey:
+            if st.session_state.get(live_attempt_key, False):
+                st.warning("No live Gemini result was used. This is the calibrated offline fallback; check API access, model availability, and quota before presenting.")
+            else:
+                st.info("Showing an offline benchmark reference. Click Run Damage Triage to test whether the configured Gemini key can return a live result.")
+        else:
+            st.warning("No Gemini API key is configured. This is an offline benchmark/fallback result, not live image analysis.")
+
         t_col1, t_col2 = st.columns([1.1, 1.35], gap="large")
 
         with t_col1:
@@ -1604,12 +1669,15 @@ with tab_vision:
             m1.markdown(f"<div class='kpi-card'><div class='kpi-label'>Water Level</div><div class='kpi-value' style='font-size:18px; color:#38bdf8;'>{water_str}</div></div>", unsafe_allow_html=True)
             m2.markdown(f"<div class='kpi-card'><div class='kpi-label'>Road Access</div><div class='kpi-value' style='font-size:16px; color:#ef4444;'>{road_stat}</div></div>", unsafe_allow_html=True)
             m3.markdown(f"<div class='kpi-card'><div class='kpi-label'>Response Window</div><div class='kpi-value' style='font-size:16px; color:#f97316;'>{urgency_txt}</div></div>", unsafe_allow_html=True)
-            m4.markdown(f"<div class='kpi-card'><div class='kpi-label'>AI Confidence</div><div class='kpi-value' style='font-size:18px; color:#10b981;'>{triage_res.get('confidence_score', 0.95)*100:.0f}%</div></div>", unsafe_allow_html=True)
+            confidence_value = f"{triage_res.get('confidence_score', 0.95)*100:.0f}%" if is_live_vision else "N/A"
+            confidence_label = "Gemini Confidence" if is_live_vision else "Live Confidence"
+            m4.markdown(f"<div class='kpi-card'><div class='kpi-label'>{confidence_label}</div><div class='kpi-value' style='font-size:18px; color:#10b981;'>{confidence_value}</div></div>", unsafe_allow_html=True)
 
             render_html("<div style='height: 10px;'></div>")
 
             # Visual Evidence
-            render_html("<div style='font-size:13px; font-weight:700; color:#cbd5e1;'>🔍 What Gemini Vision Detected:</div>")
+            observation_heading = "🔍 Gemini Vision Observations:" if is_live_vision else "🔍 Offline Benchmark Reference (not model output):"
+            render_html(f"<div style='font-size:13px; font-weight:700; color:#cbd5e1;'>{observation_heading}</div>")
             for obs in triage_res.get("visual_observations", []):
                 render_html(f"<div style='font-size:13px; color:#cbd5e1; margin-bottom:4px;'>▸ {obs}</div>")
 
@@ -1757,7 +1825,277 @@ with tab_sim:
 
 
 # ==============================================================================
-# TAB 6: Technical Architecture & Evaluator Audit (Collapsed for Judges)
+# TAB 6: Parametric Insurance Liquidity Trigger Dashboard
+# ==============================================================================
+with tab_insurance:
+    st.markdown("""
+    <div style="font-size:18px; font-weight:800; color:#38bdf8; display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+        <span>💰</span> Parametric Insurance Liquidity Trigger Dashboard
+    </div>
+    <div style="font-size:13px; color:#cbd5e1; margin-bottom:14px;">
+        Parametric insurance pays out <b>automatically</b> when wind speed or surge crosses a pre-agreed threshold —
+        <b>no claims process, no damage assessment delay.</b> Funds can be released <b>pre-landfall</b> to pay for
+        evacuation buses, generator fuel, medicine stockpiles, and cyclone shelter supplies.
+    </div>
+    """, unsafe_allow_html=True)
+
+    if evaluate_parametric_trigger and compute_district_parametric_matrix and get_aggregate_payout_summary:
+        ins_result = evaluate_parametric_trigger(
+            wind_kts=peak_wind,
+            surge_m=calc_surge_m,
+            state_name=selected_state
+        )
+
+        # State-level trigger card
+        ins_border = ins_result.color
+        ins_badge = "TRIGGERED ✅" if ins_result.is_triggered else "NOT YET TRIGGERED"
+        render_html(f"""
+        <div class="situation-card" style="border-left-color:{ins_border};">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px;">
+                <div>
+                    <div style="font-size:12px; font-weight:700; color:{ins_border}; text-transform:uppercase; letter-spacing:0.8px;">💰 PARAMETRIC INSURANCE TRIGGER STATUS</div>
+                    <h2 style="margin:4px 0 6px 0; font-size:22px; font-weight:800; color:#f8fafc;">{ins_result.tier_label}</h2>
+                    <div style="font-size:13.5px; color:#cbd5e1; line-height:1.6;">
+                        🌪️ <b>Wind</b>: {ins_result.wind_kts:.0f} kts &nbsp;|&nbsp;
+                        🌊 <b>Surge</b>: {ins_result.surge_m:.2f} m &nbsp;|&nbsp;
+                        🎯 <b>Trigger Source</b>: {ins_result.trigger_source.upper()}<br>
+                        📋 {ins_result.description}
+                    </div>
+                </div>
+                <div style="text-align:right;">
+                    <div style="font-size:30px; font-weight:900; color:{ins_border};">
+                        ₹ {ins_result.payout_amount_cr:.0f} Cr
+                    </div>
+                    <div style="font-size:12px; color:#94a3b8;">Auto-payout within {ins_result.time_to_payout_hours}h of trigger confirmation</div>
+                    <div style="font-size:11px; color:{ins_border}; font-weight:700; margin-top:4px;">{ins_badge}</div>
+                </div>
+            </div>
+            <div class="directive-box" style="margin-top:12px; margin-bottom:0;">
+                <div style="font-size:11px; font-weight:800; color:#ef4444; text-transform:uppercase;">🚨 NDRF / SDMA IMPLICATION:</div>
+                <div style="font-size:13px; color:#f1f5f9; margin-top:2px;">{ins_result.ndrf_implication}</div>
+            </div>
+        </div>
+        """)
+
+        # Tier waterfall visualization
+        st.markdown("<div style='font-size:14px; font-weight:700; color:#38bdf8; margin:12px 0 8px;'>📊 Trigger Tier Waterfall — All Thresholds</div>", unsafe_allow_html=True)
+        tier_cols = st.columns(4)
+        for i, tier in enumerate(ins_result.all_tiers_status):
+            with tier_cols[i % 4]:
+                is_active = tier["is_triggered"]
+                bg = f"background:rgba({','.join(str(int(tier['color'].lstrip('#')[j:j+2], 16)) for j in (0,2,4))}, 0.18);"
+                border = f"border:2px solid {tier['color']};" if is_active else "border:1px solid rgba(148,163,184,0.2);"
+                st.markdown(f"""
+                <div style="{bg}{border}border-radius:10px;padding:12px;text-align:center;margin-bottom:8px;">
+                    <div style="font-size:11px; font-weight:700; color:{tier['color']}; text-transform:uppercase;">{tier['tier_name']}</div>
+                    <div style="font-size:18px; font-weight:900; color:#f8fafc; margin:4px 0;">₹ {STATE_DEFAULT_SUM_INSURED_CR.get(selected_state,500)*tier['payout_pct']:.0f} Cr</div>
+                    <div style="font-size:11px; color:#94a3b8;">Wind ≥ {tier['wind_threshold']:.0f} kts<br>OR Surge ≥ {tier['surge_threshold']:.1f} m</div>
+                    <div style="font-size:12px; font-weight:700; color:{'#10b981' if is_active else '#64748b'}; margin-top:6px;">{'✅ ACTIVE' if is_active else '⭕ NOT MET'}</div>
+                </div>
+                """, unsafe_allow_html=True)
+
+        # District-level parametric matrix
+        st.markdown("<div style='font-size:14px; font-weight:700; color:#38bdf8; margin:14px 0 8px;'>🏘️ District-Level Parametric Payout Matrix</div>", unsafe_allow_html=True)
+        st.caption("Each district receives a proportional payout based on its exposure to the cyclone core. More exposed districts receive higher effective wind/surge values and trigger higher tiers.")
+
+        if not state_vuln_df.empty:
+            district_ins = compute_district_parametric_matrix(
+                district_rows=state_vuln_df.to_dict(orient="records"),
+                base_wind_kts=peak_wind,
+                base_surge_m=calc_surge_m,
+                state_name=selected_state,
+                sum_insured_cr_per_district=50.0
+            )
+            summary = get_aggregate_payout_summary(district_ins, selected_state)
+
+            ins_df = pd.DataFrame(district_ins)[[
+                "district_name", "population", "effective_wind_kts", "effective_surge_m",
+                "insurance_tier_name", "payout_pct", "payout_amount_cr", "ndrf_implication"
+            ]]
+            ins_df.columns = ["District", "Population", "Wind (kts)", "Surge (m)",
+                               "Insurance Tier", "Payout %", "Payout (₹ Cr)", "NDRF Directive"]
+            ins_df["Payout %"] = (ins_df["Payout %"] * 100).apply(lambda x: f"{x:.0f}%")
+            st.dataframe(ins_df, use_container_width=True, hide_index=True)
+
+            # Aggregate summary ribbon
+            s1, s2, s3, s4 = st.columns(4)
+            s1.metric("Total State Payout", f"₹ {summary['total_payout_cr']:.0f} Cr")
+            s2.metric("Districts Triggered", f"{summary['triggered_districts']} / {summary['total_districts']}")
+            s3.metric("SDRF Utilisation", f"{summary['sdrf_utilization_pct']:.1f}%")
+            s4.metric("SDRF Sufficient?", "✅ YES" if summary['is_sdrf_sufficient'] else f"⚠️ GAP: ₹{summary['sdrf_gap_cr']:.0f} Cr")
+
+            ins_csv = ins_df.to_csv(index=False).encode("utf-8")
+            st.download_button(
+                label="📥 Download Parametric Insurance Matrix CSV",
+                data=ins_csv,
+                file_name=f"parametric_insurance_{selected_state.lower().replace(' ', '_')}_{selected_storm_name.lower()}.csv",
+                mime="text/csv"
+            )
+    else:
+        st.info("Parametric insurance module not loaded. Ensure `parametric_insurance.py` is present in the project folder.")
+
+    with st.expander("ℹ️ What is Parametric Insurance? (Plain Language)", expanded=False):
+        st.markdown("""
+        **Traditional insurance** pays after someone assesses your damage — this takes weeks or months.
+
+        **Parametric insurance** pays automatically the moment wind speed or surge crosses a pre-agreed number
+        (the 'trigger'). No inspector, no forms, no waiting.
+
+        This means:
+        - **Before the storm hits**: the government already has cash to buy food, water, and fuel for generators.
+        - **District Collectors** can order 1,000 extra evacuation buses without worrying about budget approvals.
+        - **Hospitals** get guaranteed diesel supply for backup power before the grid fails.
+
+        The World Bank, UNDP, and Swiss Re operate these products in the Philippines, Caribbean, and Pacific —
+        **CycloneShield makes this trigger logic visible and actionable for Indian SDMAs.**
+        """)
+
+
+# ==============================================================================
+# TAB 7: Real-Time Meteorological Feed (Open-Meteo — Free, No API Key)
+# ==============================================================================
+with tab_met:
+    st.markdown("""
+    <div style="font-size:18px; font-weight:800; color:#38bdf8; display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+        <span>🌤️</span> Real-Time Meteorological Feed
+    </div>
+    <div style="font-size:13px; color:#cbd5e1; margin-bottom:14px;">
+        Live wind, rain, and pressure data sourced from <b>Open-Meteo ECMWF IFS</b> — updated every 15 minutes.
+        <b>Completely free, no API key required.</b> Includes offshore marine wave and swell forecast for surge amplification modelling.
+    </div>
+    """, unsafe_allow_html=True)
+
+    # Determine best landfall coordinates for met query
+    state_coords = {
+        "West Bengal": (21.9, 88.1),
+        "Odisha": (20.3, 86.2),
+        "Andhra Pradesh": (16.5, 81.8),
+        "Tamil Nadu": (11.8, 79.8),
+        "Gujarat": (22.3, 70.0)
+    }
+    met_lat, met_lon = state_coords.get(selected_state, (20.5, 85.0))
+
+    met_c1, met_c2 = st.columns([1.2, 1.0], gap="large")
+
+    with met_c1:
+        st.markdown("<div style='font-size:14px; font-weight:700; color:#38bdf8; margin-bottom:8px;'>⚡ 72-Hour Landfall Forecast (ECMWF IFS)</div>", unsafe_allow_html=True)
+        with st.spinner("Fetching live Open-Meteo ECMWF data..."):
+            if fetch_landfall_forecast:
+                met_data = fetch_landfall_forecast(met_lat, met_lon, hours_ahead=72)
+            else:
+                met_data = {"status": "offline", "source_badge": "🔵 ESTIMATED",
+                            "peak_wind_kmh": peak_wind * 1.852, "peak_gust_kmh": peak_wind * 2.2,
+                            "total_rain_mm": 180.0, "min_pressure_hpa": min_pres,
+                            "imd_category": "Severe Cyclonic Storm",
+                            "source_label": "Fallback estimate", "hours_covered": 0}
+
+        status_badge = met_data.get("source_badge", "🔵 ESTIMATED")
+        st.markdown(f"""
+        <div style="background:rgba(30,41,59,0.7); border:1px solid rgba(56,189,248,0.25); border-radius:8px;
+                    padding:10px 14px; font-size:12px; color:#94a3b8; margin-bottom:10px;">
+            {status_badge} &nbsp; <b style="color:#f8fafc;">{met_data.get('source_label','Open-Meteo ECMWF IFS')}</b>
+            &nbsp;|&nbsp; Retrieved: {met_data.get('retrieved_at','—')}
+            &nbsp;|&nbsp; Coverage: {met_data.get('hours_covered',0)}h
+        </div>
+        """, unsafe_allow_html=True)
+
+        m1, m2, m3, m4 = st.columns(4)
+        m1.metric("Peak Wind", f"{met_data.get('peak_wind_kmh', 0):.0f} km/h",
+                  f"{met_data.get('peak_wind_kts', 0):.0f} kts")
+        m2.metric("Peak Gust", f"{met_data.get('peak_gust_kmh', 0):.0f} km/h")
+        m3.metric("72h Rainfall", f"{met_data.get('total_rain_mm', 0):.0f} mm")
+        m4.metric("Min Pressure", f"{met_data.get('min_pressure_hpa', 1013):.0f} hPa")
+
+        st.markdown(f"""
+        <div style="background:rgba(15,23,42,0.7); border-left:4px solid #38bdf8;
+                    border-radius:8px; padding:10px 14px; margin-top:10px;">
+            <div style="font-size:11px; color:#94a3b8; text-transform:uppercase; font-weight:700;">IMD Storm Category (Forecast Peak)</div>
+            <div style="font-size:18px; font-weight:800; color:#38bdf8; margin-top:4px;">
+                {met_data.get('imd_category', '—')}
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        if met_data.get("hourly_times") and len(met_data["hourly_times"]) > 0:
+            import pandas as _pd_met
+            chart_df = _pd_met.DataFrame({
+                "Hour": met_data["hourly_times"][:72:3],
+                "Wind (km/h)": met_data["hourly_wind_kmh"][:72:3],
+                "Rain (mm)": met_data["hourly_rain_mm"][:72:3],
+            })
+            st.markdown("**Wind Forecast (hourly sample):**")
+            st.bar_chart(chart_df.set_index("Hour")[["Wind (km/h)"]].head(24), height=160)
+
+    with met_c2:
+        st.markdown("<div style='font-size:14px; font-weight:700; color:#38bdf8; margin-bottom:8px;'>🌊 Offshore Marine Wave & Swell Forecast</div>", unsafe_allow_html=True)
+        with st.spinner("Fetching marine conditions..."):
+            if fetch_marine_conditions:
+                marine = fetch_marine_conditions(met_lat - 1.0, met_lon, hours_ahead=48)
+            else:
+                marine = {"status": "offline", "source_badge": "🔵 ESTIMATED",
+                          "peak_wave_m": 4.5, "peak_swell_m": 2.8,
+                          "avg_wave_period_s": 10.0, "surge_amplification_factor": 1.34,
+                          "source_label": "Bay of Bengal Climatology Estimate"}
+
+        st.markdown(f"""
+        <div style="background:rgba(30,41,59,0.7); border:1px solid rgba(56,189,248,0.25); border-radius:8px;
+                    padding:10px 14px; font-size:12px; color:#94a3b8; margin-bottom:10px;">
+            {marine.get('source_badge','🔵')} &nbsp; <b style="color:#f8fafc;">{marine.get('source_label','Marine API')}</b>
+        </div>
+        """, unsafe_allow_html=True)
+
+        wv1, wv2, wv3 = st.columns(3)
+        wv1.metric("Peak Wave", f"{marine.get('peak_wave_m', 0):.1f} m")
+        wv2.metric("Peak Swell", f"{marine.get('peak_swell_m', 0):.1f} m")
+        wv3.metric("Wave Period", f"{marine.get('avg_wave_period_s', 8):.0f} sec")
+
+        amp_factor = marine.get("surge_amplification_factor", 1.0)
+        amp_pct = round((amp_factor - 1.0) * 100, 1)
+        amplified_surge = round(calc_surge_m * amp_factor, 2)
+        render_html(f"""
+        <div style="background:rgba(15,23,42,0.7); border-left:4px solid #7c3aed;
+                    border-radius:8px; padding:10px 14px; margin-top:10px;">
+            <div style="font-size:11px; color:#94a3b8; text-transform:uppercase; font-weight:700;">Swell Surge Amplification</div>
+            <div style="font-size:22px; font-weight:900; color:#7c3aed;">+{amp_pct:.0f}%</div>
+            <div style="font-size:12.5px; color:#cbd5e1; margin-top:2px;">
+                Base surge {calc_surge_m:.2f}m → <b style="color:#f8fafc;">Amplified: {amplified_surge:.2f}m</b><br>
+                <span style="font-size:11px; color:#94a3b8;">Offshore swell pushes additional water onto coast during landfall window.</span>
+            </div>
+        </div>
+        """)
+
+        # District-level live snapshot for selected district
+        st.markdown("<div style='font-size:14px; font-weight:700; color:#38bdf8; margin:14px 0 8px;'>📍 Live Conditions at Selected District</div>", unsafe_allow_html=True)
+        if not state_vuln_df.empty:
+            d_lat_met = float(state_vuln_df.iloc[0].get("lat", met_lat))
+            d_lon_met = float(state_vuln_df.iloc[0].get("lon", met_lon))
+            d_name_met = state_vuln_df.iloc[0].get("district_name", sel_dist)
+            with st.spinner(f"Fetching live conditions for {d_name_met}..."):
+                if fetch_district_met_snapshot:
+                    snap = fetch_district_met_snapshot(d_lat_met, d_lon_met, d_name_met)
+                else:
+                    snap = {"status": "offline", "source_badge": "🔵 ESTIMATED",
+                            "current_wind_kmh": 0.0, "current_gust_kmh": 0.0,
+                            "current_rain_mmph": 0.0, "current_pressure_hpa": 1013.0,
+                            "next_6h_rain_mm": 0.0, "next_6h_max_wind_kmh": 0.0,
+                            "imd_category": "No active data", "retrieved_at": "—"}
+
+            st.markdown(f"""
+            <div style="background:rgba(15,23,42,0.7); border:1px solid rgba(148,163,184,0.2); border-radius:8px; padding:10px 14px;">
+                <div style="font-size:11px; color:#94a3b8;">{snap.get('source_badge','—')} · {d_name_met} · {snap.get('retrieved_at','—')}</div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px;">
+                    <div><div style="font-size:10px;color:#94a3b8;">CURRENT WIND</div><div style="font-size:16px;font-weight:700;color:#f8fafc;">{snap.get('current_wind_kmh',0):.0f} km/h</div></div>
+                    <div><div style="font-size:10px;color:#94a3b8;">GUST</div><div style="font-size:16px;font-weight:700;color:#ef4444;">{snap.get('current_gust_kmh',0):.0f} km/h</div></div>
+                    <div><div style="font-size:10px;color:#94a3b8;">RAIN NOW</div><div style="font-size:16px;font-weight:700;color:#38bdf8;">{snap.get('current_rain_mmph',0):.1f} mm/h</div></div>
+                    <div><div style="font-size:10px;color:#94a3b8;">NEXT 6H RAIN</div><div style="font-size:16px;font-weight:700;color:#818cf8;">{snap.get('next_6h_rain_mm',0):.0f} mm</div></div>
+                </div>
+                <div style="font-size:12px;color:#f59e0b;margin-top:8px;font-weight:700;">{snap.get('imd_category','—')}</div>
+            </div>
+            """, unsafe_allow_html=True)
+
+
+# ==============================================================================
+# TAB 8: Technical Architecture & Evaluator Audit (Collapsed for Judges)
 # ==============================================================================
 with tab_tech:
     st.markdown("""
@@ -1846,10 +2184,11 @@ with foot_c1:
             🛡️ DATA PROVENANCE & TRANSPARENCY NOTICE
         </div>
         <div style="font-size:12px; color:#cbd5e1; line-height:1.6;">
-            • <span class="source-badge-real">Real Data</span>: NOAA IBTrACS v4 cyclone track archive, USGS/NASA SRTM 30m digital elevation, OpenStreetMap healthcare & transport networks.<br>
-            • <span class="source-badge-est">Screening Model</span>: Storm surge bathtub inundation is an inverted-barometer screening estimate; full hydrodynamic SLOSH/ADCIRC validation is on roadmap.<br>
+            • <span class="source-badge-real">Real Data</span>: NOAA IBTrACS v4 cyclone track archive, USGS/NASA SRTM 30m digital elevation (via OpenTopodata free API), OpenStreetMap healthcare, power substations & transport networks, Open-Meteo ECMWF IFS real-time weather.<br>
+            • <span class="source-badge-est">Screening Model</span>: Storm surge bathtub inundation is an inverted-barometer screening estimate (Jelesnianski empirical formula). Google Earth Engine (GEE) integration available when authenticated; OpenTopodata SRTM is the zero-auth free fallback. Full hydrodynamic SLOSH/ADCIRC validation is on roadmap.<br>
             • <span class="source-badge-sim">Simulated Data</span>: NDRF tactical dispatch logs and ML training dataset are physics-calibrated synthetic models simulating Bay of Bengal & Arabian Sea coastal profiles.<br>
-            • <b>Vertex AI Status</b>: Pre-configured and packaged as Vertex AI-Ready; inference runs locally on CPU for zero-cost reproduction.
+            • <b>Vertex AI Status</b>: Pre-configured and packaged as Vertex AI-Ready; inference runs locally on CPU for zero-cost reproduction.<br>
+            • <b>Parametric Insurance</b>: Trigger tiers based on World Bank PCRIC and UNDP India Disaster Risk Financing framework; payout amounts calibrated to SDRF 2023-24 state corpus values.
         </div>
     </div>
     """, unsafe_allow_html=True)

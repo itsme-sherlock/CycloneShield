@@ -760,7 +760,7 @@ def call_gemini_api(
         from google import genai
         from google.genai import types
         client = genai.Client(api_key=api_key)
-        for target_model in [model_name, "gemini-3.5-flash", "gemini-3.8-flash", "gemini-3.7-flash"]:
+        for target_model in [model_name, "gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]:
             try:
                 response = client.models.generate_content(
                     model=target_model,

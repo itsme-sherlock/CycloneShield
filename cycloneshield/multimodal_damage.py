@@ -90,8 +90,8 @@ os.makedirs(SAMPLE_DIR, exist_ok=True)
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # Google Gemini Configuration
-DEFAULT_VISION_MODEL = "gemini-3.1-flash-lite"
-FALLBACK_VISION_MODEL = "gemini-3.7-flash"
+DEFAULT_VISION_MODEL = "gemini-2.5-flash"
+FALLBACK_VISION_MODEL = "gemini-1.5-flash"
 GEMINI_REST_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models"
 
 
@@ -357,12 +357,15 @@ def call_gemini_vision_api(
     model_name: str = DEFAULT_VISION_MODEL
 ) -> Optional[Dict[str, Any]]:
     """
-    Submits disaster photo to Google Gemini API (gemini-3.7-flash / gemini-3.5-flash).
+    Submits disaster photo to Google Gemini API (gemini-2.5-flash / gemini-1.5-flash).
     Tries ultra-fast direct Google AI Studio REST endpoint first, then Google GenAI SDK.
     """
     candidate_models = [
         model_name,
-        "gemini-3.1-flash-lite"
+        "gemini-2.5-flash",
+        "gemini-2.0-flash",
+        "gemini-1.5-flash",
+        "gemini-1.5-flash-8b"
     ]
     # De-duplicate while preserving order
     seen = set()

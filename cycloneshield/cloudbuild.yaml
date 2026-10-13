@@ -1,0 +1,40 @@
+steps:
+  # Build the container image using the root Dockerfile
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'asia-south1-docker.pkg.dev/$PROJECT_ID/cycloneshield-repo/cycloneshield:latest', '.']
+
+  # Push image to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'asia-south1-docker.pkg.dev/$PROJECT_ID/cycloneshield-repo/cycloneshield:latest']
+
+  # Deploy container image to Google Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'cycloneshield'
+      - '--image'
+      - 'asia-south1-docker.pkg.dev/$PROJECT_ID/cycloneshield-repo/cycloneshield:latest'
+      - '--region'
+      - 'asia-south1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--port'
+      - '8080'
+      - '--memory'
+      - '2Gi'
+      - '--cpu'
+      - '2'
+      - '--min-instances'
+      - '1'
+      - '--max-instances'
+      - '10'
+      - '--timeout'
+      - '300'
+
+images:
+  - 'asia-south1-docker.pkg.dev/$PROJECT_ID/cycloneshield-repo/cycloneshield:latest'
+options:
+  logging: CLOUD_LOGGING_ONLY

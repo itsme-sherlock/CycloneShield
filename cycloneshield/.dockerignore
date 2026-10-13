@@ -1,0 +1,15 @@
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.git/
+.gitignore
+.env
+outputs/video_recordings/
+outputs/screenshots/
+outputs/CycloneShield_Demo_Walkthrough.mp4
+outputs/cycloneshield_demo_walkthrough.webm
+CycloneShield_Pitch_Deck.pptx
+*.log
