@@ -78,6 +78,8 @@ if active_gemini_key:
     os.environ["GEMINI_API_KEY"] = active_gemini_key
 
 # Module imports with resilient fallbacks
+from risk_engine import compute_district_risk, load_facilities
+
 try:
     from gemini_advisory import (
         call_gemini_api,
@@ -841,9 +843,10 @@ def compute_state_district_vulnerability(
     state_name: str,
     storm_name: str,
     peak_wind_kts: float,
-    peak_surge_m: float
+    peak_surge_m: float,
+    track_df: pd.DataFrame
 ) -> pd.DataFrame:
-    """Computes realistic district risk scores, exposed populations, and lifeline impact."""
+    """Scores each district from the storm track using IMD wind classes and IMD/NDMA colour bands (see risk_engine.py)."""
     loaded_districts = load_all_coastal_districts()
     state_clean = state_name.strip().lower()
     dists = [
@@ -853,98 +856,31 @@ def compute_state_district_vulnerability(
     if not dists:
         dists = STATE_FALLBACK_DISTRICTS.get(state_name, STATE_FALLBACK_DISTRICTS.get("West Bengal", []))
 
-    rows = []
-    # Rank districts by coastal exposure
-    for idx, d in enumerate(dists):
-        pop = int(d.get("population", 2000000))
-        # Landfall proximity gradient: first 2 districts represent core impact
-        if idx == 0:
-            tier = "CRITICAL"
-            score = min(96.0, round(84.0 + (peak_wind_kts - 60.0) * 0.15, 1))
-            prio = 1
-            driver = "Core Eyewall Winds & Catastrophic Storm Surge"
-            fh = 4
-            fs = 6
-            sr = round(peak_surge_m * 11.2, 1)
-            f_power = 6
-            action = f"Order mandatory evacuation of {d['coastal_zone']} within 6 hours. Pre-position 4 NDRF boat teams."
-        elif idx == 1:
-            tier = "CRITICAL" if peak_wind_kts >= 90 else "HIGH"
-            score = min(92.0, round(78.0 + (peak_wind_kts - 60.0) * 0.12, 1))
-            prio = 1 if tier == "CRITICAL" else 2
-            driver = "Severe Storm-Force Winds & Embankment Overtopping"
-            fh = 2
-            fs = 3
-            sr = round(peak_surge_m * 6.5, 1)
-            f_power = 3
-            action = f"Move elderly and patients to elevated multi-purpose cyclone shelters in {d['hq']}."
-        elif idx == 2:
-            tier = "HIGH"
-            score = round(65.0 + (peak_wind_kts - 60.0) * 0.08, 1)
-            prio = 2
-            driver = "Gale Winds & Heavy Pluvial Runoff"
-            fh = 1
-            fs = 1
-            sr = round(peak_surge_m * 2.8, 1)
-            f_power = 1
-            action = "Stage heavy road-clearing cranes and emergency generator sets along arterial highways."
-        elif idx == 3:
-            tier = "MODERATE"
-            score = round(52.0 + (peak_wind_kts - 60.0) * 0.05, 1)
-            prio = 3
-            driver = "Localized Rain Waterlogging & Coastal Swells"
-            fh = 0
-            fs = 0
-            sr = 0.0
-            f_power = 0
-            action = "Inspect sluice gate flap valves; alert fishing harbors and halt ferry crossings."
-        else:
-            tier = "LOW"
-            score = round(34.0, 1)
-            prio = 4
-            driver = "Peripheral Squalls & Gusty Rain"
-            fh = 0
-            fs = 0
-            sr = 0.0
-            f_power = 0
-            action = "Maintain active administrative watch; stage humanitarian supplies for inter-district relief."
-
-        # District Geo Coordinates with state fallback
-        state_defaults = {
-            "West Bengal": (22.15, 88.55),
-            "Odisha": (20.30, 86.20),
-            "Andhra Pradesh": (16.50, 81.80),
-            "Tamil Nadu": (12.20, 79.90),
-            "Gujarat": (22.30, 69.80)
-        }
-        fallback_coord = state_defaults.get(state_name, (20.5, 85.0))
-        d_lat = float(d.get("lat") if d.get("lat") is not None else fallback_coord[0])
-        d_lon = float(d.get("lon") if d.get("lon") is not None else fallback_coord[1])
-
-        rows.append({
-            "rank": idx + 1,
-            "district_name": d["district_name"],
-            "state_or_division": state_name,
-            "country": d.get("country", "India"),
-            "lat": d_lat,
-            "lon": d_lon,
-            "population": pop,
-            "vulnerability_score": score,
-            "threat_tier": tier,
-            "evacuation_priority": prio,
-            "primary_risk_driver": driver,
-            "flooded_hospitals": fh,
-            "total_hospitals": max(fh + 2, 8),
-            "flooded_shelters": fs,
-            "total_shelters": max(fs + 4, 18),
-            "submerged_road_km": sr,
-            "flooded_power_substations": f_power,
-            "action_directive": action
-        })
-    return pd.DataFrame(rows)
+    state_defaults = {
+        "West Bengal": (22.15, 88.55),
+        "Odisha": (20.30, 86.20),
+        "Andhra Pradesh": (16.50, 81.80),
+        "Tamil Nadu": (12.20, 79.90),
+        "Gujarat": (22.30, 69.80)
+    }
+    fallback_coord = state_defaults.get(state_name, (20.5, 85.0))
+    dists = [
+        {**d, "lat": d.get("lat") if d.get("lat") is not None else fallback_coord[0],
+         "lon": d.get("lon") if d.get("lon") is not None else fallback_coord[1]}
+        for d in dists
+    ]
+    return compute_district_risk(
+        dists,
+        track_df,
+        state_name,
+        fallback_wind_kts=peak_wind_kts,
+        fallback_pressure_mb=1013.0 - peak_surge_m / 0.099,
+        facilities=load_facilities(os.path.join(DATA_DIR, "osm_infrastructure_baseline.geojson")),
+        fallback_point=fallback_coord,
+    )
 
 state_vuln_df = compute_state_district_vulnerability(
-    selected_state, selected_storm_name, peak_wind, calc_surge_m
+    selected_state, selected_storm_name, peak_wind, calc_surge_m, active_track_df
 )
 
 # Total Exposure Statistics
@@ -1074,7 +1010,7 @@ with kpi_cols[4]:
     <div class="kpi-card" title="Hospitals and cyclone shelters expected to flood. Flooded hospitals cannot admit patients; flooded shelters cannot protect evacuees — both need contingency plans now.">
         <div class="kpi-label">Flooded Hospitals & Shelters</div>
         <div class="kpi-value" style="color:#ef4444;">{total_flooded_hosps} Hospitals / {total_flooded_shelters} Shelters</div>
-        <div class="kpi-sub">Facilities at risk of flood inundation</div>
+        <div class="kpi-sub">{'Facilities below modelled surge level' if state_vuln_df["facility_data_available"].any() else 'No facility inventory for this state'}</div>
     </div>
     """)
 
