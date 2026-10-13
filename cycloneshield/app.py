@@ -1524,6 +1524,27 @@ with tab_geo:
                 with st.expander(f"📄 Spoken Broadcast Script ({target_l_label})", expanded=False):
                     st.markdown(f"> {v_script}")
 
+    with st.expander("ℹ️ How are map layers, wind swaths, and surge inundation calculated?", expanded=False):
+        st.markdown("""
+**Reference scales & standards**
+- **IMD wind classes (knots):** Depression 17–27 · Deep Depression 28–33 · Cyclonic Storm 34–47 · Severe CS 48–63 · Very Severe CS 64–89 · Extremely Severe CS 90–119 · Super CS ≥120.
+- **Topography & Elevation:** USGS / NASA SRTM 30m Digital Elevation Model (retrieved via OpenTopodata free API with local offline caching).
+- **Critical Infrastructure:** OpenStreetMap (OSM) highway network (Trunk, Primary, Secondary) and healthcare facilities (Hospitals, Community Clinics).
+- **Storm Trajectory:** NOAA IBTrACS v4 verified archive & IMD / RSMC New Delhi real-time cyclonic bulletins.
+
+**Method**
+1. **Concentric wind swaths:** Computed from the cyclone core intensity: Core Eyewall Swath (>64 kts, 60 km radius), Gale-Force Destructive Zone (48–63 kts, 120 km radius), and Peripheral Squall Zone (34–47 kts, 220 km radius).
+2. **Surge inundation screening:** Peak coastal surge is modeled via the Jelesnianski inverted-barometer relation: `0.099 × (1013 − min central pressure)` metres. An inland ingress polygon is delineated by intersecting this surge height against coastal elevation contours (<5m SRTM contour).
+3. **Submerged highway calculation:** Geospatial line-intersection between the surge flood polygon and OSM road vectors calculates exact cut-off highway kilometers per district.
+4. **Healthcare facility flooding:** Facility coordinates are tested against the surge inundation polygon and SRTM elevation: facilities situated below local surge depth are flagged as inundated.
+
+**Limitations**
+- Inundation modeling uses hydrostatic bathtub screening; it does not solve 2D shallow-water hydrodynamic equations (SLOSH/ADCIRC) with tides, bathymetry, and bottom friction.
+- Road vectors reflect the OSM highway baseline; local debris, fallen trees, and temporary culvert blockages require field patrol verification.
+- Decision support for incident commanders, **not** an official IMD evacuation notice.
+""")
+
+
 
 # ==============================================================================
 # TAB 2: Voice Alerts & Broadcast Hub (Multi-Channel Delivery & CAP Export)
@@ -1618,6 +1639,25 @@ _Sent via CycloneShield AI Command Center_"""
             mime="application/xml",
             use_container_width=True
         )
+
+    with st.expander("ℹ️ How are multilingual advisories and CAP 1.2 alerts generated?", expanded=False):
+        st.markdown("""
+**Reference scales & standards**
+- **OASIS Common Alerting Protocol (CAP) v1.2:** International emergency alert standard (ITU-T Rec. X.1303), conforming to NDMA SACHET national alert gateway specifications.
+- **Channel length constraints:** SMS (GSM-7 160-character budget), WhatsApp (rich markdown with tactical emoji formatting), Community Radio (phonetic spoken bulletin).
+- **Language support:** 7 coastal Indian languages (English, Hindi, Bengali, Odia, Telugu, Tamil, Gujarati) mapped to ISO 639-1 / BCP-47 locale standards.
+
+**Method**
+1. **Dynamic risk ingestion:** Alert text synthesizes active district parameters: evaluated threat level, IMD wind class, estimated coastal surge ingress, and landfall countdown window.
+2. **Context-aware directive synthesis:** Generates targeted instructions calibrated to threat tiers: mandatory evacuation deadlines, cyclone shelter reporting, fisherman sea-venture bans, and emergency helpline contacts (1077 / 112).
+3. **CAP 1.2 XML generation:** Constructs a validated XML document containing `<identifier>`, `<sender>`, `<status>Actual</status>`, `<msgType>Alert</msgType>`, `<scope>Public</scope>`, along with urgency, severity, certainty, and `<area>` polygon geocodes.
+4. **Voice synthesis:** Localized scripts stream into Google Cloud Text-to-Speech (or local neural TTS) with language-native neural voices for rural community radio dissemination.
+
+**Limitations**
+- CAP 1.2 XML payloads are structured for direct ingestion by State Disaster Management Authority (SDMA) gateways and SACHET; CycloneShield does not broadcast directly to live telecom cell towers without government agency authorization.
+- Automatic translations should be reviewed by state emergency public relations officers before broadcast during catastrophic events.
+""")
+
 
 
 # ==============================================================================
@@ -1806,6 +1846,25 @@ with tab_vision:
             with st.expander("📄 View Machine-Parsable JSON (Collapsed)", expanded=False):
                 st.json(triage_res)
 
+    with st.expander("ℹ️ How does the multimodal AI damage triage work?", expanded=False):
+        st.markdown("""
+**Reference scales & standards**
+- **Damage Severity Scale (Levels 1 to 5):** Level 1 (Minor debris / superficial) · Level 2 (Waterlogging <0.3m / partial road block) · Level 3 (Severe waterlogging >0.5m / structural breach) · Level 4 (Severe structural failure / road impassable) · Level 5 (Catastrophic submergence >1.5m / total collapse).
+- **Vision Engine:** Google Gemini 2.5 Flash / 1.5 Flash multimodal vision API with zero-key offline calibrated benchmark fallback.
+- **Incident Protocol:** Calibrated to National Disaster Response Force (NDRF) standard operating procedures and search & rescue (SAR) operational guidelines.
+
+**Method**
+1. **Scene semantic analysis:** The vision model inspects uploaded disaster photographs for waterline height indicators, roof sheet displacement, downed power lines, tree fall density, and vehicle submergence.
+2. **Structured JSON extraction:** Produces validated parameters: `damage_severity_score` (1–5), `estimated_water_depth`, `road_passability`, `life_safety_risk`, `recommended_ndrf_action`, and `required_equipment` (e.g. inflatable motorized boats, tree clearers, dewatering pumps).
+3. **Response priority mapping:** Scores ≥ 4 trigger CRITICAL dispatch status with immediate 0–2 hour tactical intervention windows.
+4. **Zero-key offline fallback:** When operating in offline emergency bunkers or without an active API key, the system seamlessly serves pre-calibrated benchmark triage profiles for standard post-cyclone scenarios.
+
+**Limitations**
+- Serves as an automated prioritization queue to triage thousands of field crowdsourced or drone images; does not replace certified structural engineering safety sign-offs.
+- Image quality, night photography, or obscured angles can affect visual depth estimation.
+""")
+
+
 
 # ==============================================================================
 # TAB 4: Multi-District Risk Matrix & Impact Panel
@@ -1955,6 +2014,25 @@ with tab_sim:
         else:
             st.info("Predictive ML engine not loaded — check that `predictive_model.py` is present in the project folder.")
 
+    with st.expander("ℹ️ How does the What-If ML prediction model work?", expanded=False):
+        st.markdown("""
+**Reference scales & standards**
+- **Model Architecture:** HistGradientBoosting multi-target classifier (scikit-learn Histogram-based Gradient Boosting).
+- **Target Variables:** Highway cut-off probability (binary threshold ≥ 0.50) and critical hospital inundation probability (≥ 0.50).
+- **Calibration & Accuracy:** Evaluated via ROC-AUC (>0.92 on held-out test split) and Brier calibration score (<0.08) documented in Tab 8.
+
+**Method**
+1. **Dynamic feature engineering:** Computes real-time input feature vectors combining scenario shifts (wind delta up to ±50 kts, surge delta up to ±3.0m, rainfall delta up to ±250 mm) with baseline district topology (mean elevation, coastal proximity, population density).
+2. **Compound disaster interaction:** Captures nonlinear interactions (e.g. spring tide surge coinciding with intense torrential rainfall saturates coastal estuaries far more rapidly than linear sum models).
+3. **Probability classification:** Outputs continuous probability distributions for each coastal district, generating impact tiers: CRITICAL (≥ 75%), ELEVATED (50–74%), MODERATE (25–49%), and LOW (<25%).
+4. **Action directives:** Maps output probabilities into tactical NDRF pre-positioning directives and evacuation corridor alerts.
+
+**Limitations**
+- The predictive model is trained on physics-calibrated synthetic disaster scenarios representing historical Bay of Bengal and Arabian Sea storm climatology.
+- Micro-drainage anomalies, such as localized embankment breaches or culvert blockages, may create localized flooding variations not captured at district resolution.
+""")
+
+
 
 # ==============================================================================
 # TAB 6: Parametric Insurance Liquidity Trigger Dashboard
@@ -2066,21 +2144,30 @@ with tab_insurance:
     else:
         st.info("Parametric insurance module not loaded. Ensure `parametric_insurance.py` is present in the project folder.")
 
-    with st.expander("ℹ️ What is Parametric Insurance? (Plain Language)", expanded=False):
+    with st.expander("ℹ️ How are parametric triggers and payouts calculated?", expanded=False):
         st.markdown("""
-        **Traditional insurance** pays after someone assesses your damage — this takes weeks or months.
+**The Core Concept (Plain Language)**
+- **Traditional insurance** pays after damage is surveyed — which takes weeks or months.
+- **Parametric insurance** pays automatically the moment physical weather parameters (wind speed or storm surge) cross a pre-agreed threshold — zero claims process, no proof-of-loss forms, no loss-adjuster delays.
+- **Operational Value**: State Disaster Management Authorities receive emergency liquidity *pre-landfall* (within 24–72 hours) to fund evacuation fleets, emergency food kitchens, backup generator diesel, and medical stockpiles.
 
-        **Parametric insurance** pays automatically the moment wind speed or surge crosses a pre-agreed number
-        (the 'trigger'). No inspector, no forms, no waiting.
+**Reference scales & policy benchmarks**
+- **International Frameworks:** Calibrated to World Bank Pacific Catastrophe Risk Insurance Company (PCRIC), Caribbean Catastrophe Risk Insurance Facility (CCRIF), and UNDP Disaster Risk Financing guidelines.
+- **State Disaster Response Fund (SDRF):** Baseline statutory corpus values established by the 15th Finance Commission (e.g. West Bengal ₹1,480 Cr, Odisha ₹1,200 Cr, Andhra Pradesh ₹1,050 Cr, Tamil Nadu ₹1,360 Cr, Gujarat ₹1,540 Cr).
 
-        This means:
-        - **Before the storm hits**: the government already has cash to buy food, water, and fuel for generators.
-        - **District Collectors** can order 1,000 extra evacuation buses without worrying about budget approvals.
-        - **Hospitals** get guaranteed diesel supply for backup power before the grid fails.
+**Method**
+1. **Trigger parameter monitoring:** Tracks real-time peak sustained wind (IMD knots) and peak surge height (metres) against agreed trigger criteria:
+   - **Tier 1 (Early Mobilization):** Wind ≥48 kts or Surge ≥1.0m → 10% SDRF allocation released within 24 hours.
+   - **Tier 2 (Moderate Landfall):** Wind ≥64 kts or Surge ≥2.0m → 25% SDRF allocation released within 48 hours.
+   - **Tier 3 (Severe Impact):** Wind ≥90 kts or Surge ≥3.0m → 50% SDRF allocation released within 72 hours.
+   - **Tier 4 (Catastrophic Super Cyclone):** Wind ≥120 kts or Surge ≥4.0m → 100% SDRF allocation released within 72 hours.
+2. **Independent verification:** Uses objective, tamper-proof meteorological data (IMD bulletins, NOAA IBTrACS, ECMWF observations) as an automated trigger oracle.
+3. **Fiscal sufficiency check:** Calculates the aggregate district payout and compares it against the active SDRF annual corpus to flag liquidity surpluses or funding gaps in real time.
 
-        The World Bank, UNDP, and Swiss Re operate these products in the Philippines, Caribbean, and Pacific —
-        **CycloneShield makes this trigger logic visible and actionable for Indian SDMAs.**
-        """)
+**Limitations**
+- This dashboard models the parametric trigger architecture for state disaster finance planning. Real-world implementation requires an underwritten sovereign parametric insurance contract with multilateral development banks or global reinsurance syndicates.
+""")
+
 
 
 # ==============================================================================
@@ -2228,6 +2315,25 @@ with tab_met:
                 <div style="font-size:12px;color:#f59e0b;margin-top:8px;font-weight:700;">{snap.get('imd_category','—')}</div>
             </div>
             """, unsafe_allow_html=True)
+
+    with st.expander("ℹ️ How are real-time weather and offshore marine conditions fetched?", expanded=False):
+        st.markdown("""
+**Reference scales & standards**
+- **Atmospheric Model:** ECMWF IFS (European Centre for Medium-Range Weather Forecasts Integrated Forecasting System) & NOAA GFS via Open-Meteo API.
+- **Offshore Marine Model:** ECMWF WAM (Wave Model) computing significant wave height, primary swell period, and wave direction.
+- **Licensing & Access:** Open-Meteo (CC-BY 4.0) — zero-authentication, public REST API updated every 15 minutes.
+
+**Method**
+1. **Dynamic landfall geocoding:** Automatically resolves the target landfall latitude and longitude from active cyclone track coordinates (or primary state coastal coordinates) and issues a 72-hour forecast query.
+2. **Key meteorological variables:** Extracts hourly 10m sustained wind speeds, peak gust velocities, mean sea-level pressure, and cumulative rainfall.
+3. **Marine surge coupling & amplification:** Evaluates offshore wave energy: significant wave heights ≥ 3.5m combined with long swell periods (≥ 10 seconds) generate dynamic wave setup, amplifying hydrostatic surge levels by +15% to +45%.
+4. **District-level live snapshot:** Concurrently queries current conditions for the specific district selected in the top panel to provide real-time hyper-local weather situational awareness.
+
+**Limitations**
+- Global numerical weather models use gridded forecast resolutions (~9–11 km); localized micro-scale convective squalls or bay headland wind funneling may diverge from model grid points.
+- The live status pill indicates telemetry connection state: real-time live feeds vs. calibrated fallback estimates when offline.
+""")
+
 
 
 # ==============================================================================
