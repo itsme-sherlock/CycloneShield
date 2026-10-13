@@ -75,8 +75,8 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # Google AI Studio API Endpoint
 GEMINI_API_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models"
-DEFAULT_MODEL = "gemini-2.5-flash"
-FALLBACK_MODEL = "gemini-1.5-flash"
+DEFAULT_MODEL = "gemini-3.8-flash"
+FALLBACK_MODEL = "gemini-3.5-flash-lite"
 
 
 def get_resolved_api_key() -> Optional[str]:
@@ -309,7 +309,7 @@ def translate_advisory_text(
 
     # 1. Primary: Gemini Translation
     if key and len(key) > 10 and not key.startswith("AQ."):
-        for m_name in [DEFAULT_MODEL, FALLBACK_MODEL, "gemini-2.0-flash", "gemini-1.5-flash"]:
+        for m_name in [DEFAULT_MODEL, FALLBACK_MODEL, "gemini-3.1-flash-lite"]:
             try:
                 prompt = (
                     f"You are an expert Indian emergency broadcast translator for disaster management. "
@@ -760,7 +760,7 @@ def call_gemini_api(
         from google import genai
         from google.genai import types
         client = genai.Client(api_key=api_key)
-        for target_model in [model_name, "gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]:
+        for target_model in [model_name, DEFAULT_MODEL, FALLBACK_MODEL, "gemini-3.1-flash-lite"]:
             try:
                 response = client.models.generate_content(
                     model=target_model,
@@ -803,7 +803,7 @@ def call_gemini_api(
 
     # Method C: Direct Google AI Studio REST API
     try:
-        models_to_try = [model_name, FALLBACK_MODEL, "gemini-2.0-flash"]
+        models_to_try = [model_name, FALLBACK_MODEL, "gemini-3.1-flash-lite"]
         for target_model in models_to_try:
             url = f"{GEMINI_API_BASE_URL}/{target_model}:generateContent?key={api_key}"
             headers = {"Content-Type": "application/json"}
@@ -1070,7 +1070,7 @@ def query_gemini_json(
         from google import genai
         from google.genai import types
         client = genai.Client(api_key=key)
-        for m in [model_name, "gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]:
+        for m in [model_name, DEFAULT_MODEL, FALLBACK_MODEL, "gemini-3.1-flash-lite"]:
             try:
                 response = client.models.generate_content(
                     model=m,
@@ -1098,7 +1098,7 @@ def query_gemini_json(
     try:
         import google.generativeai as legacy_genai
         legacy_genai.configure(api_key=key)
-        for m in [model_name if "1.5" in model_name else FALLBACK_MODEL, "gemini-1.5-flash"]:
+        for m in [model_name if "1.5" in model_name else FALLBACK_MODEL, "gemini-3.1-flash-lite"]:
             try:
                 model = legacy_genai.GenerativeModel(
                     model_name=m,
@@ -1121,7 +1121,7 @@ def query_gemini_json(
 
     # Method 3: Direct Google AI Studio REST API
     try:
-        for m in [model_name, FALLBACK_MODEL, "gemini-2.0-flash", "gemini-1.5-flash"]:
+        for m in [model_name, DEFAULT_MODEL, FALLBACK_MODEL, "gemini-3.1-flash-lite"]:
             try:
                 url = f"{GEMINI_API_BASE_URL}/{m}:generateContent?key={key}"
                 headers = {"Content-Type": "application/json"}

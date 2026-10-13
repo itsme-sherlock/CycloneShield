@@ -114,8 +114,8 @@ try:
 except ImportError:
     analyze_damage_image = None
     load_sample_damage_images = None
-    DEFAULT_VISION_MODEL = "gemini-2.5-flash"
-    FALLBACK_VISION_MODEL = "gemini-1.5-flash"
+    DEFAULT_VISION_MODEL = "gemini-3.8-flash"
+    FALLBACK_VISION_MODEL = "gemini-3.5-flash-lite"
     SAMPLE_DIR = os.path.join(DATA_DIR, "sample_damage")
 
 try:
@@ -2168,7 +2168,7 @@ with tab_vision:
             horizontal=True
         )
     with v_c2:
-        vis_model_choice = st.selectbox("Gemini Vision Model:", ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"], index=0)
+        vis_model_choice = st.selectbox("Gemini Vision Model:", ["gemini-3.8-flash", "gemini-3.5-flash-lite", "gemini-3.1-flash-lite"], index=0)
 
     sample_items = load_sample_damage_images() if load_sample_damage_images else []
     sel_img_path = None
@@ -2344,7 +2344,7 @@ with tab_vision:
             ],
             "benefit": "After landfall, photos arrive faster than people can review them. Instant severity scores and suggested equipment let control rooms push the most serious incidents to the front of the queue and send the right resources sooner.",
             "tech": [
-                "Google Gemini Multimodal Vision (gemini-2.5-flash, 2.0-flash, or 1.5-flash) — analyzes images only when a live API request succeeds.",
+                "Google Gemini Multimodal Vision (gemini-3.8-flash, 3.5-flash-lite, or 3.1-flash-lite) — analyzes images only when a live API request succeeds.",
                 "Structured JSON response — organizes findings into severity, observations, water depth, access status, urgency, and recommended actions.",
                 "Prepared offline benchmark scenes — four predefined scenarios with reference outputs for demonstration when live API is unavailable.",
                 "Clear live/offline status badges — every result shows whether it came from a confirmed Gemini response or the offline fallback."
