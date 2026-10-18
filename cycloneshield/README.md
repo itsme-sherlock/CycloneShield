@@ -36,29 +36,39 @@ photo ─► Gemini (damage + severity) ─┐
 **Setup** (replace `PROJECT`, `BUCKET`):
 
 ```bash
+# 1. (Optional) Link billing account if creating new GCS buckets or deploying Cloud Run
+gcloud billing projects link PROJECT --billing-account=ACCOUNT_ID
+
+# 2. Enable Cloud Storage and Pub/Sub APIs
 gcloud services enable storage.googleapis.com pubsub.googleapis.com --project PROJECT
+
+# 3. Create GCS Evidence Bucket & Pub/Sub Alert Topic
 gcloud storage buckets create gs://BUCKET --project PROJECT --location asia-south1
 gcloud pubsub topics create cyclone-alerts --project PROJECT
 gcloud pubsub subscriptions create cs-alerts-all --topic cyclone-alerts --project PROJECT
-# optional per-district subscription
+
+# 4. (Optional) District-filtered subscription demo
 gcloud pubsub subscriptions create cs-puri --topic cyclone-alerts --project PROJECT \
   --message-filter='attributes.district = "Puri"'
 ```
 
-Grant the app's service account `roles/storage.objectCreator` on the bucket and `roles/pubsub.publisher` on the topic. Then provide settings in `.streamlit/secrets.toml` (or as environment variables; never commit them):
+Grant the app's service account `roles/storage.objectCreator` on the bucket and `roles/pubsub.publisher` on the topic. Then provide settings in `.streamlit/secrets.toml` or `.env` (never commit real secrets):
 
 ```toml
 GCS_BUCKET = "BUCKET"
 PUBSUB_TOPIC = "cyclone-alerts"
 GCP_PROJECT = "PROJECT"
 
-[gcp_service_account]   # optional; otherwise Application Default Credentials are used
+[gcp_service_account]   # optional; otherwise Application Default Credentials (ADC) are used
 # paste the service-account JSON key fields here
 ```
 
-Demo the alerts: `python scripts/alert_subscriber.py --project PROJECT --subscription cs-alerts-all`, then run a CRITICAL/HIGH triage in Tab 3.
+Demo the alerts live: `python scripts/alert_subscriber.py --project PROJECT --subscription cs-alerts-all`, then run a CRITICAL/HIGH triage in Tab 3.
 
-**Deploy on Cloud Run with storage + alerts enabled.** `deploy_cloud_run.sh`/`.ps1` pass `GCS_BUCKET`, `PUBSUB_TOPIC`, `GCP_PROJECT` and `GEMINI_API_KEY` through if they are set in your shell (`GCS_BUCKET=... PUBSUB_TOPIC=... ./deploy_cloud_run.sh`). They do not create the bucket/topic, attach a service account, or use Secret Manager, and `cloudbuild.yaml` sets none of these. Without the variables the app runs with cloud features off ("Cloud features not configured"). The manual equivalent, with IAM and Secret Manager:
+**Deploy to Google Cloud Run:**
+
+- **1-Click Script Deployment**: Run `./deploy_cloud_run.sh` (POSIX/Cloud Shell) or `.\deploy_cloud_run.ps1` (Windows PowerShell). Both scripts automatically detect your active project, package the container via the root `Dockerfile`, bind port 8080, and forward `GCS_BUCKET`, `PUBSUB_TOPIC`, `GCP_PROJECT`, and `GEMINI_API_KEY` into Cloud Run environment variables.
+- **Production Deployment with Service Account & Secret Manager**:
 
 ```bash
 # service account used by the Cloud Run service (no key file needed)
@@ -67,19 +77,26 @@ SA=cycloneshield-run@PROJECT.iam.gserviceaccount.com
 gcloud storage buckets add-iam-policy-binding gs://BUCKET --member=serviceAccount:$SA --role=roles/storage.objectCreator
 gcloud pubsub topics add-iam-policy-binding cyclone-alerts --project PROJECT --member=serviceAccount:$SA --role=roles/pubsub.publisher
 
-# keep the Gemini key in Secret Manager, not in a plain env var
+# store the Gemini key securely in Secret Manager
 printf '%s' "$GEMINI_API_KEY" | gcloud secrets create gemini-api-key --data-file=- --project PROJECT
 gcloud secrets add-iam-policy-binding gemini-api-key --project PROJECT --member=serviceAccount:$SA --role=roles/secretmanager.secretAccessor
 
+# Deploy to Cloud Run
 gcloud run deploy cycloneshield --source . --region asia-south1 --project PROJECT \
   --service-account $SA --allow-unauthenticated --port 8080 --memory 2Gi --cpu 2 \
   --set-env-vars GCS_BUCKET=BUCKET,PUBSUB_TOPIC=cyclone-alerts,GCP_PROJECT=PROJECT \
   --set-secrets GEMINI_API_KEY=gemini-api-key:latest
 ```
 
-Notes: on Cloud Run the app reads these from environment variables (there is no `secrets.toml`) and authenticates as the attached service account. Browser "device location" needs HTTPS, which Cloud Run URLs provide. Pub/Sub delivers to subscribers, so run `scripts/alert_subscriber.py` from a laptop or Cloud Shell to watch alerts.
+Notes: On Cloud Run the app reads these from environment variables (no `secrets.toml` needed) and authenticates as the attached service account. Browser "device location" requires HTTPS, which Cloud Run natively provides. Pub/Sub delivers to subscribers, so run `scripts/alert_subscriber.py` from your laptop or Cloud Shell to monitor alerts live.
 
-**Google Colab:** `CycloneShield_Colab.ipynb` has a "Location-Aware Evidence & Alerts" cell under Section 9. It shows each location source, the district lookup, the outside-coverage case, and the storage/alert step (which reports "not configured" unless you set `GCS_BUCKET`, `PUBSUB_TOPIC`, `GCP_PROJECT` and run `google.colab.auth.authenticate_user()`). The notebook clones from GitHub `main`, so the cell prints a notice until these modules are merged there.
+**Google Colab Notebook:**
+[`CycloneShield_Colab.ipynb`](./CycloneShield_Colab.ipynb) includes a dedicated **Section 9.1: Location-Aware Evidence & Alerts** cell. It demonstrates:
+1. EXIF GPS extraction from geotagged field photos
+2. Device coordinate simulation
+3. Manual operator district override
+4. Out-of-coverage boundary protection (no nearest guess)
+5. Live Pub/Sub alert dispatch and Cloud Storage persistence with graceful zero-key / unconfigured fallback. To run against live GCP in Colab, authenticate via `google.colab.auth.authenticate_user()`.
 
 ---
 
