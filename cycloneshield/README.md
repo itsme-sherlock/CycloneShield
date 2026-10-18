@@ -58,7 +58,7 @@ GCP_PROJECT = "PROJECT"
 
 Demo the alerts: `python scripts/alert_subscriber.py --project PROJECT --subscription cs-alerts-all`, then run a CRITICAL/HIGH triage in Tab 3.
 
-**Deploy on Cloud Run with storage + alerts enabled.** `deploy_cloud_run.sh`/`.ps1` and `cloudbuild.yaml` do not set the variables below, so add them or the app deploys with cloud features off ("Cloud features not configured"):
+**Deploy on Cloud Run with storage + alerts enabled.** `deploy_cloud_run.sh`/`.ps1` pass `GCS_BUCKET`, `PUBSUB_TOPIC`, `GCP_PROJECT` and `GEMINI_API_KEY` through if they are set in your shell (`GCS_BUCKET=... PUBSUB_TOPIC=... ./deploy_cloud_run.sh`). They do not create the bucket/topic, attach a service account, or use Secret Manager, and `cloudbuild.yaml` sets none of these. Without the variables the app runs with cloud features off ("Cloud features not configured"). The manual equivalent, with IAM and Secret Manager:
 
 ```bash
 # service account used by the Cloud Run service (no key file needed)
