@@ -58,6 +58,29 @@ GCP_PROJECT = "PROJECT"
 
 Demo the alerts: `python scripts/alert_subscriber.py --project PROJECT --subscription cs-alerts-all`, then run a CRITICAL/HIGH triage in Tab 3.
 
+**Deploy on Cloud Run with storage + alerts enabled.** `deploy_cloud_run.sh`/`.ps1` and `cloudbuild.yaml` do not set the variables below, so add them or the app deploys with cloud features off ("Cloud features not configured"):
+
+```bash
+# service account used by the Cloud Run service (no key file needed)
+gcloud iam service-accounts create cycloneshield-run --project PROJECT
+SA=cycloneshield-run@PROJECT.iam.gserviceaccount.com
+gcloud storage buckets add-iam-policy-binding gs://BUCKET --member=serviceAccount:$SA --role=roles/storage.objectCreator
+gcloud pubsub topics add-iam-policy-binding cyclone-alerts --project PROJECT --member=serviceAccount:$SA --role=roles/pubsub.publisher
+
+# keep the Gemini key in Secret Manager, not in a plain env var
+printf '%s' "$GEMINI_API_KEY" | gcloud secrets create gemini-api-key --data-file=- --project PROJECT
+gcloud secrets add-iam-policy-binding gemini-api-key --project PROJECT --member=serviceAccount:$SA --role=roles/secretmanager.secretAccessor
+
+gcloud run deploy cycloneshield --source . --region asia-south1 --project PROJECT \
+  --service-account $SA --allow-unauthenticated --port 8080 --memory 2Gi --cpu 2 \
+  --set-env-vars GCS_BUCKET=BUCKET,PUBSUB_TOPIC=cyclone-alerts,GCP_PROJECT=PROJECT \
+  --set-secrets GEMINI_API_KEY=gemini-api-key:latest
+```
+
+Notes: on Cloud Run the app reads these from environment variables (there is no `secrets.toml`) and authenticates as the attached service account. Browser "device location" needs HTTPS, which Cloud Run URLs provide. Pub/Sub delivers to subscribers, so run `scripts/alert_subscriber.py` from a laptop or Cloud Shell to watch alerts.
+
+**Google Colab:** `CycloneShield_Colab.ipynb` has a "Location-Aware Evidence & Alerts" cell under Section 9. It shows each location source, the district lookup, the outside-coverage case, and the storage/alert step (which reports "not configured" unless you set `GCS_BUCKET`, `PUBSUB_TOPIC`, `GCP_PROJECT` and run `google.colab.auth.authenticate_user()`). The notebook clones from GitHub `main`, so the cell prints a notice until these modules are merged there.
+
 ---
 
 ## 📦 Hackathon Submission Package (Judge Quick-Links)
