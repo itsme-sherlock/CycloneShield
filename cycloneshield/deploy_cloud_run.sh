@@ -25,6 +25,11 @@ echo ""
 echo "[2/3] Submitting source build directly to Cloud Run..."
 echo "      Configuring 2Gi memory, 2 vCPU, and scale-to-1 pre-warmed instance..."
 
+ENV_VARS="STREAMLIT_SERVER_HEADLESS=true,STREAMLIT_SERVER_PORT=8080,STREAMLIT_SERVER_ADDRESS=0.0.0.0,GCP_PROJECT=${GCP_PROJECT:-$PROJECT_ID}"
+[ -n "$GCS_BUCKET" ] && ENV_VARS="$ENV_VARS,GCS_BUCKET=$GCS_BUCKET"
+[ -n "$PUBSUB_TOPIC" ] && ENV_VARS="$ENV_VARS,PUBSUB_TOPIC=$PUBSUB_TOPIC"
+[ -n "$GEMINI_API_KEY" ] && ENV_VARS="$ENV_VARS,GEMINI_API_KEY=$GEMINI_API_KEY"
+
 gcloud run deploy "$SERVICE_NAME" \
     --source . \
     --region "$REGION" \
@@ -36,7 +41,7 @@ gcloud run deploy "$SERVICE_NAME" \
     --min-instances 1 \
     --max-instances 10 \
     --timeout 300 \
-    --set-env-vars STREAMLIT_SERVER_HEADLESS=true,STREAMLIT_SERVER_PORT=8080,STREAMLIT_SERVER_ADDRESS=0.0.0.0
+    --set-env-vars "$ENV_VARS"
 
 echo ""
 echo "[3/3] Deployment Successful!"
