@@ -31,6 +31,17 @@ Write-Host "      Service Name:   $SERVICE_NAME" -ForegroundColor Gray
 Write-Host "`n[2/3] Submitting source build directly to Cloud Run..." -ForegroundColor Green
 Write-Host "      Building container with 2Gi memory, 2 vCPU, and scale-to-1 pre-warmed instance..." -ForegroundColor Gray
 
+$envList = @(
+    "STREAMLIT_SERVER_HEADLESS=true",
+    "STREAMLIT_SERVER_PORT=8080",
+    "STREAMLIT_SERVER_ADDRESS=0.0.0.0",
+    "GCP_PROJECT=$PROJECT_ID"
+)
+if ($env:GCS_BUCKET) { $envList += "GCS_BUCKET=$($env:GCS_BUCKET)" }
+if ($env:PUBSUB_TOPIC) { $envList += "PUBSUB_TOPIC=$($env:PUBSUB_TOPIC)" }
+if ($env:GEMINI_API_KEY) { $envList += "GEMINI_API_KEY=$($env:GEMINI_API_KEY)" }
+$ENV_VARS = $envList -join ","
+
 gcloud run deploy $SERVICE_NAME `
     --source . `
     --region $REGION `
@@ -42,7 +53,7 @@ gcloud run deploy $SERVICE_NAME `
     --min-instances 1 `
     --max-instances 10 `
     --timeout 300 `
-    --set-env-vars "STREAMLIT_SERVER_HEADLESS=true,STREAMLIT_SERVER_PORT=8080,STREAMLIT_SERVER_ADDRESS=0.0.0.0"
+    --set-env-vars "$ENV_VARS"
 
 if ($LASTEXITCODE -eq 0) {
     Write-Host "`n[3/3] Deployment Successful!" -ForegroundColor Green
