@@ -19,8 +19,17 @@ env/
 # IDE & OS files
 .vscode/
 .idea/
+.kilo/
 *.swp
 *.swo
 *~
 .DS_Store
 Thumbs.db
+~$*.pptx
+~$*.docx
+~$*.xlsx
+
+# Diagnostic & Scratch Files
+_*.txt
+_*.py
+
