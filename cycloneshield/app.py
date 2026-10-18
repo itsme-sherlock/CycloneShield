@@ -118,6 +118,16 @@ except ImportError:
     FALLBACK_VISION_MODEL = "gemini-3.5-flash-lite"
     SAMPLE_DIR = os.path.join(DATA_DIR, "sample_damage")
 
+from geo_locate import (
+    LocationResult,
+    DISTRICTS_PATH,
+    extract_exif_gps,
+    list_districts,
+    resolve_location,
+)
+from evidence_store import new_incident_id, save_incident
+from alerts import publish_alert, should_alert
+
 try:
     from voice_engine import (
         get_audio_path,
@@ -2133,6 +2143,90 @@ _Prepared by CycloneShield for review — not sent_"""
 
 
 # ==============================================================================
+# Location + evidence helpers for Tab 3 (Gemini never judges location)
+# ==============================================================================
+LOCATION_SOURCE_LABELS = {
+    "gps": "📡 GPS (photo EXIF)",
+    "device": "📱 Device location",
+    "manual": "✍️ Manual",
+    "unverified": "⚠️ Unverified",
+}
+
+
+def get_device_coords(key: str) -> Optional[Tuple[float, float]]:
+    """Ask the browser for its location (needs streamlit-js-eval); None until granted."""
+    try:
+        from streamlit_js_eval import get_geolocation
+    except ImportError:
+        st.caption("Device location needs the `streamlit-js-eval` package.")
+        return None
+    geo = get_geolocation(component_key=f"{key}_geo")
+    coords = (geo or {}).get("coords") if isinstance(geo, dict) else None
+    if not coords:
+        st.caption("Waiting for browser location permission...")
+        return None
+    return float(coords["latitude"]), float(coords["longitude"])
+
+
+def get_map_click(key: str) -> Optional[Tuple[float, float]]:
+    """Let the operator click a point on a folium map (needs streamlit-folium)."""
+    try:
+        from streamlit_folium import st_folium
+    except ImportError:
+        return None
+    fmap = folium.Map(location=[19.5, 82.0], zoom_start=5, tiles="CartoDB positron")
+    folium.GeoJson(DISTRICTS_PATH, style_function=lambda _f: {"weight": 1, "fillOpacity": 0.05}).add_to(fmap)
+    out = st_folium(fmap, height=320, key=f"{key}_map", returned_objects=["last_clicked"])
+    click = (out or {}).get("last_clicked")
+    return (click["lat"], click["lng"]) if click else None
+
+
+def render_location_picker(photo_bytes: bytes, key: str) -> LocationResult:
+    """Collect location inputs (EXIF > device > manual) and resolve them to a district."""
+    st.markdown("**📍 Photo location** — set from GPS/device/operator input, never inferred by Gemini")
+    device_coords = manual_coords = manual_id = None
+    if extract_exif_gps(photo_bytes):
+        st.caption("EXIF GPS found in the photo; it takes priority over other sources.")
+    else:
+        st.caption("No EXIF GPS in this photo. Use device location or pick a district.")
+        if st.checkbox("Use this device's location (browser will ask permission)", key=f"{key}_dev"):
+            device_coords = get_device_coords(key)
+        districts = list_districts()
+        by_id = {d["district_id"]: d for d in districts}
+        manual_id = st.selectbox(
+            "Or choose the district manually:",
+            options=[None] + list(by_id),
+            format_func=lambda i: "— not set —" if i is None else f"{by_id[i]['district']}, {by_id[i]['state']}",
+            key=f"{key}_dist",
+        )
+        with st.expander("Or click a point on the map"):
+            manual_coords = get_map_click(key)
+    return resolve_location(photo_bytes, device_coords, manual_id, manual_coords)
+
+
+def run_cloud_pipeline(
+    triage: Dict[str, Any], photo_bytes: bytes, filename: str, loc: LocationResult
+) -> Dict[str, Any]:
+    """Attach location, store evidence in Cloud Storage and publish an alert. Never raises."""
+    loc_dict = loc.to_dict()
+    triage["location"] = loc_dict
+    triage["location_source"] = loc.location_source
+    triage["model_incident_id"] = triage.get("incident_id")
+    triage["incident_id"] = new_incident_id()
+    stored = save_incident(photo_bytes, filename, triage, loc_dict, triage["incident_id"])
+    alert = publish_alert(triage, loc_dict, stored.photo_uri)
+    triage["cloud"] = {
+        "stored": stored.ok,
+        "store_message": stored.message,
+        "photo_uri": stored.photo_uri,
+        "alert_attempted": should_alert(triage),
+        "alert_published": alert.published,
+        "alert_message": alert.message,
+    }
+    return triage
+
+
+# ==============================================================================
 # TAB 3: Ground Damage AI Photo Triage (Google Gemini Multimodal Vision)
 # ==============================================================================
 with tab_vision:
@@ -2195,6 +2289,14 @@ with tab_vision:
             target_img_name = up_file.name
             st.caption(f"📍 **Field Photo Uploaded**: {up_file.name} ({len(up_img_bytes)//1024} KB)")
 
+    photo_bytes: Optional[bytes] = up_img_bytes
+    if photo_bytes is None and sel_img_path and os.path.exists(sel_img_path):
+        with open(sel_img_path, "rb") as _f:
+            photo_bytes = _f.read()
+    loc_result = LocationResult()
+    if photo_bytes:
+        loc_result = render_location_picker(photo_bytes, f"loc_{target_img_name}")
+
     # Execute Triage
     triage_res = None
     if sel_img_path or up_img_bytes:
@@ -2216,6 +2318,7 @@ with tab_vision:
                             filename=target_img_name,
                             force_offline=False
                         )
+                        triage_res = run_cloud_pipeline(triage_res, photo_bytes, target_img_name, loc_result)
                         st.session_state[cache_key] = triage_res
                     except Exception as e:
                         st.error(f"Error during vision triage: {e}")
@@ -2289,7 +2392,7 @@ with tab_vision:
                         <h3 style="margin:2px 0 0 0; font-size:20px; font-weight:800; color:#f8fafc;">
                             {triage_res.get('damage_type', 'Disaster Impact')}
                         </h3>
-                        <div style="font-size:12.5px; color:#38bdf8; margin-top:2px;">📍 {triage_res.get('affected_infrastructure', 'Corridor')}</div>
+                        <div style="font-size:12.5px; color:#38bdf8; margin-top:2px;">🏗️ {triage_res.get('affected_infrastructure', 'Corridor')}</div>
                     </div>
                     <div style="text-align:right;">
                         <span class="{'badge-critical' if sev_score>=4 else 'badge-high'}" title="Damage severity from Level 1 (minor damage) to Level 5 (completely destroyed or deep underwater).">● LEVEL {sev_score} / 5</span>
@@ -2299,7 +2402,45 @@ with tab_vision:
             </div>
             """)
 
-            # 4 Key Emergency Indicators
+            # Trust labels: location, assessment source, confidence, human confirmation
+            cloud = triage_res.get("cloud")
+            shown_loc = triage_res.get("location") if cloud else loc_result.to_dict()
+            loc_src = shown_loc.get("location_source", "unverified")
+            loc_district = shown_loc.get("district")
+            loc_text = f"{loc_district}, {shown_loc.get('state')}" if shown_loc.get("state") else (loc_district or "Location unverified")
+            conf_text = f"{triage_res.get('confidence_score', 0.95)*100:.0f}%" if is_live_vision else "n/a (offline)"
+            assess_text = "Gemini live" if is_live_vision else "Offline fallback"
+            chips = [
+                (f"Location: {LOCATION_SOURCE_LABELS.get(loc_src, loc_src)}", "#ef4444" if loc_src == "unverified" else "#10b981"),
+                (f"Assessment: {assess_text}", "#10b981" if is_live_vision else "#f59e0b"),
+                (f"Confidence: {conf_text}", "#38bdf8"),
+            ]
+            if str(t_tier).upper() == "CRITICAL":
+                chips.append(("🧑‍⚖️ Needs human confirmation", "#ef4444"))
+            chip_html = "".join(
+                f"<span style='display:inline-block; margin:0 6px 6px 0; padding:3px 10px; border-radius:12px; "
+                f"font-size:12px; font-weight:700; color:{c}; border:1px solid {c};'>{html_lib.escape(t)}</span>"
+                for t, c in chips
+            )
+            st.markdown(f"<div>{chip_html}</div>", unsafe_allow_html=True)
+            if loc_src == "unverified":
+                st.warning("Location unverified — no EXIF GPS, device location or manual district. Evidence is filed under _unverified.")
+            elif loc_district == "outside coverage area":
+                st.warning("Location is outside the coverage area (no district match).")
+            else:
+                st.markdown(f"📍 **{loc_text}**" + (" — _overlapping district boundaries; verify_" if shown_loc.get("ambiguous") else ""))
+            if cloud is None:
+                st.caption("☁️ Not saved yet — click Run Damage Triage to store evidence and send alerts.")
+            else:
+                if cloud["stored"]:
+                    st.caption(f"☁️ Stored: {cloud['photo_uri']}")
+                else:
+                    note = "Cloud features not configured" if "not configured" in cloud["store_message"] else "Cloud storage failed"
+                    st.caption(f"☁️ {note} — evidence not stored ({cloud['store_message']})")
+                if cloud["alert_published"]:
+                    st.caption("🔔 Alert published to Pub/Sub.")
+                elif cloud["alert_attempted"]:
+                    st.caption(f"🔔 Alert not sent ({cloud['alert_message']})")
             m1, m2, m3, m4 = st.columns(4)
             m1.markdown(f"<div class='kpi-card'><div class='kpi-label'>Flood Water Level</div><div class='kpi-value' style='font-size:18px; color:#38bdf8;'>{water_str}</div></div>", unsafe_allow_html=True)
             m2.markdown(f"<div class='kpi-card'><div class='kpi-label'>Road Access</div><div class='kpi-value' style='font-size:16px; color:#ef4444;'>{road_stat}</div></div>", unsafe_allow_html=True)

@@ -16,6 +16,50 @@
 
 ---
 
+## 📍 Geo-Evidence & Alerts (Photo Triage)
+
+Gemini judges **damage type and severity only**. Location never comes from the model.
+
+```
+photo ─► geo_locate.py ──► district (point-in-polygon, coastal_districts.geojson)
+          EXIF GPS > device > manual > "unverified"
+photo ─► Gemini (damage + severity) ─┐
+                                     ├─► evidence_store.py ─► gs://BUCKET/<state>/<district>/<incident_id>/
+                                     └─► alerts.py (CRITICAL/HIGH) ─► Pub/Sub topic ─► scripts/alert_subscriber.py
+```
+
+- Unverified locations are filed under `_unverified/`; points outside all polygons under `_outside_coverage/`.
+- The bundled district polygons are coarse, overlapping rectangles: the smallest containing polygon is returned and flagged `ambiguous`.
+- Storage and alerts are optional. Without credentials the app shows "Cloud features not configured" and keeps working.
+- Run tests: `python -m pytest tests`
+
+**Setup** (replace `PROJECT`, `BUCKET`):
+
+```bash
+gcloud services enable storage.googleapis.com pubsub.googleapis.com --project PROJECT
+gcloud storage buckets create gs://BUCKET --project PROJECT --location asia-south1
+gcloud pubsub topics create cyclone-alerts --project PROJECT
+gcloud pubsub subscriptions create cs-alerts-all --topic cyclone-alerts --project PROJECT
+# optional per-district subscription
+gcloud pubsub subscriptions create cs-puri --topic cyclone-alerts --project PROJECT \
+  --message-filter='attributes.district = "Puri"'
+```
+
+Grant the app's service account `roles/storage.objectCreator` on the bucket and `roles/pubsub.publisher` on the topic. Then provide settings in `.streamlit/secrets.toml` (or as environment variables; never commit them):
+
+```toml
+GCS_BUCKET = "BUCKET"
+PUBSUB_TOPIC = "cyclone-alerts"
+GCP_PROJECT = "PROJECT"
+
+[gcp_service_account]   # optional; otherwise Application Default Credentials are used
+# paste the service-account JSON key fields here
+```
+
+Demo the alerts: `python scripts/alert_subscriber.py --project PROJECT --subscription cs-alerts-all`, then run a CRITICAL/HIGH triage in Tab 3.
+
+---
+
 ## 📦 Hackathon Submission Package (Judge Quick-Links)
 
 | Submission Deliverable | Direct Repository Link / URL | Description |

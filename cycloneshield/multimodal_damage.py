@@ -164,6 +164,9 @@ You MUST respond ONLY with a single valid JSON object adhering strictly to this 
   "confidence_score": "float between 0.0 and 1.0"
 }
 
+LOCATION RULE: Judge ONLY damage type and severity. Do NOT identify, guess or infer where the photo was taken
+(no place, district, state, road number or landmark names). Describe infrastructure generically.
+
 Ensure all numerical values and categories reflect tactical operational reality. Do NOT output markdown code fences or explanatory text outside the JSON object.
 """
 
@@ -179,7 +182,7 @@ CALIBRATED_SAMPLE_KNOWLEDGE: Dict[str, Dict[str, Any]] = {
         "threat_tier": "HIGH",
         "estimated_water_depth_m": 1.2,
         "access_impediment": "Complete Blockage",
-        "affected_infrastructure": "State Highway SH-3 (Basanti Arterial Highway) / R760 Coastal Link",
+        "affected_infrastructure": "Two-lane paved arterial highway",
         "visual_observations": [
             "Severe saline floodwaters (~1.2m deep) completely inundating two-lane paved arterial highway",
             "Civilian utility truck partially submerged up to bonnet level; wheel traction entirely lost",
@@ -205,7 +208,7 @@ CALIBRATED_SAMPLE_KNOWLEDGE: Dict[str, Dict[str, Any]] = {
         "threat_tier": "CRITICAL",
         "estimated_water_depth_m": 2.2,
         "access_impediment": "Complete Blockage",
-        "affected_infrastructure": "Saline Coastal Embankment Polder 14/15 Dyke & Agricultural Bund",
+        "affected_infrastructure": "Saline coastal embankment dyke & agricultural bund",
         "visual_observations": [
             "Catastrophic 25-30 meter breach in earthen saline protective dyke during peak high-tide storm surge",
             "High-velocity saltwater surge actively cascading into low-lying agricultural polder and settlements",
@@ -231,7 +234,7 @@ CALIBRATED_SAMPLE_KNOWLEDGE: Dict[str, Dict[str, Any]] = {
         "threat_tier": "CRITICAL",
         "estimated_water_depth_m": 0.9,
         "access_impediment": "Partial Passage (Emergency Boats Only)",
-        "affected_infrastructure": "Sundarbans Rural Primary Health Centre (PHC) & Emergency Maternity Clinic",
+        "affected_infrastructure": "Rural Primary Health Centre (PHC) & emergency maternity clinic",
         "visual_observations": [
             "Ground-floor clinical entrance, emergency ramp, and triage porch flooded under ~0.9m brackish water",
             "Emergency ambulance immobilized in facility courtyard with water submerged past wheel axles",
@@ -324,7 +327,7 @@ def get_calibrated_offline_vision_triage(
         "threat_tier": "MODERATE",
         "estimated_water_depth_m": 0.8,
         "access_impediment": "Partial Blockage",
-        "affected_infrastructure": f"Coastal Sector Transport Corridor & Assets ({clean_name})",
+        "affected_infrastructure": "Coastal transport corridor & assets (generic screening estimate)",
         "visual_observations": [
             f"Field photograph '{clean_name}' ({file_size_kb} KB) processed via Zero-Key Calibrated Vision Engine",
             "Waterlogging and debris obstruction detected along low-lying access corridor",
@@ -582,21 +585,21 @@ def load_sample_damage_images() -> List[Dict[str, str]]:
     samples = [
         {
             "id": "flooded_highway",
-            "name": "State Highway SH-3 (Basanti Corridor Submersion)",
+            "name": "State Highway Corridor Submersion",
             "filename": "flooded_highway.jpg",
             "scenario": "Severed arterial highway under 1.2m storm surge with stranded pickup truck",
             "expected_tier": "HIGH"
         },
         {
             "id": "broken_embankment",
-            "name": "Sundarbans Saline Embankment Dyke Breach",
+            "name": "Saline Embankment Dyke Breach",
             "filename": "broken_embankment.jpg",
             "scenario": "30-meter catastrophic dyke breach with saltwater surge flooding village huts",
             "expected_tier": "CRITICAL"
         },
         {
             "id": "submerged_clinic",
-            "name": "Sundarbans Rural Hospital & PHC Inundation",
+            "name": "Rural Hospital & PHC Inundation",
             "filename": "submerged_clinic.jpg",
             "scenario": "Flooded healthcare entrance, waterlogged ambulance & oxygen supply triage",
             "expected_tier": "CRITICAL"
