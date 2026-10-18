@@ -30,6 +30,18 @@ from typing import Any, Dict, Optional
 UNVERIFIED_PREFIX = "_unverified"
 OUTSIDE_PREFIX = "_outside_coverage"
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+try:
+    from dotenv import load_dotenv
+    for _env_path in [
+        os.path.join(BASE_DIR, ".env"),
+        os.path.join(os.path.dirname(BASE_DIR), ".env"),
+    ]:
+        if os.path.exists(_env_path):
+            load_dotenv(_env_path)
+except ImportError:
+    pass
+
 
 @dataclass
 class StoreResult:
